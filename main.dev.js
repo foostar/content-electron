@@ -1,6 +1,4 @@
 const {BrowserWindow, app, session} = require('electron');
-const path = require('path');
-const url = require('url');
 
 let mainWindow;
 
@@ -41,7 +39,7 @@ function createWindow () {
     //     mainWindow.loadURL('https://console.apps.xiaoyun.com');
     // }, 5000);
 
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
 
     mainWindow.on('closed', function () {
         mainWindow = null;

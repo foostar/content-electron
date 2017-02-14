@@ -27,6 +27,10 @@ const config = {
                     'css-loader?modules&constLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]',
                     'stylus-loader'
                 ]
+            },
+            {
+                test: /\.(png|jpg)$/,
+                use: ['file-loader?name=/[path][name].[ext]']
             }
 
         ]
@@ -53,24 +57,24 @@ if (process.env.NODE_ENV === 'production') {
     config.plugins.push(
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': `"procution"`
-        }),
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                warnings: false,
-                screw_ie8: true,
-                conditionals: true,
-                unused: true,
-                comparisons: true,
-                sequences: true,
-                dead_code: true,
-                evaluate: true,
-                if_return: true,
-                join_vars: true
-            },
-            output: {
-                comments: false
-            }
         })
+        // new webpack.optimize.UglifyJsPlugin({
+        //     compress: {
+        //         warnings: false,
+        //         screw_ie8: true,
+        //         conditionals: true,
+        //         unused: true,
+        //         comparisons: true,
+        //         sequences: true,
+        //         dead_code: true,
+        //         evaluate: true,
+        //         if_return: true,
+        //         join_vars: true
+        //     },
+        //     output: {
+        //         comments: false
+        //     }
+        // })
     );
 }
 
