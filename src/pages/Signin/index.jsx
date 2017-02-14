@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Form, Icon, Input, Button} from 'antd';
+import {Form, Icon, Input, Button, message} from 'antd';
 
 import style from './style.styl';
 
@@ -11,6 +11,7 @@ export default class extends Component {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
+                message.info(`username: ${values.username}, password: ${values.password}`);
                 console.log('Received values of form: ', values);
             }
         });
