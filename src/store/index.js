@@ -13,7 +13,6 @@ const errorMiddleware = store => next => async action => {
         let description = '未知错误';
         let show = true;
         try {
-            console.log(action.payload.result.status);
             const {message, code} = action.payload.result.status;
             description = `[${code}]: ${message}`;
         } catch (err) {}
