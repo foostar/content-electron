@@ -1,18 +1,41 @@
 import React, {Component} from 'react';
 import {Form, Icon, Input, Button, message} from 'antd';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import {hashHistory} from 'react-router';
+import * as actions from 'reducers/passport';
 
 import style from './style.styl';
 
 const FormItem = Form.Item;
 
+const mapStateToProps = state => {
+    return {
+        passport: state.passport
+    };
+};
+const mapDispatchToProps = dispatch => {
+    return bindActionCreators(actions, dispatch);
+};
+
+@connect(mapStateToProps, mapDispatchToProps)
 @Form.create()
 export default class extends Component {
+    componentDidMount () {
+        message.info(JSON.stringify(this.props.passport));
+    }
+
     handleSubmit = (e) => {
         e.preventDefault();
-        this.props.form.validateFields((err, values) => {
-            if (!err) {
-                message.info(`username: ${values.username}, password: ${values.password}`);
-                console.log('Received values of form: ', values);
+        this.props.form.validateFields(async (err, values) => {
+            if (err) return;
+            const {username, password} = values;
+            const res = await this.props.signin({
+                body: {username, password}
+            });
+            console.log(res);
+            if (res.type === 'SIGN_IN_SUCCESS') {
+                hashHistory.replace('/');
             }
         });
     }
