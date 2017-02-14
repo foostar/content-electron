@@ -8,12 +8,13 @@ import Layout from 'pages/Layout';
 import Signin from 'pages/Signin';
 
 export default (store) => {
+    function hasPassport () {
+        return store.getState().passport.data.token;
+    }
     function onChange (prevState, nextState, replace) {
-        const state = store.getState();
-        if (state.passport) {
-            console.error('[on change]: no auth');
-            replace('/signin');
-        }
+        if (hasPassport()) return;
+        console.error(`[NO PASSPORT]: Change to ${nextState.location.pathname}!`);
+        replace('/signin');
         notification.warning({
             message: '登录信息过期',
             description: '请重新登录'
@@ -21,11 +22,9 @@ export default (store) => {
     }
 
     function onEnter (nextState, replace) {
-        const state = store.getState();
-        if (state.passport) {
-            console.error('[on enter]: no auth');
-            replace('/signin');
-        }
+        if (hasPassport()) return;
+        console.error(`[NO PASSPORT]: Enter to ${nextState.location.pathname}!`);
+        replace('/signin');
     }
 
     return (

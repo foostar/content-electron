@@ -9,8 +9,8 @@ const INITAL = {
 
 export const signin = makeAction(HUSSIF, {
     type: 'SIGN_IN',
-    endpoint: '/siginin',
-    method: 'GET',
+    endpoint: '/signin',
+    method: 'POST',
     request: (state, payload) => update(state, {
         fetching: { $set: true }
     }),
