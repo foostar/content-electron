@@ -1,10 +1,14 @@
-import { makeAction, createReducer } from 'redux-act-async-api';
+import {makeAction, createReducer} from 'middleware/api';
+import {createAction} from 'redux-act';
+
 import update from 'react/lib/update';
 
 const HUSSIF = {};
 const INITAL = {
     fetching: false,
-    data: []
+    data: {
+        token: localStorage.getItem('token')
+    }
 };
 
 export const signin = makeAction(HUSSIF, {
@@ -12,15 +16,28 @@ export const signin = makeAction(HUSSIF, {
     endpoint: '/signin',
     method: 'POST',
     request: (state, payload) => update(state, {
-        fetching: { $set: true }
+        fetching: {$set: true}
     }),
-    success: (state, payload) => update(state, {
-        fetching: { $set: false },
-        data: { $set: payload.result.data }
-    }),
+    success: (state, payload) => {
+        const {data} = payload.result;
+        localStorage.setItem('token', data.token);
+        return update(state, {
+            fetching: { $set: false },
+            data: {$set: payload.result.data}
+        });
+    },
     failure: (state, payload) => update(state, {
-        fetching: { $set: true }
+        fetching: {$set: true}
     })
 });
+
+export const signout = createAction('SIGN_OUT');
+
+HUSSIF[signout] = (state) => {
+    localStorage.clear();
+    return update(state, {
+        data: {$set: {}}
+    });
+};
 
 export default createReducer(HUSSIF, INITAL);

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Form, Icon, Input, Button, message} from 'antd';
+import {Form, Icon, Input, Button} from 'antd';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {hashHistory} from 'react-router';
@@ -15,26 +15,26 @@ const mapStateToProps = state => {
     };
 };
 const mapDispatchToProps = dispatch => {
-    return bindActionCreators(actions, dispatch);
+    return {
+        actions: bindActionCreators(actions, dispatch)
+    };
 };
 
 @connect(mapStateToProps, mapDispatchToProps)
 @Form.create()
-export default class extends Component {
+export default class Signin extends Component {
     componentDidMount () {
-        message.info(JSON.stringify(this.props.passport));
+        this.props.actions.signout();
     }
-
     handleSubmit = (e) => {
         e.preventDefault();
         this.props.form.validateFields(async (err, values) => {
             if (err) return;
             const {username, password} = values;
-            const res = await this.props.signin({
+            const {type} = await this.props.actions.signin({
                 body: {username, password}
             });
-            console.log(res);
-            if (res.type === 'SIGN_IN_SUCCESS') {
+            if (type === 'SIGN_IN_SUCCESS') {
                 hashHistory.replace('/');
             }
         });
@@ -47,18 +47,23 @@ export default class extends Component {
                     {getFieldDecorator('username', {
                         rules: [{ required: true, message: '请输入账号!' }]
                     })(
-                        <Input addonBefore={<Icon type='user' />} placeholder='账号' />
+                        <Input
+                            placeholder='账号'
+                            addonBefore={<Icon type='user' />}
+                        />
                     )}
                 </FormItem>
-
                 <FormItem>
                     {getFieldDecorator('password', {
                         rules: [{ required: true, message: '请输入密码!' }]
                     })(
-                        <Input addonBefore={<Icon type='lock' />} type='password' placeholder='密码' />
+                        <Input
+                            type='password'
+                            placeholder='密码'
+                            addonBefore={<Icon type='lock' />}
+                        />
                      )}
                 </FormItem>
-
                 <FormItem>
                     <Button type='primary' htmlType='submit' style={{width: '100%'}}>
                         登录

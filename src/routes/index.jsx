@@ -6,6 +6,9 @@ import {notification} from 'antd';
 import HomePage from 'pages/HomePage';
 import Layout from 'pages/Layout';
 import Signin from 'pages/Signin';
+import Articles from 'pages/Articles';
+import User from 'pages/User';
+import GitHub from 'pages/GitHub';
 
 export default (store) => {
     function hasPassport () {
@@ -13,7 +16,7 @@ export default (store) => {
     }
     function onChange (prevState, nextState, replace) {
         if (hasPassport()) return;
-        console.error(`[NO PASSPORT]: Change to ${nextState.location.pathname}!`);
+        console.info(`[NO PASSPORT]: Change to ${nextState.location.pathname}!`);
         replace('/signin');
         notification.warning({
             message: '登录信息过期',
@@ -23,7 +26,7 @@ export default (store) => {
 
     function onEnter (nextState, replace) {
         if (hasPassport()) return;
-        console.error(`[NO PASSPORT]: Enter to ${nextState.location.pathname}!`);
+        console.info(`[NO PASSPORT]: Enter to ${nextState.location.pathname}!`);
         replace('/signin');
     }
 
@@ -36,6 +39,9 @@ export default (store) => {
                 onChange={onChange}
             >
                 <IndexRoute component={HomePage} />
+                <Route path='articles' component={Articles} />
+                <Route path='user' component={User} />
+                <Route path='github' component={GitHub} />
             </Route>
 
         </Route>

@@ -1,11 +1,14 @@
 import React from 'react';
+import {Spin} from 'antd';
+
+import style from './style.styl';
 
 export default class extends React.Component {
     state = {
         loading: true
     }
     componentDidMount () {
-        const {style = {}, className, ...restProps} = this.props;
+        const {style = {}, className, src = '', ...restProps} = this.props;
         const {webview} = this.refs;
 
         Object.entries(restProps).map(([k, v]) => {
@@ -17,8 +20,9 @@ export default class extends React.Component {
         });
 
         webview.className = className;
+        webview.setAttribute('src', src);
 
-        webview.addEventListener('did-stop-loading', () => {
+        webview.addEventListener('dom-ready', () => {
             this.setState({
                 loading: false
             });
@@ -27,7 +31,11 @@ export default class extends React.Component {
 
     render () {
         return (
-            <webview ref='webview' />
+            <div className={style.container}>
+                <Spin spinning={this.state.loading}>
+                    <webview ref='webview' />
+                </Spin>
+            </div>
         );
     }
 }

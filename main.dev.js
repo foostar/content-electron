@@ -31,17 +31,7 @@ function createWindow () {
 
     mainWindow.loadURL('http://localhost:8000/');
 
-    // mainWindow.loadURL(url.format({
-    //     pathname: path.join(__dirname, 'pages', 'index.html'),
-    //     protocol: 'file:',
-    //     slashes: true
-    // }));
-
-    // setTimeout(() => {
-    //     mainWindow.loadURL('https://console.apps.xiaoyun.com');
-    // }, 5000);
-
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
 
     mainWindow.on('closed', function () {
         mainWindow = null;

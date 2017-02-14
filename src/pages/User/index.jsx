@@ -1,11 +1,10 @@
 import React, {Component} from 'react';
-// import style from './style.styl';
 
-export default class extends Component {
+export default class User extends Component {
     render () {
         return (
             <div>
-                <h1>HomePage</h1>
+                <h1>User</h1>
             </div>
         );
     }
