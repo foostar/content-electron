@@ -5,8 +5,8 @@ export default class extends Component {
     render () {
         return (
             <WebView
-                autoresize
-                src='https://github.com'
+                partition='persist:console'
+                src='http://console.apps.xiaoyun.com'
             />
         );
     }

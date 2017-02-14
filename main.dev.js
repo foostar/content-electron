@@ -1,6 +1,4 @@
 const {BrowserWindow, app, session} = require('electron');
-const path = require('path');
-const url = require('url');
 
 let mainWindow;
 
@@ -13,15 +11,18 @@ function setCookies (cookies) {
 }
 
 function createWindow () {
-    setCookies([{
-        url: 'https://github.com',
-        name: 'user_session',
-        value: 'COz6RpLclOx4QoXjG8pUqd0_f5_vohtP7ier9RZiboiIb-TA'
-    }, {
-        url: 'https://console.apps.xiaoyun.com',
-        name: 'console-ssr',
-        value: 's%3Af3p0_OF5s7HvfZhZEmm6gjhR9GME_00J.%2FkO6spjV%2B32%2FvfA7SD3Ot86opoJCBbRMC3hAalVHK9k'
-    }]);
+    setCookies([
+        {
+            url: 'https://github.com',
+            name: 'user_session',
+            value: 'COz6RpLclOx4QoXjG8pUqd0_f5_vohtP7ier9RZiboiIb-TA'
+        }
+        // {
+        //     url: 'https://console.apps.xiaoyun.com',
+        //     name: 'console-ssr',
+        //     value: 's%3Af3p0_OF5s7HvfZhZEmm6gjhR9GME_00J.%2FkO6spjV%2B32%2FvfA7SD3Ot86opoJCBbRMC3hAalVHK9k'
+        // }
+    ]);
 
     mainWindow = new BrowserWindow({
         width: 800,

@@ -9,6 +9,7 @@ import Signin from 'pages/Signin';
 import Articles from 'pages/Articles';
 import User from 'pages/User';
 import GitHub from 'pages/GitHub';
+import Console from 'pages/Console';
 
 export default (store) => {
     function hasPassport () {
@@ -42,6 +43,7 @@ export default (store) => {
                 <Route path='articles' component={Articles} />
                 <Route path='user' component={User} />
                 <Route path='github' component={GitHub} />
+                <Route path='console' component={Console} />
             </Route>
 
         </Route>

@@ -1,12 +1,12 @@
 import {createStore, applyMiddleware} from 'redux';
-import {apiMiddleware} from 'middleware/api';
+import {apiMiddleware} from 'middlewares/api';
 
 import reducers from 'reducers';
 
 import config from 'config';
 
 const {API_PREFIX} = config;
-import errorMiddleware from 'middleware/error';
+import errorMiddleware from 'middlewares/error';
 
 const middleware = [
     apiMiddleware({API_PREFIX}),

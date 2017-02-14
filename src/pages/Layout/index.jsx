@@ -32,14 +32,7 @@ export default class Layout extends Component {
                         <span>文章</span>
                     </Item>
 
-                    <SubMenu key='sub1' title={<span><Icon type='user' />用户</span>}>
-                        <Item key='/signin'>
-                            <Icon type='logout' />
-                            <span>登出</span>
-                        </Item>
-                    </SubMenu>
-
-                    <SubMenu key='sub2' title={<span><Icon type='setting' />其他</span>}>
+                    <SubMenu key='sub' title={<span><Icon type='setting' />其他</span>}>
                         <Item key='/github'>
                             <Icon type='github' />
                             <span>GitHub</span>
@@ -49,6 +42,10 @@ export default class Layout extends Component {
                             <span>Console</span>
                         </Item>
                     </SubMenu>
+                    <Item key='/signin'>
+                        <Icon type='logout' />
+                        <span>登出</span>
+                    </Item>
                 </Menu>
                 <div className={style.content}>
                     {this.props.children}
