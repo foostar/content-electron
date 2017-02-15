@@ -26,6 +26,11 @@ export default class LeftMenu extends Component {
                     <span>主页</span>
                 </Item>
 
+                <Item key='/editor'>
+                    <Icon type='edit' />
+                    <span>新建文章</span>
+                </Item>
+
                 <Item key='/articles'>
                     <Icon type='switcher' />
                     <span>文章管理</span>
