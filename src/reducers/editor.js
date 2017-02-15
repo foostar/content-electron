@@ -1,5 +1,5 @@
-import { createReducer } from 'redux-act-async-api';
-import { createAction } from 'redux-act';
+import {createReducer} from 'middlewares/api';
+import {createAction} from 'redux-act';
 // import update from 'react/lib/update';
 
 const HUSSIF = {};
