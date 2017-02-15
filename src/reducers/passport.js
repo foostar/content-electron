@@ -22,7 +22,7 @@ export const signin = makeAction(HUSSIF, {
         const {data} = payload.result;
         localStorage.setItem('token', data.token);
         return update(state, {
-            fetching: { $set: false },
+            fetching: {$set: false},
             data: {$set: data}
         });
     },
