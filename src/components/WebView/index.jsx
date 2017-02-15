@@ -1,5 +1,5 @@
 import React from 'react';
-import {Spin} from 'antd';
+import {Spin, Icon} from 'antd';
 import style from './style.styl';
 
 import WEBVIEW_EVENT from './webview-events';
@@ -40,7 +40,6 @@ export default class extends React.Component {
     onDomReady = () => {
         const {webview} = this.refs;
         this.setState({loading: false});
-        webview.openDevTools();
         this.props.onDomReady && this.props.onDomReady(webview);
     }
 
@@ -61,9 +60,20 @@ export default class extends React.Component {
         });
     }
 
+    openDevTools = () => {
+        this.refs.webview.openDevTools();
+    }
+
     render () {
         return (
             <div className={style.container}>
+                {process.env.NODE_ENV !== 'production' &&
+                    <Icon
+                        type='setting'
+                        className={style['dev-tool']}
+                        onClick={this.openDevTools}
+                    />
+                }
                 <Spin spinning={this.state.loading}>
                     <webview ref='webview' style={{width: '100%', height: '100%'}} />
                 </Spin>
