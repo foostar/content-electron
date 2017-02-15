@@ -27,6 +27,10 @@ const config = {
                     'css-loader?modules&constLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]',
                     'stylus-loader'
                 ]
+            },
+            {
+                test: /\.(png)|(gif)|(jpg)$/,
+                use: ['url-loader']
             }
 
         ]

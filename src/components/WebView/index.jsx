@@ -5,9 +5,8 @@ import style from './style.styl';
 import WEBVIEW_EVENT from './webview-events';
 
 export default class extends React.Component {
-    state = {
-        loading: true
-    }
+    state = {loading: true}
+
     componentDidMount () {
         this.setAttribute();
 
@@ -18,6 +17,7 @@ export default class extends React.Component {
         this.bindEvent();
         this.refs.webview.setAttribute('src', this.props.src);
     }
+
     componentWillUnmount () {
         this.unbindEvent();
     }
@@ -36,12 +36,14 @@ export default class extends React.Component {
             this.refs.webview.setAttribute(k, v);
         });
     }
+
     onDomReady = () => {
         const {webview} = this.refs;
         this.setState({loading: false});
         webview.openDevTools();
         this.props.onDomReady && this.props.onDomReady(webview);
     }
+
     bindEvent () {
         const {webview} = this.refs;
         webview.addEventListener('dom-ready', this.onDomReady);
@@ -50,6 +52,7 @@ export default class extends React.Component {
             webview.addEventListener(event, this.props[handler].bind(webview));
         });
     }
+
     unbindEvent () {
         const {webview} = this.refs;
         webview.removeEventListener('dom-ready', this.onDomReady);
@@ -57,6 +60,7 @@ export default class extends React.Component {
             webview.removeEventListener(event, this.props.handler);
         });
     }
+
     render () {
         return (
             <div className={style.container}>

@@ -5,6 +5,8 @@ import { bindActionCreators } from 'redux';
 import {hashHistory} from 'react-router';
 import * as actions from 'reducers/passport';
 
+import bgGif from './cat.gif';
+
 import style from './style.styl';
 
 const FormItem = Form.Item;
@@ -42,34 +44,37 @@ export default class Signin extends Component {
     render () {
         const {getFieldDecorator} = this.props.form;
         return (
-            <Form onSubmit={this.handleSubmit} className={style['login-form']}>
-                <FormItem>
-                    {getFieldDecorator('username', {
-                        rules: [{ required: true, message: '请输入账号!' }]
-                    })(
-                        <Input
-                            placeholder='账号'
-                            addonBefore={<Icon type='user' />}
-                        />
-                    )}
-                </FormItem>
-                <FormItem>
-                    {getFieldDecorator('password', {
-                        rules: [{ required: true, message: '请输入密码!' }]
-                    })(
-                        <Input
-                            type='password'
-                            placeholder='密码'
-                            addonBefore={<Icon type='lock' />}
-                        />
-                     )}
-                </FormItem>
-                <FormItem>
-                    <Button type='primary' htmlType='submit' style={{width: '100%'}}>
-                        登录
-                    </Button>
-                </FormItem>
-            </Form>
+            <div className={style.container}>
+                <img className={style.bicycle} src={bgGif} />
+                <Form onSubmit={this.handleSubmit} className={style['login-form']}>
+                    <FormItem>
+                        {getFieldDecorator('username', {
+                            rules: [{ required: true, message: '请输入账号!' }]
+                        })(
+                            <Input
+                                placeholder='账号'
+                                addonBefore={<Icon type='user' />}
+                            />
+                        )}
+                    </FormItem>
+                    <FormItem>
+                        {getFieldDecorator('password', {
+                            rules: [{ required: true, message: '请输入密码!' }]
+                        })(
+                            <Input
+                                type='password'
+                                placeholder='密码'
+                                addonBefore={<Icon type='lock' />}
+                            />
+                        )}
+                    </FormItem>
+                    <FormItem>
+                        <Button type='primary' htmlType='submit' style={{width: '100%'}}>
+                            登录
+                        </Button>
+                    </FormItem>
+                </Form>
+            </div>
         );
     }
 }
