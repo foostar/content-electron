@@ -7,13 +7,18 @@ import WEBVIEW_EVENT from './webview-events';
 export default class extends React.Component {
     state = {loading: true}
     componentDidMount () {
+        const {webview} = this.refs;
+
+        this.props.ref && this.props.ref(webview);
+
         this.setAttribute();
+
         this.handleEvents = Object.keys(this.props)
             .map(key => ({event: camel2Hyphen(key), handler: key}))
             .filter(({event}) => WEBVIEW_EVENT.includes(event));
 
         this.bindEvent();
-        this.refs.webview.setAttribute('src', this.props.src);
+        webview.setAttribute('src', this.props.src);
     }
     componentWillUnmount () {
         this.unbindEvent();
