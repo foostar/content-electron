@@ -18,7 +18,7 @@ const config = {
             },
             {
                 test: /\.css$/,
-                use: ['style-loader', 'css-loader']
+                use: ['style-loader', 'css-loader?root=.']
             },
             {
                 test: /\.styl$/,
@@ -31,6 +31,22 @@ const config = {
             {
                 test: /\.(png|jpg)$/,
                 use: ['file-loader?name=/[path][name].[ext]']
+            },
+            {
+                test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
+                loader: 'file-loader?limit=10000&mimetype=application/font-woff'
+            }, {
+                test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
+                loader: 'file-loader?limit=10000&mimetype=application/font-woff'
+            }, {
+                test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
+                loader: 'file-loader?limit=10000&mimetype=application/octet-stream'
+            }, {
+                test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
+                loader: 'file-loader'
+            }, {
+                test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+                loader: 'file-loader?limit=10000&mimetype=image/svg+xml'
             }
 
         ]
@@ -41,10 +57,15 @@ const config = {
             path.resolve(__dirname, 'src')
         ],
         extensions: ['.js', '.jsx', '.json']
+        // modulesDirectories: ['node_modules']
     },
     plugins: [
         new HtmlWebpackPlugin({
             template: path.join(__dirname, 'src', 'index.html')
+        }),
+        new webpack.ProvidePlugin({
+            $: 'jquery',
+            jQuery: 'jquery'
         })
     ],
     devServer: {
