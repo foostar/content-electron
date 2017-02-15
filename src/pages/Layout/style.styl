@@ -6,3 +6,12 @@
 .content
     flex 1
     position relative
+
+:global
+    .change-route-enter
+        opacity 0.01
+        transform translate3d(15px,0,0)
+    .change-route-enter.change-route-enter-active
+        opacity 1
+        transform translate3d(0,0,0)
+        transition 500ms

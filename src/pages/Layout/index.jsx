@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import ReactCSSTransitionGroup from 'react/lib/ReactCSSTransitionGroup';
 import {hashHistory} from 'react-router';
 
 import { Menu, Icon } from 'antd';
@@ -28,8 +29,8 @@ export default class Layout extends Component {
                     </Item>
 
                     <Item key='/articles'>
-                        <Icon type='user' />
-                        <span>文章</span>
+                        <Icon type='edit' />
+                        <span>写文章</span>
                     </Item>
 
                     <SubMenu key='sub' title={<span><Icon type='setting' />其他</span>}>
@@ -48,7 +49,18 @@ export default class Layout extends Component {
                     </Item>
                 </Menu>
                 <div className={style.content}>
-                    {this.props.children}
+                    <ReactCSSTransitionGroup
+                        transitionName='change-route'
+                        transitionEnterTimeout={500}
+                        transitionLeave={false}
+                    >
+                        {
+                            React.cloneElement(
+                                this.props.children,
+                                {key: this.props.location.pathname}
+                            )
+                        }
+                    </ReactCSSTransitionGroup>
                 </div>
             </div>
         );
