@@ -1,46 +1,38 @@
 import React from 'react';
 import {Spin, Icon} from 'antd';
 import style from './style.styl';
+import _ from 'lodash';
 
-import WEBVIEW_EVENT from './webview-events';
+import {WEBVIEW_EVENT, AVAILABLE_SETATTRIBUTES} from './util';
 
 export default class extends React.Component {
     state = {loading: true}
     componentDidMount () {
-        const {webview} = this.refs;
-
-        this.props.ref && this.props.ref(webview);
-
+        this.props.getRef && this.props.getRef(this.refs.webview);
         this.setAttribute();
-
         this.handleEvents = Object.keys(this.props)
             .map(key => ({event: camel2Hyphen(key), handler: key}))
             .filter(({event}) => WEBVIEW_EVENT.includes(event));
 
         this.bindEvent();
-        webview.setAttribute('src', this.props.src);
+        this.refs.webview.setAttribute('src', this.props.src);
     }
     componentWillUnmount () {
         this.unbindEvent();
     }
     setAttribute () {
-        /*eslint-disable */
-        const {
-            style,
-            className,
-            src = '',
-            ...restProps
-        } = this.props;
-        /*eslint-enable */
-
-        Object.entries(restProps).map(([k, v]) => {
+        Object.entries(
+            _.pickBy(
+                this.props,
+                (value, key) => AVAILABLE_SETATTRIBUTES.includes(key)
+            )
+        ).map(([k, v]) => {
             this.refs.webview.setAttribute(k, v);
         });
     }
-    onDomReady = () => {
-        const {webview} = this.refs;
+    onDomReady = (...args) => {
         this.setState({loading: false});
-        this.props.onDomReady && this.props.onDomReady(webview);
+        this.props.onDomReady && this.props.onDomReady(...args);
     }
     bindEvent () {
         const {webview} = this.refs;

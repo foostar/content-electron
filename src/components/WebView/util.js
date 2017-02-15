@@ -1,4 +1,4 @@
-export default [
+export const WEBVIEW_EVENT = [
     'load-commit',
     'did-finish-load',
     'did-fail-load',
@@ -32,3 +32,17 @@ export default [
     'devtools-closed',
     'devtools-focused'
 ];
+
+export const AVAILABLE_SETATTRIBUTES = [
+    'partition',
+    'disablewebsecurity',
+    'useragent',
+    'httpreferrer',
+    'preload',
+    'nodeintegration',
+    'autosize',
+    'allowpopups',
+    'webpreferences',
+    'blinkfeatures'
+];
+

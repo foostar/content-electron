@@ -1,20 +1,31 @@
 import React, {Component} from 'react';
+import {ipcRenderer} from 'electron';
+
 import WebView from 'components/WebView';
 import Page from 'components/Page';
 
+const isConsoleLogin = `window.__INITIAL_STATE__;`;
+
 export default class extends Component {
-    onDidFinishLoad () {
-        console.log('onDidFinishLoad success');
+    getCookies (isLogin) {
+        if (!isLogin) return;
+        ipcRenderer.send('GET_COOKISE_BY_PARTITION', 'persist:console');
     }
-    ref = webview => {
-        this.webview = webview;
+    onDidStopLoading = (...args) => {
+        if (this.webview.getURL() === 'http://console.apps.xiaoyun.com/') {
+            this.webview.executeJavaScript(
+                isConsoleLogin,
+                this.getCookies
+            );
+        }
     }
     render () {
         return (
             <Page>
                 <WebView
-                    ref={this.ref}
-                    onDidFinishLoad={this.onDidFinishLoad}
+                    getRef={webview => { this.webview = webview; }}
+                    onDidStopLoading={this.onDidStopLoading}
+                    onDomReady={this.onDomReady}
                     partition='persist:console'
                     src='http://console.apps.xiaoyun.com'
                 />
