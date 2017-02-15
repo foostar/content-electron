@@ -8,6 +8,7 @@ import Layout from 'pages/Layout';
 import Signin from 'pages/Signin';
 import Articles from 'pages/Articles';
 import User from 'pages/User';
+import NotFound from 'pages/NotFound';
 import GitHub from 'pages/GitHub';
 import Console from 'pages/Console';
 
@@ -44,8 +45,8 @@ export default (store) => {
                 <Route path='user' component={User} />
                 <Route path='github' component={GitHub} />
                 <Route path='console' component={Console} />
+                <Route path='*' component={NotFound} />
             </Route>
-
         </Route>
     );
 };

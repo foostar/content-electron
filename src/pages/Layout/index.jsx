@@ -29,11 +29,19 @@ export default class Layout extends Component {
                     </Item>
 
                     <Item key='/articles'>
-                        <Icon type='edit' />
-                        <span>写文章</span>
+                        <Icon type='switcher' />
+                        <span>文章管理</span>
                     </Item>
 
-                    <SubMenu key='sub' title={<span><Icon type='setting' />其他</span>}>
+                    <SubMenu key='sub' title={<span><Icon type='setting' />管理员</span>}>
+                        <Item key='/admin/articles'>
+                            <Icon type='switcher' />
+                            <span>管理文章</span>
+                        </Item>
+                        <Item key='/admin/users'>
+                            <Icon type='team' />
+                            <span>管理用户</span>
+                        </Item>
                         <Item key='/github'>
                             <Icon type='github' />
                             <span>GitHub</span>
@@ -43,25 +51,27 @@ export default class Layout extends Component {
                             <span>Console</span>
                         </Item>
                     </SubMenu>
+
                     <Item key='/signin'>
                         <Icon type='logout' />
                         <span>登出</span>
                     </Item>
                 </Menu>
-                <div className={style.content}>
-                    <ReactCSSTransitionGroup
-                        transitionName='change-route'
-                        transitionEnterTimeout={500}
-                        transitionLeave={false}
-                    >
-                        {
-                            React.cloneElement(
-                                this.props.children,
-                                {key: this.props.location.pathname}
-                            )
-                        }
-                    </ReactCSSTransitionGroup>
-                </div>
+
+                <ReactCSSTransitionGroup
+                    className={style.content}
+                    component='main'
+                    transitionName='change-route'
+                    transitionEnterTimeout={500}
+                    transitionLeave={false}
+                >
+                    {
+                        React.cloneElement(
+                            this.props.children,
+                            {key: this.props.location.pathname}
+                        )
+                    }
+                </ReactCSSTransitionGroup>
             </div>
         );
     }
