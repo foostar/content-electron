@@ -1,11 +1,20 @@
 {
     "parser": "babel-eslint",
     "extends": ["standard", "standard-react"],
+    "globals": {
+        "FormData": true,
+        "fetch": true
+    },
     "rules": {
         "indent": ["error", 4],
+        "no-class-assign": 0,
         "semi": ["error", "always"],
         "react/jsx-indent": ["error", 4],
         "react/jsx-indent-props": ["error", 4],
         "react/prop-types": "off"
+    },
+    "globals": {
+        "fetch": true,
+        "localStorage": true
     }
 }
