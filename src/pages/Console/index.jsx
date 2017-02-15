@@ -4,20 +4,28 @@ import {ipcRenderer} from 'electron';
 import WebView from 'components/WebView';
 import Page from 'components/Page';
 
-const isConsoleLogin = `window.__INITIAL_STATE__;`;
+const getAccountScript = `window.__INITIAL_STATE__.passport.name;`;
 
 export default class extends Component {
-    getCookies (isLogin) {
-        if (!isLogin) return;
-        ipcRenderer.send('GET_COOKISE_BY_PARTITION', 'persist:console');
+    sendGetCookiesRequest (account) {
+        if (!account) return;
+
+        ipcRenderer.send(
+            'GET_COOKISES_BY_PARTITION_REQUEST',
+            {
+                account,
+                platform: '小云 • console',
+                partition: 'persist:console'
+            }
+        );
     }
-    onDidStopLoading = (...args) => {
-        if (this.webview.getURL() === 'http://console.apps.xiaoyun.com/') {
-            this.webview.executeJavaScript(
-                isConsoleLogin,
-                this.getCookies
-            );
-        }
+    onDidStopLoading = () => {
+        if (this.webview.getURL() !== 'http://console.apps.xiaoyun.com/') return;
+
+        this.webview.executeJavaScript(
+            getAccountScript,
+            this.sendGetCookiesRequest
+        );
     }
     render () {
         return (
