@@ -33,7 +33,7 @@ export const WEBVIEW_EVENT = [
     'devtools-focused'
 ];
 
-export const AVAILABLE_SETATTRIBUTES = [
+export const AVAILABLE_ATTRIBUTES = [
     'partition',
     'disablewebsecurity',
     'useragent',
