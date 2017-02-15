@@ -1,25 +1,34 @@
 import React, {Component} from 'react';
+import ReactCSSTransitionGroup from 'react/lib/ReactCSSTransitionGroup';
+import LeftMenu from './LeftMenu';
 import {Link} from 'react-router';
 import {Button} from 'antd';
+// import logo from '../../images/xiaoyun-logo@2x.png';
 import style from './style.styl';
 
-export default class extends Component {
+export default class Layout extends Component {
     render () {
+        const {pathname} = this.props.location;
         return (
             <div className={style.container}>
-                <nav>
-                    <Link to='/' activeClassName='active'>
-                        <Button>Home</Button>
-                    </Link>
-                    <Link to='/article'>
-                        <Button>Article</Button>
-                    </Link>
-                </nav>
+                <LeftMenu pathname={pathname} />
                 <div className={style.content}>
-                    {this.props.children}
+                    <ReactCSSTransitionGroup
+                        component='main'
+                        className={style.inner}
+                        transitionName='change-route'
+                        transitionEnterTimeout={300}
+                        transitionLeaveTimeout={300}
+                    >
+                        {
+                            React.cloneElement(
+                                this.props.children,
+                                {key: pathname}
+                            )
+                        }
+                    </ReactCSSTransitionGroup>
                 </div>
             </div>
         );
     }
 }
-

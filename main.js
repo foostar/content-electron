@@ -35,12 +35,6 @@ function createWindow () {
         slashes: true
     }));
 
-    // setTimeout(() => {
-    //     mainWindow.loadURL('https://console.apps.xiaoyun.com');
-    // }, 5000);
-
-    // mainWindow.webContents.openDevTools();
-
     mainWindow.on('closed', function () {
         mainWindow = null;
     });
