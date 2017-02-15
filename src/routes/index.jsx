@@ -11,6 +11,8 @@ import User from 'pages/User';
 import NotFound from 'pages/NotFound';
 import GitHub from 'pages/GitHub';
 import Console from 'pages/Console';
+import AdminUsers from 'pages/admin/Users';
+import AdminArticles from 'pages/admin/Articles';
 
 export default (store) => {
     function hasPassport () {
@@ -45,6 +47,12 @@ export default (store) => {
                 <Route path='user' component={User} />
                 <Route path='github' component={GitHub} />
                 <Route path='console' component={Console} />
+
+                <Route path='admin'>
+                    <Route path='users' component={AdminUsers} />
+                    <Route path='articles' component={AdminArticles} />
+
+                </Route>
                 <Route path='*' component={NotFound} />
             </Route>
         </Route>

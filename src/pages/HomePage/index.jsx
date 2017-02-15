@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
+import Page from 'components/Page';
 // import style from './style.styl';
 
 export default class extends Component {
     render () {
         return (
-            <div>
+            <Page>
                 <h1>HomePage</h1>
-            </div>
+            </Page>
         );
     }
 }
