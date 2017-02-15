@@ -1,8 +1,6 @@
 import {createStore, applyMiddleware} from 'redux';
 import {apiMiddleware} from 'middlewares/api';
-
 import reducers from 'reducers';
-
 import config from 'config';
 
 const {API_PREFIX} = config;
@@ -19,7 +17,9 @@ if (process.env.NODE_ENV !== 'production') {
     );
 }
 
-export default (initState = {}) => createStore(
+const initState = {};
+
+export default createStore(
     reducers,
     initState,
     applyMiddleware(...middleware)
