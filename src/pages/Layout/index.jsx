@@ -14,9 +14,8 @@ export default class Layout extends Component {
                         component='main'
                         className={style.inner}
                         transitionName='change-route'
-                        transitionEnterTimeout={500}
-                        transitionLeaveTimeout={500}
-
+                        transitionEnterTimeout={300}
+                        transitionLeaveTimeout={300}
                     >
                         {
                             React.cloneElement(

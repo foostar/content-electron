@@ -25,18 +25,21 @@
 :global
     body
         -webkit-user-select none
+
     .change-route-enter
         opacity 0
-        transform translate3d(-36px,0,0)
+        transform translate3d(0,-36px,0)
+
     .change-route-enter.change-route-enter-active
         opacity 1
         transform translate3d(0,0,0)
         transition 300ms
 
     .change-route-leave
-        opacity 1
+        opacity .3
         transform translate3d(0,0,0)
+
     .change-route-leave.change-route-leave-active
         opacity 0
-        transform translate3d(36px,0,0)
+        transform translate3d(0,-36px,0)
         transition 300ms
