@@ -1,6 +1,6 @@
 const {session, ipcMain} = require('electron');
 
-ipcMain.on('GET_COOKIES_BY_PARTITION', (event, partition) => {
+ipcMain.on('GET_COOKIES_BY_PARTITION', (event, {partition, opt = {}} = {}) => {
     if (!partition) {
         event.returnValue = {
             error: true,
@@ -8,9 +8,7 @@ ipcMain.on('GET_COOKIES_BY_PARTITION', (event, partition) => {
         };
         return;
     };
-    session.fromPartition(partition).cookies.get({
-        url: 'http://console.apps.xiaoyun.com'
-    }, (err, cookies) => {
+    session.fromPartition(partition).cookies.get(opt, (err, cookies) => {
         if (err) {
             event.returnValue = {
                 error: true,
@@ -22,7 +20,7 @@ ipcMain.on('GET_COOKIES_BY_PARTITION', (event, partition) => {
     });
 });
 
-ipcMain.on('SET_PARTITION_COOKIES', (event, {partition, values}) => {
+ipcMain.on('SET_PARTITION_COOKIES', (event, {partition, cookies = []} = {}) => {
     if (!partition) {
         event.returnValue = {
             error: true,
@@ -30,13 +28,11 @@ ipcMain.on('SET_PARTITION_COOKIES', (event, {partition, values}) => {
         };
         return;
     };
-    console.log({values});
-
     const webviewCookies = session.fromPartition(partition).cookies;
-    values.map(cookie => {
-        webviewCookies.set(Object.assign(cookie, {
-            url: 'http://console.apps.xiaoyun.com'
-        }), console.log);
+    cookies.map((cookie) => {
+        webviewCookies.set(cookie, (err) => {
+            if (err) console.log('[set cookie error:]', cookie);
+        });
     });
     event.returnValue = true;
 });

@@ -1,14 +1,3 @@
-/* 发文平台
- *      platform
- *        |- 企鹅
- *        |    |- account 1
- *        |    `- account 2
- *        `- 百家
- *             |- account 1
- *             |- account 2
- *             `- account 3
- */
-
 import {createCallApi} from 'middlewares/api';
 import {createCallIpc} from 'middlewares/ipc';
 
@@ -22,20 +11,7 @@ import update from 'react/lib/update';
 const HUSSIF = {};
 const INITAL = {
     fetching: false,
-    data: [],
-    platforms: {
-        // '企鹅号': {
-        //     accounts: ['330465659@qq.com']
-        // },
-        // '百家号': {
-        //     accounts: []
-        // }
-    },
-    accounts: {
-        // '330465659@qq.com': {
-        //     cookies: []
-        // }
-    }
+    data: []
 };
 
 export const getCookiesByPartition = createCallIpc(HUSSIF, {

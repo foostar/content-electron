@@ -44,34 +44,20 @@ export default class LeftMenu extends Component {
                     </Item>
 
                     <Item key='/articles'>
-                        <Icon type='switcher' />
-                        <span>文章管理</span>
+                        <Icon type='copy' />
+                        <span>文章列表</span>
                     </Item>
                 </MenuItemGroup>
 
-                <MenuItemGroup title={<Icon type='ellipsis' />}>
+                <MenuItemGroup title={<span><Icon type='ellipsis' />&emsp;admin</span>}>
+                    <Item key='/admin/upstream'>
+                        <Icon type='cloud-upload-o' />
+                        Upstream
+                    </Item>
                     <Item key='/admin/articles'>
-                        <Icon type='switcher' />
-                        <span>文章管理</span>
+                        <Icon type='book' />
+                        文章管理
                     </Item>
-                    <Item key='/admin/users'>
-                        <Icon type='team' />
-                        <span>用户管理</span>
-                    </Item>
-
-                    <SubMenu
-                        key='platfrom-sub'
-                        title={<div><Icon type='share-alt' /><span>平台管理</span></div>}
-                    >
-                        <Item key='/admin/platfrom/qi_e'>
-                            <i className='fa fa-qq' style={{marginRight: 8}} />
-                            企鹅号
-                        </Item>
-                        <Item key='/admin/platfrom/bai_jia'>
-                            <i className='fa fa-paw' style={{marginRight: 8}} />
-                            百家号
-                        </Item>
-                    </SubMenu>
                 </MenuItemGroup>
 
                 <SubMenu

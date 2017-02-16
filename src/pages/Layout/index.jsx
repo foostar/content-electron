@@ -1,27 +1,29 @@
 import React, {Component} from 'react';
 import ReactCSSTransitionGroup from 'react/lib/ReactCSSTransitionGroup';
 import LeftMenu from './LeftMenu';
-import {bindActionCreators} from 'redux';
-import * as actions from 'reducers/platforms';
-import {connect} from 'react-redux';
+
+// import {bindActionCreators} from 'redux';
+// import * as actions from 'reducers/platforms';
+// import {connect} from 'react-redux';
 
 import style from './style.styl';
 
-const mapStateToProps = state => {
-    return {
-        platforms: state.platforms
-    };
-};
-const mapDispatchToProps = dispatch => {
-    return {
-        actions: bindActionCreators(actions, dispatch)
-    };
-};
-@connect(mapStateToProps, mapDispatchToProps)
+// const mapStateToProps = state => {
+//     return {
+//         platforms: state.platforms
+//     };
+// };
+// const mapDispatchToProps = dispatch => {
+//     return {
+//         actions: bindActionCreators(actions, dispatch)
+//     };
+// };
+// @connect(mapStateToProps, mapDispatchToProps)
+
 export default class Layout extends Component {
-    componentDidMount () {
-        this.props.actions.fetchPlatforms();
-    }
+    // componentDidMount () {
+    //     this.props.actions.fetchPlatforms();
+    // }
 
     render () {
         const {location} = this.props;
