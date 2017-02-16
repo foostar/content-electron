@@ -3,22 +3,22 @@ const {BrowserWindow, app, session} = require('electron');
 
 let mainWindow;
 
-function setCookies (cookies) {
-    cookies.forEach(cookie => {
-        session.defaultSession.cookies.set(cookie, (error) => {
-            if (error) console.error(error);
-        });
-    });
-}
+// function setCookies (cookies) {
+//     cookies.forEach(cookie => {
+//         session.defaultSession.cookies.set(cookie, (error) => {
+//             if (error) console.error(error);
+//         });
+//     });
+// }
 
 function createWindow () {
-    setCookies([
-        {
-            url: 'https://github.com',
-            name: 'user_session',
-            value: 'COz6RpLclOx4QoXjG8pUqd0_f5_vohtP7ier9RZiboiIb-TA'
-        }
-    ]);
+    // setCookies([
+    //     {
+    //         url: 'https://github.com',
+    //         name: 'user_session',
+    //         value: 'COz6RpLclOx4QoXjG8pUqd0_f5_vohtP7ier9RZiboiIb-TA'
+    //     }
+    // ]);
 
     mainWindow = new BrowserWindow({
         width: 800,

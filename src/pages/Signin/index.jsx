@@ -4,10 +4,8 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {hashHistory} from 'react-router';
 import * as actions from 'reducers/passport';
-
-import bgGif from './cat.gif';
-
 import style from './style.styl';
+import bgGif from './cat.gif';
 
 const FormItem = Form.Item;
 

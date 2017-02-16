@@ -1,15 +1,33 @@
 import React, {Component} from 'react';
 import ReactCSSTransitionGroup from 'react/lib/ReactCSSTransitionGroup';
 import LeftMenu from './LeftMenu';
-// import logo from '../../images/xiaoyun-logo@2x.png';
+import {bindActionCreators} from 'redux';
+import * as actions from 'reducers/platforms';
+import {connect} from 'react-redux';
+
 import style from './style.styl';
 
+const mapStateToProps = state => {
+    return {
+        platforms: state.platforms
+    };
+};
+const mapDispatchToProps = dispatch => {
+    return {
+        actions: bindActionCreators(actions, dispatch)
+    };
+};
+@connect(mapStateToProps, mapDispatchToProps)
 export default class Layout extends Component {
+    componentDidMount () {
+        this.props.actions.fetchPlatforms();
+    }
+
     render () {
-        const {pathname} = this.props.location;
+        const {location} = this.props;
         return (
             <div className={style.container}>
-                <LeftMenu pathname={pathname} />
+                <LeftMenu location={location} />
                 <div className={style.content}>
                     <ReactCSSTransitionGroup
                         component='main'
@@ -21,7 +39,7 @@ export default class Layout extends Component {
                         {
                             React.cloneElement(
                                 this.props.children,
-                                {key: pathname}
+                                {key: location.pathname}
                             )
                         }
                     </ReactCSSTransitionGroup>

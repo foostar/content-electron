@@ -14,6 +14,7 @@ import GitHub from 'pages/GitHub';
 import Console from 'pages/Console';
 import AdminUsers from 'pages/admin/Users';
 import AdminArticles from 'pages/admin/Articles';
+import AdminPlatfrom from 'pages/admin/Platform';
 
 import store from 'store';
 
@@ -50,10 +51,11 @@ export default (
             <Route path='user' component={User} />
             <Route path='github' component={GitHub} />
             <Route path='console' component={Console} />
+            <Route path='console2' component={Console} />
             <Route path='admin'>
                 <Route path='users' component={AdminUsers} />
                 <Route path='articles' component={AdminArticles} />
-
+                <Route path='platfrom' component={AdminPlatfrom} />
             </Route>
             <Route path='*' component={NotFound} />
         </Route>

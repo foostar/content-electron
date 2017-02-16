@@ -1,4 +1,4 @@
-import { createAction } from 'redux-act';
+import {createAction} from 'redux-act';
 
 export const CALL_API = Symbol('CALL_API');
 
@@ -74,7 +74,7 @@ export const apiMiddleware = (opt = {}) => store => next => async action => {
     return next(nextAction(payload));
 };
 
-export const makeAction = (HUSSIF, { type, endpoint, method, request, success, failure }) => {
+export const createCallApi = (HUSSIF, { type, endpoint, method, request, success, failure }) => {
     type = type.toUpperCase();
     const actions = [
         `${type}_REQUEST`,
@@ -82,9 +82,9 @@ export const makeAction = (HUSSIF, { type, endpoint, method, request, success, f
         `${type}_FAILURE`
     ].map(createAction);
 
-    HUSSIF[ actions[0] ] = request;
-    HUSSIF[ actions[1] ] = success;
-    HUSSIF[ actions[2] ] = failure;
+    HUSSIF[actions[0]] = request || (state => state);
+    HUSSIF[actions[1]] = success || (state => state);
+    HUSSIF[actions[2]] = failure || (state => state);
 
     return ({ body, query } = {}) => ({
         [CALL_API]: {
@@ -96,5 +96,3 @@ export const makeAction = (HUSSIF, { type, endpoint, method, request, success, f
         }
     });
 };
-
-export { createAction, createReducer } from 'redux-act';

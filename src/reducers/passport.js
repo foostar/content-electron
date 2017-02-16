@@ -1,5 +1,5 @@
-import {makeAction, createReducer} from 'middlewares/api';
-import {createAction} from 'redux-act';
+import {createCallApi} from 'middlewares/api';
+import {createAction, createReducer} from 'redux-act';
 
 import update from 'react/lib/update';
 
@@ -11,7 +11,7 @@ const INITAL = {
     }
 };
 
-export const signin = makeAction(HUSSIF, {
+export const signin = createCallApi(HUSSIF, {
     type: 'SIGN_IN',
     endpoint: '/signin',
     method: 'POST',
