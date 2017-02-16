@@ -47,6 +47,7 @@ export const signin = createCallApi(HUSSIF, {
 export const signout = createAction('SIGN_OUT');
 
 HUSSIF[signout] = (state) => {
+    fs.writeFile(path.resolve('.token'), '');
     localStorage.clear();
     return update(state, {
         data: {$set: {}}
