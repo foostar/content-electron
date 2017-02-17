@@ -37,7 +37,7 @@ export const apiMiddleware = (opt = {}) => store => next => async action => {
         url = API_PREFIX + endpoint;
     }
 
-    let payload = { body, query };
+    let payload = {body, query};
     let nextAction = failure;
 
     if (query) {
@@ -52,7 +52,7 @@ export const apiMiddleware = (opt = {}) => store => next => async action => {
     next(request());
 
     try {
-        const res = await fetch(url, { headers, method, body });
+        const res = await fetch(url, {headers, method, body});
         payload.result = await res.json();
         if (typeof opt.formatData === 'function') {
             payload.result = opt.formatData(payload.result);
@@ -79,7 +79,7 @@ export const apiMiddleware = (opt = {}) => store => next => async action => {
     return next(nextAction(payload));
 };
 
-export const createCallApi = (HUSSIF, { type, endpoint, method, request, success, failure }) => {
+export const createCallApi = (HUSSIF, {type, endpoint, method, request, success, failure}) => {
     type = type.toUpperCase();
     const actions = [
         `${type}_REQUEST`,
@@ -91,7 +91,7 @@ export const createCallApi = (HUSSIF, { type, endpoint, method, request, success
     HUSSIF[actions[1]] = success || (state => state);
     HUSSIF[actions[2]] = failure || (state => state);
 
-    return ({ body, query } = {}) => ({
+    return ({body, query} = {}) => ({
         [CALL_API]: {
             endpoint,
             method,

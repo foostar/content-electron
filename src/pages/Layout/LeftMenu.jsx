@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {hashHistory} from 'react-router';
-import { Menu, Icon } from 'antd';
+import {Menu, Icon} from 'antd';
 import style from './style.styl';
 
 const SubMenu = Menu.SubMenu;

@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 // import { browserHistory } from 'react-router';
-import { Form, Button, Spin } from 'antd';
+import {Form, Button, Spin} from 'antd';
 import * as actions from 'reducers/editor';
 
 import Page from 'components/Page';
@@ -30,7 +30,7 @@ export default class Editor extends Component {
     handleSubmit = (e) => {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
-            const { model, isFetching } = this.props.editor;
+            const {model, isFetching} = this.props.editor;
             if (err) return;
             if (isFetching) return;
             this.props.fetching();
@@ -73,7 +73,7 @@ export default class Editor extends Component {
         });
     }
     async fetchImg (item) {
-        const { token, key } = await this.getToken();
+        const {token, key} = await this.getToken();
         const blob = await this.getImg(item.url);
         const formData = new FormData();
         formData.append('key', key);
@@ -85,7 +85,7 @@ export default class Editor extends Component {
         })
         .then(response => response.json())
         .then(json => {
-            const { key } = json;
+            const {key} = json;
             return {
                 index: item.index,
                 url: `http://ofsyr49wg.bkt.clouddn.com/${key}`
@@ -111,11 +111,11 @@ export default class Editor extends Component {
         this.props.updateModel(model);
     }
     render () {
-        const { model, isFetching } = this.props.editor;
+        const {model, isFetching} = this.props.editor;
         // const { getFieldDecorator } = this.props.form;
         const formItemLayout = {
-            labelCol: { span: 6 },
-            wrapperCol: { span: 14 }
+            labelCol: {span: 6},
+            wrapperCol: {span: 14}
         };
         const tailFormItemLayout = {
             wrapperCol: {

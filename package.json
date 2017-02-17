@@ -28,6 +28,8 @@
     "electron": "^1.4.15",
     "file-loader": "^0.10.0",
     "html-webpack-plugin": "^2.28.0",
+    "less": "^2.7.2",
+    "less-loader": "^2.2.3",
     "lodash": "^4.17.4",
     "purecss": "^0.6.2",
     "ramda": "^0.23.0",

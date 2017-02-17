@@ -1,7 +1,6 @@
 import React from 'react';
-import { Route, IndexRoute } from 'react-router';
-
-import { notification } from 'antd';
+import {Route, IndexRoute} from 'react-router';
+import {notification} from 'antd';
 
 import HomePage from 'pages/HomePage';
 import Layout from 'pages/Layout';
