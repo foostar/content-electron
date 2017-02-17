@@ -1,5 +1,4 @@
 import {makeAction, createReducer} from 'middlewares/api';
-import { createAction } from 'redux-act';
 import update from 'react/lib/update';
 
 const HUSSIF = {};
@@ -7,17 +6,9 @@ const INITAL = {
     isFetching: false,
     count: 50,
     skip: 0,
-    selectKeys: [],
     contents: []
 };
-export const changeSelectRows = createAction('CHANGESELECTROWS');
-
-HUSSIF[ changeSelectRows ] = (state, keys) => {
-    return update(state, {
-        selectKeys: { $set: keys }
-    });
-};
-// 新增文章
+// 获取文章列表
 export const getArticles = makeAction(HUSSIF, {
     type: 'GETARTICLES',
     endpoint: '/content',
