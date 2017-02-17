@@ -4,6 +4,9 @@ import {Row, Col, Card} from 'antd';
 import style from './style.styl';
 
 export default class ChoosePlatform extends Component {
+    choosePlatform = (platform) => {
+        this.props.nextStep({platform});
+    }
     render () {
         const platforms = [{
             name: '企鹅号',
@@ -21,7 +24,7 @@ export default class ChoosePlatform extends Component {
                         md={6}
                         lg={4}
                         key={item.name}
-                        onClick={this.props.nextStep}
+                        onClick={() => this.choosePlatform(item.name)}
                     >
                         <Card className={style['platform-card']}>
                             <div

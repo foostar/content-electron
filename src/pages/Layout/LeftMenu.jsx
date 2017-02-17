@@ -40,12 +40,12 @@ export default class LeftMenu extends Component {
                     </Item>
                     <Item key='/editor'>
                         <Icon type='edit' />
-                        <span>新建文章</span>
+                        <span>新建内容</span>
                     </Item>
 
                     <Item key='/articles'>
                         <Icon type='copy' />
-                        <span>文章列表</span>
+                        <span>内容列表</span>
                     </Item>
                 </MenuItemGroup>
 
@@ -56,7 +56,7 @@ export default class LeftMenu extends Component {
                     </Item>
                     <Item key='/admin/articles'>
                         <Icon type='book' />
-                        文章管理
+                        内容管理
                     </Item>
                 </MenuItemGroup>
 
