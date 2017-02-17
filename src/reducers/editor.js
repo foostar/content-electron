@@ -35,7 +35,7 @@ export const addArticle = makeAction(HUSSIF, {
     }),
     success: (state, payload) => INITAL,
     failure: (state, payload) => update(state, {
-        isFetching: { $set: true }
+        isFetching: { $set: false }
     })
 });
 // 文章详情
@@ -52,7 +52,7 @@ export const getArticle = makeAction(HUSSIF, {
         });
     },
     failure: (state, payload) => update(state, {
-        isFetching: { $set: true }
+        isFetching: { $set: false }
     })
 });
 // 修改文章
