@@ -1,7 +1,6 @@
 import React from 'react';
-import { Route, IndexRoute } from 'react-router';
-
-// import { notification } from 'antd';
+import {Route, IndexRoute} from 'react-router';
+import {notification} from 'antd';
 
 import HomePage from 'pages/HomePage';
 import Layout from 'pages/Layout';
@@ -14,6 +13,7 @@ import GitHub from 'pages/GitHub';
 import Console from 'pages/Console';
 import AdminUsers from 'pages/admin/Users';
 import AdminArticles from 'pages/admin/Articles';
+import AdminUpstream from 'pages/admin/Upstream';
 
 import store from 'store';
 
@@ -45,15 +45,16 @@ export default (
             onChange={onChange}
         >
             <IndexRoute component={HomePage} />
-            <Route path='/editor' component={Editor} />
+            <Route path='editor' component={Editor} />
             <Route path='articles' component={Articles} />
             <Route path='user' component={User} />
             <Route path='github' component={GitHub} />
             <Route path='console' component={Console} />
+            <Route path='console2' component={Console} />
             <Route path='admin'>
                 <Route path='users' component={AdminUsers} />
                 <Route path='articles' component={AdminArticles} />
-
+                <Route path='upstream' component={AdminUpstream} />
             </Route>
             <Route path='*' component={NotFound} />
         </Route>

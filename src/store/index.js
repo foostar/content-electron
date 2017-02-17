@@ -1,14 +1,18 @@
 import {createStore, applyMiddleware} from 'redux';
-import {apiMiddleware} from 'middlewares/api';
+
 import reducers from 'reducers';
 import config from 'config';
 
-const {API_PREFIX} = config;
 import errorMiddleware from 'middlewares/error';
+import {apiMiddleware} from 'middlewares/api';
+import {ipcMiddleware} from 'middlewares/ipc';
+
+const {API_PREFIX} = config;
 
 const middleware = [
+    ipcMiddleware(),
     apiMiddleware({API_PREFIX}),
-    errorMiddleware
+    errorMiddleware()
 ];
 
 if (process.env.NODE_ENV !== 'production') {

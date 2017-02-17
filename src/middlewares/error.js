@@ -1,6 +1,6 @@
 import {notification} from 'antd';
 
-export default store => next => async action => {
+export default opt => store => next => async action => {
     if (action.payload && action.payload.error) {
         let description = '未知错误';
         let show = true;

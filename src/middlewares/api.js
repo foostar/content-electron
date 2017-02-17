@@ -1,4 +1,4 @@
-import { createAction } from 'redux-act';
+import {createAction} from 'redux-act';
 
 export const CALL_API = Symbol('CALL_API');
 
@@ -10,6 +10,7 @@ export const apiMiddleware = (opt = {}) => store => next => async action => {
         method = 'GET',
         query,
         body,
+        params,
         actions: [ request, success, failure ]
     } = action[CALL_API];
 
@@ -27,6 +28,10 @@ export const apiMiddleware = (opt = {}) => store => next => async action => {
 
     let url = '';
 
+    if (params) {
+        endpoint += `/${params}`;
+    }
+
     if (typeof API_PREFIX === 'object') {
         const prefixKey = endpoint.split('/')[0];
         const prefixValue = API_PREFIX[prefixKey];
@@ -37,7 +42,7 @@ export const apiMiddleware = (opt = {}) => store => next => async action => {
         url = API_PREFIX + endpoint;
     }
 
-    let payload = { body, query };
+    let payload = {body, query};
     let nextAction = failure;
 
     if (query) {
@@ -52,29 +57,36 @@ export const apiMiddleware = (opt = {}) => store => next => async action => {
     next(request());
 
     try {
-        const res = await fetch(url, { headers, method, body });
+        const res = await fetch(url, {headers, method, body});
         payload.result = await res.json();
         if (typeof opt.formatData === 'function') {
             payload.result = opt.formatData(payload.result);
         }
         if (res.ok) {
-            if (typeof opt.isFailure === 'function' && opt.failure(payload.result)) {
-                payload.error = true;
-            } else {
-                nextAction = success;
-                payload.error = false;
-            }
+            // if (typeof opt.isFailure === 'function' && opt.failure(payload.result)) {
+            //     payload.error = true;
+            // } else {
+            //     nextAction = success;
+            //     payload.error = false;
+            // }
+            nextAction = success;
+            payload.error = false;
         } else {
             payload.error = true;
         }
     } catch (error) {
         payload.error = true;
-        payload.result = { message: error.message };
+        payload.result = {
+            status: {
+                code: '本地',
+                message: '网络连接错误'
+            }
+        };
     }
     return next(nextAction(payload));
 };
 
-export const makeAction = (HUSSIF, { type, endpoint, method, request, success, failure }) => {
+export const createCallApi = (HUSSIF, {type, endpoint, method, request, success, failure}) => {
     type = type.toUpperCase();
     const actions = [
         `${type}_REQUEST`,
@@ -82,19 +94,18 @@ export const makeAction = (HUSSIF, { type, endpoint, method, request, success, f
         `${type}_FAILURE`
     ].map(createAction);
 
-    HUSSIF[ actions[0] ] = request;
-    HUSSIF[ actions[1] ] = success;
-    HUSSIF[ actions[2] ] = failure;
+    HUSSIF[actions[0]] = request || (state => state);
+    HUSSIF[actions[1]] = success || (state => state);
+    HUSSIF[actions[2]] = failure || (state => state);
 
-    return ({ body, query } = {}) => ({
+    return ({body, query, params} = {}) => ({
         [CALL_API]: {
             endpoint,
             method,
             body,
+            params,
             query,
             actions
         }
     });
 };
-
-export { createAction, createReducer } from 'redux-act';

@@ -1,13 +1,11 @@
 import React, {Component} from 'react';
 import {Form, Icon, Input, Button} from 'antd';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {hashHistory} from 'react-router';
 import * as actions from 'reducers/passport';
-
-import bgGif from './cat.gif';
-
 import style from './style.styl';
+import bgGif from './cat.gif';
 
 const FormItem = Form.Item;
 
@@ -49,7 +47,7 @@ export default class Signin extends Component {
                 <Form onSubmit={this.handleSubmit} className={style['login-form']}>
                     <FormItem>
                         {getFieldDecorator('username', {
-                            rules: [{ required: true, message: '请输入账号!' }]
+                            rules: [{required: true, message: '请输入账号!'}]
                         })(
                             <Input
                                 placeholder='账号'
@@ -59,7 +57,7 @@ export default class Signin extends Component {
                     </FormItem>
                     <FormItem>
                         {getFieldDecorator('password', {
-                            rules: [{ required: true, message: '请输入密码!' }]
+                            rules: [{required: true, message: '请输入密码!'}]
                         })(
                             <Input
                                 type='password'
