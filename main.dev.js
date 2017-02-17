@@ -7,7 +7,8 @@ function createWindow () {
     mainWindow = new BrowserWindow({
         width: 1024,
         height: 900,
-        nodeIntegration: false
+        minWidth: 800,
+        minHeight: 600
     });
 
     mainWindow.webContents.session.clearStorageData();

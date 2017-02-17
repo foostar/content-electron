@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Button, Table, Icon} from 'antd';
 import style from './style.styl';
 import Page from 'components/Page';
+import CreateModal from './CreateModal';
 
 const columns = [{
     title: '账户名称',
@@ -26,11 +27,7 @@ const columns = [{
     }],
     onFilter: (value, record) => record.platfrom.includes(value)
 }, {
-    title: (
-        <Button type='primary' shape='circle' size='small'>
-            <Icon type='plus' />
-        </Button>
-    ),
+    title: <CreateModal />,
     key: 'action',
     render: (text, record) => (
         <Button type='danger' shape='circle' size='small'>
