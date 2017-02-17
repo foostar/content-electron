@@ -58,12 +58,14 @@ export const apiMiddleware = (opt = {}) => store => next => async action => {
             payload.result = opt.formatData(payload.result);
         }
         if (res.ok) {
-            if (typeof opt.isFailure === 'function' && opt.failure(payload.result)) {
-                payload.error = true;
-            } else {
-                nextAction = success;
-                payload.error = false;
-            }
+            // if (typeof opt.isFailure === 'function' && opt.failure(payload.result)) {
+            //     payload.error = true;
+            // } else {
+            //     nextAction = success;
+            //     payload.error = false;
+            // }
+            nextAction = success;
+            payload.error = false;
         } else {
             payload.error = true;
         }
