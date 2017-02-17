@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, IndexRoute } from 'react-router';
 
-// import { notification } from 'antd';
+import { notification } from 'antd';
 
 import HomePage from 'pages/HomePage';
 import Layout from 'pages/Layout';
@@ -45,7 +45,7 @@ export default (
             onChange={onChange}
         >
             <IndexRoute component={HomePage} />
-            <Route path='/editor' component={Editor} />
+            <Route path='editor' component={Editor} />
             <Route path='articles' component={Articles} />
             <Route path='user' component={User} />
             <Route path='github' component={GitHub} />
@@ -53,7 +53,6 @@ export default (
             <Route path='admin'>
                 <Route path='users' component={AdminUsers} />
                 <Route path='articles' component={AdminArticles} />
-
             </Route>
             <Route path='*' component={NotFound} />
         </Route>

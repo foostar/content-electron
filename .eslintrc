@@ -3,7 +3,8 @@
     "extends": ["standard", "standard-react"],
     "globals": {
         "FormData": true,
-        "fetch": true
+        "fetch": true,
+        "localStorage": true
     },
     "rules": {
         "indent": ["error", 4],
@@ -11,10 +12,7 @@
         "semi": ["error", "always"],
         "react/jsx-indent": ["error", 4],
         "react/jsx-indent-props": ["error", 4],
+        "eqeqeq": 0,
         "react/prop-types": "off"
-    },
-    "globals": {
-        "fetch": true,
-        "localStorage": true
     }
 }

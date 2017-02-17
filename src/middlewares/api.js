@@ -10,6 +10,7 @@ export const apiMiddleware = (opt = {}) => store => next => async action => {
         method = 'GET',
         query,
         body,
+        params,
         actions: [ request, success, failure ]
     } = action[CALL_API];
 
@@ -26,6 +27,10 @@ export const apiMiddleware = (opt = {}) => store => next => async action => {
     } catch (err) {}
 
     let url = '';
+
+    if (params) {
+        endpoint += `/${params}`;
+    }
 
     if (typeof API_PREFIX === 'object') {
         const prefixKey = endpoint.split('/')[0];
@@ -86,11 +91,12 @@ export const makeAction = (HUSSIF, { type, endpoint, method, request, success, f
     HUSSIF[ actions[1] ] = success;
     HUSSIF[ actions[2] ] = failure;
 
-    return ({ body, query } = {}) => ({
+    return ({ body, query, params } = {}) => ({
         [CALL_API]: {
             endpoint,
             method,
             body,
+            params,
             query,
             actions
         }

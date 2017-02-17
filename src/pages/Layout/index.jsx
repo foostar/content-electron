@@ -1,8 +1,6 @@
 import React, {Component} from 'react';
 import ReactCSSTransitionGroup from 'react/lib/ReactCSSTransitionGroup';
 import LeftMenu from './LeftMenu';
-import {Link} from 'react-router';
-import {Button} from 'antd';
 // import logo from '../../images/xiaoyun-logo@2x.png';
 import style from './style.styl';
 
