@@ -1,11 +1,13 @@
 import React, {Component} from 'react';
+
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-// import { browserHistory } from 'react-router';
-import {Form, Button, Spin} from 'antd';
+import {hashHistory} from 'react-router';
+import {Form, Button, Spin, Input, Select, notification} from 'antd';
 import * as actions from 'reducers/editor';
 
 import Page from 'components/Page';
+import style from './style.styl';
 
 import 'froala-editor/js/froala_editor.pkgd.min.js';
 import 'froala-editor/css/froala_editor.pkgd.min.css';
@@ -14,6 +16,7 @@ import 'font-awesome/css/font-awesome.css';
 import FroalaEditor from 'react-froala-wysiwyg';
 
 const FormItem = Form.Item;
+const Option = Select.Option;
 
 const mapStateToProps = state => {
     return {
@@ -27,30 +30,52 @@ const mapDispatchToProps = dispatch => {
 @Form.create()
 @connect(mapStateToProps, mapDispatchToProps)
 export default class Editor extends Component {
+    componentDidMount () {
+        const {articleId} = this.props.router.location.query;
+        if (articleId) {
+            this.props.getArticle({params: articleId});
+        }
+    }
     handleSubmit = (e) => {
+        const {articleId} = this.props.router.location.query;
         e.preventDefault();
-        this.props.form.validateFields((err, values) => {
-            const {model, isFetching} = this.props.editor;
+        this.props.form.validateFields(async (err, values) => {
+            const {content, isFetching} = this.props.editor;
             if (err) return;
             if (isFetching) return;
-            this.props.fetching();
-            this.replaceImg(model)
-            .then((model) => {
-                const data = Object.assign({}, values, {
-                    model
+            if (!content) {
+                return notification.warning({
+                    message: '请输入文章内容'
                 });
-                console.log('data', data);
-                // return this.props.editArticle(data)
-                //     .then(() => {
-                //         // browserHistory.replace('/article')
-                //     });
+            }
+            if (articleId) {
+                const {type} = await this.props.editArticle({
+                    body: values,
+                    params: articleId
+                });
+                if (type === 'EDITARTICLE_SUCCESS') {
+                    hashHistory.replace('/articles');
+                }
+                return;
+            }
+            this.props.fetching();
+            const _content = await this.replaceImg(content);
+
+            const data = Object.assign({}, values, _content);
+
+            const {type} = await this.props.addArticle({
+                body: data
             });
+            if (type === 'ADDARTICLE_SUCCESS') {
+                hashHistory.replace('/articles');
+            }
         });
     }
-    replaceImg (model) {
+    replaceImg (content) {
         const modelDom = this.refs.model;
-        modelDom.innerHTML = model;
+        modelDom.innerHTML = content;
         const aImgs = modelDom.getElementsByTagName('img');
+        if (aImgs.length < 1) return new Promise((resolve, reject) => resolve(content));
         const beforeImgs = [];
         for (let i = 0; i < aImgs.length; i++) {
             let src = aImgs[i].getAttribute('src');
@@ -95,24 +120,20 @@ export default class Editor extends Component {
     getImg (url) {
         return fetch(url)
         .then(response => response.blob())
-        .then((blob) => {
-            return blob;
-        });
+        .then(blob => blob);
     }
     getToken () {
         const url = `http://baijia.rss.apps.xiaoyun.com/api/qiniu/uptoken`;
-        return fetch(url).then((response) => {
-            return response.json();
-        }).then((json) => {
-            return json;
-        });
+        return fetch(url)
+        .then(response => response.json())
+        .then(json => json);
     }
-    handleEditorChange = (model) => {
-        this.props.updateModel(model);
+    handleEditorChange = (content) => {
+        this.props.updateModel(content);
     }
     render () {
-        const {model, isFetching} = this.props.editor;
-        // const { getFieldDecorator } = this.props.form;
+        const {content, isFetching, title, category} = this.props.editor;
+        const {getFieldDecorator} = this.props.form;
         const formItemLayout = {
             labelCol: {span: 6},
             wrapperCol: {span: 14}
@@ -124,22 +145,35 @@ export default class Editor extends Component {
             }
         };
         return (
-            <Page>
+            <Page className={style.container}>
                 <Spin spinning={isFetching}>
                     <Form onSubmit={this.handleSubmit}>
-                        { /* <FormItem
+                        <FormItem
                             {...formItemLayout}
-                            label='E-mail'
+                            label='标题'
                             hasFeedback
                         >
-                            {getFieldDecorator('email', {
+                            {getFieldDecorator('title', {
                                 rules: [{
-                                    required: true, message: 'Please input your E-mail!'
-                                }]
+                                    required: true, message: '请输入标题'
+                                }],
+                                initialValue: title || ''
                             })(
                                 <Input />
                             )}
-                        </FormItem> */}
+                        </FormItem>
+                        <FormItem
+                            {...formItemLayout}
+                            label='文章分类'
+                        >
+                            {getFieldDecorator('category', {
+                                initialValue: category || 'other'
+                            })(
+                                <Select>
+                                    <Option value='other'>其他</Option>
+                                </Select>
+                            )}
+                        </FormItem>
                         <FormItem
                             {...formItemLayout}
                             label='内容'
@@ -147,16 +181,15 @@ export default class Editor extends Component {
                         >
                             <FroalaEditor
                                 tag='textarea'
-                                placeholderText='Edit Your Content Here!'
                                 charCounterCount={false}
-                                model={model}
+                                model={content}
                                 onModelChange={this.handleEditorChange}
                             />
                         </FormItem>
                         <FormItem {...tailFormItemLayout}>
                             <Button type='primary' htmlType='submit' size='large'>提交</Button>
                         </FormItem>
-                        <div ref='model' />
+                        <div className={style.disappear} ref='model' />
                     </Form>
                 </Spin>
             </Page>

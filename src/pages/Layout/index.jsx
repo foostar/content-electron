@@ -1,11 +1,6 @@
 import React, {Component} from 'react';
 import ReactCSSTransitionGroup from 'react/lib/ReactCSSTransitionGroup';
 import LeftMenu from './LeftMenu';
-
-// import {bindActionCreators} from 'redux';
-// import * as actions from 'reducers/platforms';
-// import {connect} from 'react-redux';
-
 import style from './style.styl';
 
 // const mapStateToProps = state => {

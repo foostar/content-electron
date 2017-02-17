@@ -45,7 +45,7 @@ export default (
             onChange={onChange}
         >
             <IndexRoute component={HomePage} />
-            <Route path='/editor' component={Editor} />
+            <Route path='editor' component={Editor} />
             <Route path='articles' component={Articles} />
             <Route path='user' component={User} />
             <Route path='github' component={GitHub} />
