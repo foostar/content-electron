@@ -69,7 +69,12 @@ export const apiMiddleware = (opt = {}) => store => next => async action => {
         }
     } catch (error) {
         payload.error = true;
-        payload.result = { message: error.message };
+        payload.result = {
+            status: {
+                code: '本地',
+                message: '网络连接错误'
+            }
+        };
     }
     return next(nextAction(payload));
 };
