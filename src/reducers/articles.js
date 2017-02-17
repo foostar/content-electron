@@ -1,4 +1,5 @@
-import {makeAction, createReducer} from 'middlewares/api';
+import {createCallApi} from 'middlewares/api';
+import {createReducer} from 'redux-act';
 import update from 'react/lib/update';
 
 const HUSSIF = {};
@@ -8,8 +9,9 @@ const INITAL = {
     skip: 0,
     contents: []
 };
+
 // 获取文章列表
-export const getArticles = makeAction(HUSSIF, {
+export const getArticles = createCallApi(HUSSIF, {
     type: 'GETARTICLES',
     endpoint: '/content',
     method: 'GET',

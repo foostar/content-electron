@@ -1,5 +1,5 @@
-import {makeAction, createReducer} from 'middlewares/api';
-import {createAction} from 'redux-act';
+import {createCallApi} from 'middlewares/api';
+import {createAction, createReducer} from 'redux-act';
 import update from 'react/lib/update';
 
 const HUSSIF = {};
@@ -26,7 +26,7 @@ HUSSIF[ fetching ] = (state) => {
     });
 };
 // 新增文章
-export const addArticle = makeAction(HUSSIF, {
+export const addArticle = createCallApi(HUSSIF, {
     type: 'ADDARTICLE',
     endpoint: '/content',
     method: 'POST',
@@ -39,7 +39,7 @@ export const addArticle = makeAction(HUSSIF, {
     })
 });
 // 文章详情
-export const getArticle = makeAction(HUSSIF, {
+export const getArticle = createCallApi(HUSSIF, {
     type: 'GETARTICLE',
     endpoint: '/content',
     request: (state, payload) => update(state, {
@@ -56,7 +56,7 @@ export const getArticle = makeAction(HUSSIF, {
     })
 });
 // 修改文章
-export const editArticle = makeAction(HUSSIF, {
+export const editArticle = createCallApi(HUSSIF, {
     type: 'EDITARTICLE',
     endpoint: '/content',
     method: 'PATCH',
