@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Tooltip, Button, Table, Icon} from 'antd';
+import {Button, Table, Icon} from 'antd';
 import style from './style.styl';
 import Page from 'components/Page';
 
