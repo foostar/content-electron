@@ -27,7 +27,7 @@ export default class LeftMenu extends Component {
                 theme={this.state.theme}
                 onClick={this.handleClick}
                 selectedKeys={[this.props.location.pathname]}
-                defaultOpenKeys={['platfrom-sub', 'test-sub']}
+                defaultOpenKeys={['test-sub']}
             >
                 <MenuItemGroup title={
                     <div onClick={this.changeTheme}>
@@ -50,7 +50,7 @@ export default class LeftMenu extends Component {
                 </MenuItemGroup>
 
                 <MenuItemGroup title={<span><Icon type='ellipsis' />&emsp;admin</span>}>
-                    <Item key='/admin/upstream'>
+                    <Item key='/admin/upstreams'>
                         <Icon type='cloud-upload-o' />
                         Upstream
                     </Item>

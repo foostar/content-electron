@@ -3,7 +3,7 @@ import {Row, Col, Card} from 'antd';
 
 import style from './style.styl';
 
-export default class ChoosePlatform extends Component {
+class ChoosePlatform extends Component {
     choosePlatform = (platform) => {
         this.props.nextStep({platform});
     }
@@ -38,3 +38,5 @@ export default class ChoosePlatform extends Component {
         );
     }
 }
+
+export default ChoosePlatform;

@@ -29,7 +29,13 @@ export const apiMiddleware = (opt = {}) => store => next => async action => {
     let url = '';
 
     if (params) {
-        endpoint += `/${params}`;
+        if (typeof params === 'string') {
+            endpoint = endpoint.replace(/\/$/, '') + `/${params}`;
+        } else if (typeof params === 'object') {
+            Object.entries(params).forEach(([k, v]) => {
+                endpoint = endpoint.repalce(new RegExp(`:${k}`, 'i'), v);
+            });
+        }
     }
 
     if (typeof API_PREFIX === 'object') {

@@ -1,34 +1,48 @@
 import React, {Component} from 'react';
 import {Modal, Steps, Button, Icon} from 'antd';
-import style from './style.styl';
-
+import {merge} from 'lodash';
 import ChoosePlatform from './ChoosePlatform';
+import InputAccount from './InputAccount';
 import SigninPlatform from './SigninPlatform';
 import CreateDone from './CreateDone';
 
+import style from './style.styl';
+
 const Step = Steps.Step;
 
-export default class CreateModal extends Component {
+class CreateModal extends Component {
     state = {
-        visible: true,
+        visible: false,
         current: 0,
         data: {}
     }
     clearData = () => {
         this.setState({
+            visible: false,
             current: 0,
             data: {}
         });
     }
     nextStep = (data) => {
+        if (data === 'success') {
+            return this.clearData();
+        }
         const {current} = this.state;
-        this.setState({data});
+        this.setState({
+            data: merge({}, this.state.data, data)
+        });
 
-        if (current === 2) return;
+        if (current === 3) return;
         this.setState({current: this.state.current + 1});
     }
     render () {
         const {current} = this.state;
+        const steps = [
+            '选择平台',
+            '填写账号',
+            '登录平台',
+            '确认信息'
+        ];
         return (
             <div>
                 <Button
@@ -40,29 +54,30 @@ export default class CreateModal extends Component {
                     <Icon type='plus' />
                 </Button>
                 <Modal
-                    title={JSON.stringify(this.state.data)} // '创建 Upstream'
+                    title={steps[this.state.current]}
                     width='auto'
                     className={style['create-modal']}
                     visible={this.state.visible}
-                    onCancel={() => this.setState({visible: false})}
+                    onCancel={this.clearData}
                     afterClose={this.clearData}
                     footer={null}
                 >
                     <Steps current={current}>
-                        <Step title='选择平台' />
-                        <Step title='登录平台' />
-                        <Step title='创建完成' />
+                        {steps.map(title => <Step key={title} title={title} />)}
                     </Steps>
 
                     <div className={style['steps-content']}>
                         {this.state.current === 0 &&
-                            <ChoosePlatform platforms={this.state.platforms} nextStep={this.nextStep} />
+                            <ChoosePlatform nextStep={this.nextStep} />
                         }
                         {this.state.current === 1 &&
-                            <SigninPlatform data={this.state.data} nextStep={this.nextStep} />
+                            <InputAccount data={this.state.data} nextStep={this.nextStep} />
                         }
                         {this.state.current === 2 &&
-                            <CreateDone nextStep={this.nextStep} />
+                            <SigninPlatform data={this.state.data} nextStep={this.nextStep} />
+                        }
+                        {this.state.current === 3 &&
+                            <CreateDone data={this.state.data} nextStep={this.nextStep} />
                         }
                     </div>
                 </Modal>
@@ -71,3 +86,4 @@ export default class CreateModal extends Component {
     }
 }
 
+export default CreateModal;

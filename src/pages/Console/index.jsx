@@ -4,7 +4,7 @@ import Page from 'components/Page';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 // import {hashHistory} from 'react-router';
-import * as actions from 'reducers/cookies';
+import * as actions from 'reducers/upstreams';
 
 const getAccountScript = `window.__INITIAL_STATE__.passport.name;`;
 

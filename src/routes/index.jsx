@@ -13,7 +13,7 @@ import GitHub from 'pages/GitHub';
 import Console from 'pages/Console';
 import AdminUsers from 'pages/admin/Users';
 import AdminArticles from 'pages/admin/Articles';
-import AdminUpstream from 'pages/admin/Upstream';
+import AdminUpstreams from 'pages/admin/Upstreams';
 
 import store from 'store';
 
@@ -54,7 +54,7 @@ export default (
             <Route path='admin'>
                 <Route path='users' component={AdminUsers} />
                 <Route path='articles' component={AdminArticles} />
-                <Route path='upstream' component={AdminUpstream} />
+                <Route path='upstreams' component={AdminUpstreams} />
             </Route>
             <Route path='*' component={NotFound} />
         </Route>

@@ -11,7 +11,7 @@ import update from 'react/lib/update';
 const HUSSIF = {};
 const INITAL = {
     fetching: false,
-    data: []
+    data: {}
 };
 
 export const getCookiesByPartition = createCallIpc(HUSSIF, {
@@ -22,14 +22,15 @@ export const setPartitionCookies = createCallIpc(HUSSIF, {
     channel: 'SET_PARTITION_COOKIES'
 });
 
-export const fetchPlatforms = createCallApi(HUSSIF, {
-    type: 'FETCH_PLATFORMS',
-    endpoint: '/platforms',
+export const fetchUpstreams = createCallApi(HUSSIF, {
+    type: 'FETCH_UPSTREAMS',
+    endpoint: '/upstream',
     method: 'GET',
     request: (state) => update(state, {
         fetching: {$set: true}
     }),
     success: (state, payload) => {
+        console.log('fetch upstream', payload.result.data);
         return update(state, {
             fetching: {$set: false},
             data: {$set: payload.result.data}
@@ -37,6 +38,24 @@ export const fetchPlatforms = createCallApi(HUSSIF, {
     },
     failure: (state) => update(state, {
         fetching: {$set: true}
+    })
+});
+
+export const createUpstream = createCallApi(HUSSIF, {
+    type: 'CREATE_UPSTREAM',
+    endpoint: '/upstream',
+    method: 'POST',
+    request: (state) => update(state, {
+        fetching: {$set: true}
+    }),
+    success: (state, payload) => {
+        console.log('create upstream', payload);
+        return update(state, {
+            fetching: {$set: false}
+        });
+    },
+    failure: (state, payload) => update(state, {
+        fetching: {$set: false}
     })
 });
 

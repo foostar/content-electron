@@ -42,7 +42,7 @@ const data = [...Array(100)].map((_, idx) => {
     };
 });
 
-export default class AdminUsers extends Component {
+class AdminUsers extends Component {
     render () {
         return (
             <Page className={style.container}>
@@ -54,3 +54,5 @@ export default class AdminUsers extends Component {
         );
     }
 }
+
+export default AdminUsers;
