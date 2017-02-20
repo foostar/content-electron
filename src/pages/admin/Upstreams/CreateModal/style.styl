@@ -35,9 +35,18 @@
     align-items center
 
 .account-form
-    width 300px
+    width 400px
+    :global
+        .ant-input-group-addon
+            font-size 18px
+            padding-left 12px
+            padding-right @padding-left
+    input
+        padding 24px 8px
+        font-size 16px
     button
         width 100%
+        padding 13px
 
 .create-done
     :global

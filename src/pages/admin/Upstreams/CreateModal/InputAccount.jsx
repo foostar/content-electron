@@ -37,7 +37,7 @@ class InputAccount extends Component {
                         )}
                     </FormItem>
                     <FormItem>
-                        <Button type='primary' htmlType='submit'>
+                        <Button type='primary' size='large' htmlType='submit'>
                             下一步
                         </Button>
                     </FormItem>

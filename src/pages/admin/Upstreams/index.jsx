@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
 // import {Link} from 'react-router';
+import {uniqBy} from 'lodash';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import * as actions from 'reducers/upstreams';
 import Page from 'components/Page';
 import CreateModal from './CreateModal';
-import {Button, Table, Icon} from 'antd';
+import {Button, Table, Icon, Tag} from 'antd';
 import style from './style.styl';
 
 const {Column} = Table;
@@ -30,7 +31,7 @@ class AdminUsers extends Component {
         this.props.actions.fetchUpstreams();
     }
     render () {
-        const platforms = this.props.upstreams.map(item => {
+        const platforms = uniqBy(this.props.upstreams, 'platform').map(item => {
             return {
                 text: item.platform,
                 value: item.platform
@@ -40,7 +41,9 @@ class AdminUsers extends Component {
             <Page className={style.container}>
                 <Table
                     rowKey='id'
+                    pagination={false}
                     dataSource={this.props.upstreams}
+                    scroll={{y: 'calc(100vh - 55px)'}}
                 >
                     <Column
                         title='账号'
@@ -59,6 +62,12 @@ class AdminUsers extends Component {
                         key='platform'
                         filters={platforms}
                         onFilter={(value, record) => record.platform.includes(value)}
+                        render={(text, record) => {
+                            if (record.platform === '企鹅号') {
+                                return <Tag color='purple-inverse'>{text}</Tag>;
+                            }
+                            return <Tag color='blue-inverse'>{text}</Tag>;
+                        }}
                     />
                     <Column
                         title={<CreateModal />}

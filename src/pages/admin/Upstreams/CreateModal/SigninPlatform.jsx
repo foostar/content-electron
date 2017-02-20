@@ -12,6 +12,7 @@ class Qie extends Component {
     onDidStopLoading = () => {
         const url = this.webview.getURL();
         console.info('企鹅号:', url);
+
         // 登录界面
         if (url === 'https://om.qq.com/userAuth/index') {
             this.webview.executeJavaScript(`
@@ -47,10 +48,12 @@ class Baijia extends Component {
     onDidStopLoading = () => {
         const url = this.webview.getURL();
         console.info('百家号:', url);
+
+        // 登录界面
         if (url === 'http://baijiahao.baidu.com/builder/app/login') {
             this.webview.executeJavaScript(`
-                document.querySelector('#TANGRAM__PSP_4__userName').value = '17600806970';
-                document.querySelector('#TANGRAM__PSP_4__password').value = 'zxc123456';
+                document.querySelector('#TANGRAM__PSP_4__userName').value = '${this.props.data.account}';
+                document.querySelector('#TANGRAM__PSP_4__password').value = '${this.props.data.password}';
             `);
         }
 

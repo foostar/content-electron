@@ -18,14 +18,18 @@ class CreateModal extends Component {
     }
     clearData = () => {
         this.setState({
-            visible: false,
             current: 0,
             data: {}
         });
     }
+    onCancel = () => {
+        this.setState({
+            visible: false
+        });
+    }
     nextStep = (data) => {
         if (data === 'success') {
-            return this.clearData();
+            return this.onCancel();
         }
         const {current} = this.state;
         this.setState({
@@ -58,7 +62,7 @@ class CreateModal extends Component {
                     width='auto'
                     className={style['create-modal']}
                     visible={this.state.visible}
-                    onCancel={this.clearData}
+                    onCancel={this.onCancel}
                     afterClose={this.clearData}
                     footer={null}
                 >

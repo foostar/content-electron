@@ -6,7 +6,6 @@ import HomePage from 'pages/HomePage';
 import Layout from 'pages/Layout';
 import Signin from 'pages/Signin';
 import Articles from 'pages/Articles';
-import User from 'pages/User';
 import Editor from 'pages/Editor';
 import NotFound from 'pages/NotFound';
 import GitHub from 'pages/GitHub';
@@ -47,7 +46,6 @@ export default (
             <IndexRoute component={HomePage} />
             <Route path='editor' component={Editor} />
             <Route path='articles' component={Articles} />
-            <Route path='user' component={User} />
             <Route path='github' component={GitHub} />
             <Route path='console' component={Console} />
             <Route path='console2' component={Console} />

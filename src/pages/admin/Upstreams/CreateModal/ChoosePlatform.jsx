@@ -16,7 +16,7 @@ class ChoosePlatform extends Component {
             logo: 'http://bjh.bdstatic.com/bjh/content/static/img/logo-bg-white_8e6fbd7.png'
         }];
         return (
-            <Row gutter={16}>
+            <Row gutter={16} style={{padding: 3}}>
                 {platforms.map(item => (
                     <Col
                         xs={12}

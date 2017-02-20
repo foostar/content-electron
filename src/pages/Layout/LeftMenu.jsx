@@ -49,10 +49,15 @@ export default class LeftMenu extends Component {
                     </Item>
                 </MenuItemGroup>
 
+                {/* admin 权限 */}
                 <MenuItemGroup title={<span><Icon type='ellipsis' />&emsp;admin</span>}>
                     <Item key='/admin/upstreams'>
                         <Icon type='cloud-upload-o' />
                         Upstream
+                    </Item>
+                    <Item key='/admin/users'>
+                        <Icon type='team' />
+                        用户管理
                     </Item>
                     <Item key='/admin/articles'>
                         <Icon type='book' />
