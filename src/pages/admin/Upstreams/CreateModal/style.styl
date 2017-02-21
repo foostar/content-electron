@@ -1,0 +1,66 @@
+.create-modal
+    top 10px
+    height calc(100% - 20px)
+    margin 0 10px
+    padding-bottom 0
+    overflow hidden
+    :global
+        .ant-modal-content
+            height 100%
+            display flex
+            flex-direction column
+        .ant-modal-body
+            flex 1
+            display flex
+            flex-direction column
+
+.steps-content
+    flex 1
+    overflow auto
+    padding-top 12px
+
+.platform-card
+    margin-bottom 8px
+    cursor pointer
+    .logo
+        height 60px
+        background-position center
+        background-size contain
+        background-repeat no-repeat
+
+.account-form-wrapper
+    display flex
+    height 100%
+    justify-content center
+    align-items center
+
+.account-form
+    width 400px
+    :global
+        .ant-input-group-addon
+            font-size 18px
+            padding-left 12px
+            padding-right @padding-left
+    input
+        padding 24px 8px
+        font-size 16px
+    button
+        width 100%
+        padding 13px
+
+.create-done
+    :global
+        .ant-collapse-content
+            padding 0
+        .ant-collapse-content-box
+            padding 0
+        .ant-table
+            border 0
+            table
+                padding 0
+        .ant-table-placeholder
+            border-bottom 0
+    button
+        width 300px
+        display block
+        margin auto

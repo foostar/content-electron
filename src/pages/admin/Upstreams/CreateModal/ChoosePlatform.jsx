@@ -1,19 +1,25 @@
 import React, {Component} from 'react';
 import {Row, Col, Card} from 'antd';
 
+import qieLogo from './qi-e-logo.png';
+import baiJiaLogo from './bai-jia-logo.png';
+
 import style from './style.styl';
 
-export default class ChoosePlatform extends Component {
+class ChoosePlatform extends Component {
+    choosePlatform = (platform) => {
+        this.props.nextStep({platform});
+    }
     render () {
         const platforms = [{
             name: '企鹅号',
-            logo: 'https://mats.gtimg.com/om/om_2.0/images/om_logo_header.png'
+            logo: qieLogo
         }, {
             name: '百家号',
-            logo: 'http://bjh.bdstatic.com/bjh/content/static/img/logo-bg-white_8e6fbd7.png'
+            logo: baiJiaLogo
         }];
         return (
-            <Row gutter={16}>
+            <Row gutter={16} style={{padding: 3}}>
                 {platforms.map(item => (
                     <Col
                         xs={12}
@@ -21,7 +27,7 @@ export default class ChoosePlatform extends Component {
                         md={6}
                         lg={4}
                         key={item.name}
-                        onClick={this.props.nextStep}
+                        onClick={() => this.choosePlatform(item.name)}
                     >
                         <Card className={style['platform-card']}>
                             <div
@@ -35,3 +41,5 @@ export default class ChoosePlatform extends Component {
         );
     }
 }
+
+export default ChoosePlatform;

@@ -6,7 +6,6 @@ import HomePage from 'pages/HomePage';
 import Layout from 'pages/Layout';
 import Signin from 'pages/Signin';
 import Articles from 'pages/Articles';
-import User from 'pages/User';
 import Editor from 'pages/Editor';
 import NotFound from 'pages/NotFound';
 import GitHub from 'pages/GitHub';
@@ -14,7 +13,7 @@ import Console from 'pages/Console';
 import AdminUsers from 'pages/admin/Users';
 import AdminArticles from 'pages/admin/Articles';
 import AdminEditor from 'pages/admin/Editor';
-import AdminUpstream from 'pages/admin/Upstream';
+import AdminUpstreams from 'pages/admin/Upstreams';
 
 import store from 'store';
 
@@ -48,15 +47,14 @@ export default (
             <IndexRoute component={HomePage} />
             <Route path='editor' component={Editor} />
             <Route path='articles' component={Articles} />
-            <Route path='user' component={User} />
             <Route path='github' component={GitHub} />
             <Route path='console' component={Console} />
             <Route path='console2' component={Console} />
             <Route path='admin'>
                 <Route path='users' component={AdminUsers} />
                 <Route path='articles' component={AdminArticles} />
-                <Route path='upstream' component={AdminUpstream} />
                 <Route path='editor' component={AdminEditor} />
+                <Route path='upstreams' component={AdminUpstreams} />
             </Route>
             <Route path='*' component={NotFound} />
         </Route>

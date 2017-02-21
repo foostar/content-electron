@@ -117,7 +117,7 @@ export default class extends Component {
     }, {
         title: '操作',
         key: 'action',
-        width: 120,
+        width: 70,
         render: (text, record) => (
             <span>
                 <Link to={`/admin/editor?articleId=${record.id}`}>编辑</Link>

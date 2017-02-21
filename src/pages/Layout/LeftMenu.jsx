@@ -30,7 +30,7 @@ export default class LeftMenu extends Component {
                 theme={this.state.theme}
                 onClick={this.handleClick}
                 selectedKeys={[this.props.location.pathname]}
-                defaultOpenKeys={['platfrom-sub', 'test-sub']}
+                defaultOpenKeys={['test-sub']}
             >
                 <MenuItemGroup title={
                     <div onClick={this.changeTheme}>
@@ -43,23 +43,28 @@ export default class LeftMenu extends Component {
                     </Item>
                     <Item key='/editor'>
                         <Icon type='edit' />
-                        <span>新建文章</span>
+                        <span>新建内容</span>
                     </Item>
 
                     <Item key='/articles'>
                         <Icon type='copy' />
-                        <span>文章列表</span>
+                        <span>内容列表</span>
                     </Item>
                 </MenuItemGroup>
 
+                {/* admin 权限 */}
                 <MenuItemGroup title={<span><Icon type='ellipsis' />&emsp;admin</span>}>
-                    <Item key='/admin/upstream'>
+                    <Item key='/admin/upstreams'>
                         <Icon type='cloud-upload-o' />
                         Upstream
                     </Item>
+                    <Item key='/admin/users'>
+                        <Icon type='team' />
+                        用户管理
+                    </Item>
                     <Item key='/admin/articles'>
                         <Icon type='book' />
-                        文章管理
+                        内容管理
                     </Item>
                 </MenuItemGroup>
 

@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {hashHistory} from 'react-router';
+import {hashHistory, Link} from 'react-router';
 import {Form, Button, Spin, Input, Select, notification} from 'antd';
 import * as actions from 'reducers/editor';
 
@@ -191,6 +191,7 @@ export default class Editor extends Component {
                         </FormItem>
                         <FormItem {...tailFormItemLayout}>
                             <Button type='primary' htmlType='submit' size='large'>提交</Button>
+                            <Button className={style.goback} type='primary'><Link to='/articles'>返回</Link></Button>
                         </FormItem>
                         <div className={style.disappear} ref='model' />
                     </Form>
