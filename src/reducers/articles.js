@@ -1,6 +1,7 @@
 import {createCallApi} from 'middlewares/api';
-import {createReducer} from 'redux-act';
+import {createAction, createReducer} from 'redux-act';
 import update from 'react/lib/update';
+import {format} from 'utils/util';
 
 const HUSSIF = {};
 const INITAL = {
@@ -9,7 +10,13 @@ const INITAL = {
     skip: 0,
     contents: []
 };
-
+// 改变页数
+export const pageChange = createAction('PAGECHANGE');
+HUSSIF[ pageChange ] = (state, skip) => {
+    return Object.assign({}, state, {
+        skip
+    });
+};
 // 获取文章列表
 export const getArticles = createCallApi(HUSSIF, {
     type: 'GETARTICLES',
@@ -22,6 +29,7 @@ export const getArticles = createCallApi(HUSSIF, {
         const {data} = payload.result;
         data.contents.forEach((v) => {
             v.key = v.id;
+            v.createdAt = format(v.createdAt);
         });
         return Object.assign({}, state, data, {
             isFetching: false
