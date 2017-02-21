@@ -20,6 +20,9 @@ export default class LeftMenu extends Component {
         }
     }
     render () {
+        if (this.props.location.pathname == '/admin/editor') {
+            this.props.location.pathname = '/admin/articles';
+        }
         return (
             <Menu
                 mode='inline'
