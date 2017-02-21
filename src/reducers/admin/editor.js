@@ -10,44 +10,16 @@ const INITAL = {
     category: 'other'
 };
 // 更新编辑器里的内容
-export const updateModel = createAction('UPDATE_MODEL');
-// 强制loading
-export const fetching = createAction('FETCHING');
-// 清空表单
-export const clearArticle = createAction('CLEARARTICLE');
+export const updateModel = createAction('ADMIN_UPDATE_MODEL');
 
 HUSSIF[ updateModel ] = (state, content) => {
     return Object.assign({}, state, {
         content
     });
 };
-
-HUSSIF[ fetching ] = (state) => {
-    return Object.assign({}, state, {
-        isFetching: true
-    });
-};
-
-HUSSIF[ clearArticle ] = (state, content) => {
-    return Object.assign({}, state, INITAL);
-};
-
-// 新增文章
-export const addArticle = createCallApi(HUSSIF, {
-    type: 'ADDARTICLE',
-    endpoint: '/content',
-    method: 'POST',
-    request: (state, payload) => update(state, {
-        isFetching: {$set: true}
-    }),
-    success: (state, payload) => INITAL,
-    failure: (state, payload) => update(state, {
-        isFetching: {$set: false}
-    })
-});
 // 文章详情
 export const getArticle = createCallApi(HUSSIF, {
-    type: 'GETARTICLE',
+    type: 'ADMIN_GETARTICLE',
     endpoint: '/content',
     request: (state, payload) => update(state, {
         isFetching: {$set: true}
@@ -64,7 +36,7 @@ export const getArticle = createCallApi(HUSSIF, {
 });
 // 修改文章
 export const editArticle = createCallApi(HUSSIF, {
-    type: 'EDITARTICLE',
+    type: 'ADMIN_EDITARTICLE',
     endpoint: '/content',
     method: 'PATCH',
     request: (state, payload) => update(state, {

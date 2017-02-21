@@ -7,7 +7,7 @@
         "localStorage": true
     },
     "rules": {
-        "indent": ["error", 4],
+        "indent": ["error", 4, {"SwitchCase": 1}],
         "no-class-assign": 0,
         "object-curly-spacing": ["error", "never"],
         "semi": ["error", "always"],

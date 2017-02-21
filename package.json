@@ -5,8 +5,8 @@
   "main": "main.js",
   "scripts": {
     "lint": "eslint --ext js,jsx src",
-    "dev": "concurrently --kill-others 'npm run dev:eletron' 'npm run dev:webpack'",
-    "dev:eletron": "electron main.dev.js",
+    "dev": "concurrently --kill-others 'npm run dev:electron' 'npm run dev:webpack'",
+    "dev:electron": "electron main.dev.js",
     "dev:webpack": "webpack-dev-server"
   },
   "pre-commit": [
@@ -31,6 +31,7 @@
     "less": "^2.7.2",
     "less-loader": "^2.2.3",
     "lodash": "^4.17.4",
+    "moment": "^2.17.1",
     "purecss": "^0.6.2",
     "ramda": "^0.23.0",
     "react": "^15.4.2",

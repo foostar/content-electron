@@ -1,5 +1,6 @@
-import 'babel-polyfill';
 import 'style.less';
+import 'babel-polyfill';
+import 'moment/locale/zh-cn';
 
 import React from 'react';
 import {render} from 'react-dom';

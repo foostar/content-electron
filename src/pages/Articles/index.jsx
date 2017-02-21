@@ -24,9 +24,13 @@ export default class extends Component {
         page = (page - 1) || 0;
         const {isFetching} = this.props.articles;
         if (isFetching) return;
-        this.props.getArticles({query: {skip: page, limit: 10}});
+        this.props.getArticles({query: {
+            limit: 10,
+            skip: page
+        }});
     }
     pageChange = (page) => {
+        this.props.pageChange(page);
         this.fetchData(page);
     }
     columns = [{
@@ -41,6 +45,10 @@ export default class extends Component {
         title: '文章分类',
         dataIndex: 'category',
         key: 'category'
+    }, {
+        title: '创建时间',
+        dataIndex: 'createdAt',
+        key: 'createdAt'
     }, {
         title: '操作',
         key: 'action',

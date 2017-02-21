@@ -4,7 +4,7 @@ import Page from 'components/Page';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 // import {hashHistory} from 'react-router';
-import * as actions from 'reducers/cookies';
+import * as actions from 'reducers/upstreams';
 
 const getAccountScript = `window.__INITIAL_STATE__.passport.name;`;
 
@@ -39,7 +39,7 @@ export default class extends Component {
         //     })
         // });
     }
-    onDidStopLoading = () => {
+    onDomReady = () => {
         if (this.webview.getURL() !== 'http://console.apps.xiaoyun.com/') return;
         this.webview.executeJavaScript(
             getAccountScript,
@@ -51,7 +51,6 @@ export default class extends Component {
             <Page>
                 <WebView
                     getRef={webview => { this.webview = webview; }}
-                    onDidStopLoading={this.onDidStopLoading}
                     onDomReady={this.onDomReady}
                     partition={`persist:${this.props.location.pathname}`}
                     src='http://console.apps.xiaoyun.com'
