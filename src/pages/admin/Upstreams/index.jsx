@@ -64,9 +64,9 @@ class AdminUsers extends Component {
                         onFilter={(value, record) => record.platform.includes(value)}
                         render={(text, record) => {
                             if (record.platform === '企鹅号') {
-                                return <Tag color='purple-inverse'>{text}</Tag>;
+                                return <Tag color='purple'>{text}</Tag>;
                             }
-                            return <Tag color='blue-inverse'>{text}</Tag>;
+                            return <Tag color='blue'>{text}</Tag>;
                         }}
                     />
                     <Column

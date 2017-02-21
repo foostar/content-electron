@@ -1,36 +1,54 @@
 import React, {Component} from 'react';
-import {Modal, Button, Form, Input, Radio, Alert} from 'antd';
-
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import * as actions from 'reducers/users';
+import * as usersActions from 'reducers/users';
+import * as upstreamsActions from 'reducers/upstreams';
+
+import {
+    Modal, Button, Form, Input,
+    Radio, Tag, Select, Alert
+} from 'antd';
 
 const FormItem = Form.Item;
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
+const Option = Select.Option;
 
-const mapDispatchToProps = dispatch => {
+const mapStateToProps = state => {
     return {
-        actions: bindActionCreators(actions, dispatch)
+        upstreams: state.upstreams.data,
+        skip: state.upstreams.skip,
+        count: state.upstreams.count
     };
 };
 
-@connect(null, mapDispatchToProps)
+const mapDispatchToProps = dispatch => {
+    return {
+        userActions: bindActionCreators(usersActions, dispatch),
+        upstreamsActions: bindActionCreators(upstreamsActions, dispatch)
+    };
+};
+
 @Form.create()
+@connect(mapStateToProps, mapDispatchToProps)
 class CreateModal extends Component {
+    static defaultProps = {
+        upstreams: []
+    }
     state = {
         visible: false
     }
     handleSubmit = (e) => {
         this.props.form.validateFields(async (err, values) => {
             if (err) return;
-            const {type} = await this.props.actions.createUser({
+
+            const {type} = await this.props.userActions.createUser({
                 body: values
             });
 
             if (type === 'CREATE_USER_SUCCESS') {
                 this.setState({visible: false});
-                this.props.actions.fetchUsers();
+                this.props.userActions.fetchUsers(); // 更新用户列表
                 Modal.success({
                     title: '创建成功',
                     width: 520,
@@ -50,6 +68,7 @@ class CreateModal extends Component {
         });
     }
     showModal = () => {
+        this.props.upstreamsActions.fetchUpstreams();
         this.setState({visible: true});
     }
     onCancel = () => {
@@ -63,23 +82,6 @@ class CreateModal extends Component {
 
         return (
             <Form onSubmit={this.handleSubmit}>
-                <FormItem label='账号' labelCol={{span: 5}} wrapperCol={{span: 17}}>
-                    {getFieldDecorator('username', {
-                        rules: [{required: true, message: '请输入账号!'}]
-                    })(
-                        <Input placeholder='账号' />
-                    )}
-                </FormItem>
-
-                <FormItem label='密码' labelCol={{span: 5}} wrapperCol={{span: 17}}>
-                    {getFieldDecorator('password', {
-                        initialValue: '123456',
-                        rules: [{required: true, message: '请输入密码!'}]
-                    })(
-                        <Input placeholder='密码' />
-                    )}
-                </FormItem>
-
                 <FormItem label='用户类型' labelCol={{span: 5}} wrapperCol={{span: 17}}>
                     {getFieldDecorator('level', {
                         initialValue: 1,
@@ -89,8 +91,49 @@ class CreateModal extends Component {
                             <RadioButton value={1}>内容贡献者</RadioButton>
                             <RadioButton value={2}>小云小编</RadioButton>
                         </RadioGroup>
-                    )}
+                        )}
                 </FormItem>
+
+                <FormItem label='账号' labelCol={{span: 5}} wrapperCol={{span: 17}}>
+                    {getFieldDecorator('username', {
+                        rules: [{required: true, message: '请输入账号!'}]
+                    })(
+                        <Input placeholder='账号' />
+                        )}
+                </FormItem>
+
+                <FormItem label='密码' labelCol={{span: 5}} wrapperCol={{span: 17}}>
+                    {getFieldDecorator('password', {
+                        initialValue: '123456',
+                        rules: [{required: true, message: '请输入密码!'}]
+                    })(
+                        <Input placeholder='密码' />
+                        )}
+                </FormItem>
+
+                <FormItem label='Upstreams' labelCol={{span: 5}} wrapperCol={{span: 17}}>
+                    {getFieldDecorator('bindUpstreams', {
+                        initialValue: []
+                    })(
+                        <Select
+                            multiple
+                            style={{width: '100%'}}
+                            placeholder='请选择 Upstreams'
+                        >
+                            {this.props.upstreams.map(item =>
+                                <Option key={item.id}>
+                                    {item.platform === '企鹅号'
+                                        ? <Tag color='purple'>{item.platform}</Tag>
+                                        : <Tag color='blue'>{item.platform}</Tag>
+                                    }
+                                    {item.account}
+                                </Option>
+                            )}
+
+                        </Select>
+                        )}
+                </FormItem>
+
             </Form>
         );
     }

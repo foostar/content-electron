@@ -5,7 +5,9 @@ import style from './style.styl';
 import {connect} from 'react-redux';
 import {uniqBy} from 'lodash';
 import {bindActionCreators} from 'redux';
-import * as actions from 'reducers/users';
+import * as usersActions from 'reducers/users';
+import * as upstreamsActions from 'reducers/upstreams';
+
 import {Table, Button, Tag} from 'antd';
 import CreateModal from './CreateModal';
 
@@ -13,12 +15,14 @@ const {Column} = Table;
 
 const mapStateToProps = state => {
     return {
-        users: state.users.data
+        users: state.users.data,
+        upstreams: state.upstreams.data.upstreams
     };
 };
 const mapDispatchToProps = dispatch => {
     return {
-        actions: bindActionCreators(actions, dispatch)
+        userActions: bindActionCreators(usersActions, dispatch),
+        upstreamsActions: bindActionCreators(upstreamsActions, dispatch)
     };
 };
 
@@ -28,7 +32,8 @@ class AdminUsers extends Component {
         users: []
     }
     componentDidMount () {
-        this.props.actions.fetchUsers();
+        this.props.userActions.fetchUsers();
+        this.props.upstreamsActions.fetchUpstreams();
     }
     render () {
         const userTypes = uniqBy(this.props.users, 'level').map(user => {
@@ -37,7 +42,6 @@ class AdminUsers extends Component {
                 value: user.level
             };
         });
-        console.log(userTypes);
         return (
             <Page className={style.container}>
                 <Table
@@ -64,9 +68,9 @@ class AdminUsers extends Component {
                         onFilter={(value, record) => Number(record.level) === Number(value)}
                         render={level => {
                             if (level > 1) {
-                                return <Tag color='red-inverse'>{getLevelLabel(level)}</Tag>;
+                                return <Tag color='red'>{getLevelLabel(level)}</Tag>;
                             }
-                            return <Tag color='blue-inverse'>{getLevelLabel(level)}</Tag>;
+                            return <Tag color='blue'>{getLevelLabel(level)}</Tag>;
                         }}
                     />
                     <Column
