@@ -8,15 +8,16 @@ import {bindActionCreators} from 'redux';
 import * as usersActions from 'reducers/users';
 import * as upstreamsActions from 'reducers/upstreams';
 
-import {Table, Button, Tag} from 'antd';
+import {Table, Tag} from 'antd';
 import CreateModal from './CreateModal';
+import ModifyModal from './ModifyModal';
 
 const {Column} = Table;
 
 const mapStateToProps = state => {
     return {
         users: state.users.data,
-        upstreams: state.upstreams.data.upstreams
+        upstreams: state.upstreams.data
     };
 };
 const mapDispatchToProps = dispatch => {
@@ -29,11 +30,33 @@ const mapDispatchToProps = dispatch => {
 @connect(mapStateToProps, mapDispatchToProps)
 class AdminUsers extends Component {
     static defaultProps = {
-        users: []
+        users: [],
+        upstreams: []
     }
     componentDidMount () {
         this.props.userActions.fetchUsers();
         this.props.upstreamsActions.fetchUpstreams();
+    }
+    renderUpstreamsByIds = (ids) => {
+        if (ids.length === 0) return <Tag>无</Tag>;
+        return (
+            <div>
+                {this.props.upstreams
+                    .filter(item => ids.includes(item.id))
+                    .map(item =>
+                        <div key={item.id} className={style['bind-upstream-tag']}>
+                            <Tag
+                                key={item.id}
+                                color={item.platform === '企鹅号' ? 'purple' : 'blue'}
+                            >
+                                {item.platform}
+                            </Tag>
+                            <Tag>{item.account}</Tag>
+                        </div>
+                    )
+                }
+            </div>
+        );
     }
     render () {
         const userTypes = uniqBy(this.props.users, 'level').map(user => {
@@ -42,6 +65,17 @@ class AdminUsers extends Component {
                 value: user.level
             };
         });
+        const upstreamTypes = uniqBy(this.props.upstreams, 'platform')
+            .map(upstream => {
+                return {
+                    text: upstream.platform,
+                    value: upstream.id
+                };
+            })
+            .concat({
+                text: '无',
+                value: 'null'
+            });
         return (
             <Page className={style.container}>
                 <Table
@@ -53,39 +87,54 @@ class AdminUsers extends Component {
                     <Column
                         key='username'
                         title='用户名'
+                        width='20%'
                         dataIndex='username'
-                        width='30%'
                         render={username => <a>{username}</a>}
                     />
                     <Column
                         key='level'
                         title='用户类型'
+                        width='15%'
                         dataIndex='level'
-                        width='25%'
                         filterMultiple={false}
                         filters={userTypes}
                         sorter={(a, b) => a.level - b.level}
                         onFilter={(value, record) => Number(record.level) === Number(value)}
                         render={level => {
                             if (level > 1) {
-                                return <Tag color='red'>{getLevelLabel(level)}</Tag>;
+                                return <Tag color='pink'>{getLevelLabel(level)}</Tag>;
                             }
-                            return <Tag color='blue'>{getLevelLabel(level)}</Tag>;
+                            return <Tag color='green'>{getLevelLabel(level)}</Tag>;
                         }}
+                    />
+                    <Column
+                        key='bindUpstreams'
+                        title='Upstreams'
+                        width='25%'
+                        dataIndex='bindUpstreams'
+                        filters={upstreamTypes}
+                        sorter={(a, b) => a.bindUpstreams.length - b.bindUpstreams.length}
+                        onFilter={(value, record) => {
+                            if (value === 'null' && record.bindUpstreams.length === 0) {
+                                return true;
+                            }
+                            return record.bindUpstreams.includes(value);
+                        }}
+                        render={this.renderUpstreamsByIds}
                     />
                     <Column
                         key='createdAt'
                         title='创建时间'
-                        width='30%'
+                        width='20%'
                         dataIndex='createdAt'
                         sorter={(a, b) => new Date(a.createdAt) - new Date(b.createdAt)}
                         render={time => moment(time).format('YYYY-MM-DD HH:mm')}
                     />
                     <Column
                         key='action'
-                        width='15%'
                         title={<CreateModal />}
-                        render={() => <Button disabled size='small' shape='circle' icon='edit' />}
+                        width='10%'
+                        render={(_, record) => <ModifyModal data={record} />}
                     />
                 </Table>
             </Page>
@@ -96,7 +145,7 @@ class AdminUsers extends Component {
 function getLevelLabel (level) {
     switch (level) {
         case 0: return '超级管理员';
-        case 1: return '内容贡献者';
+        case 1: return '内容提供';
         case 2: return '小云编辑';
     }
 }

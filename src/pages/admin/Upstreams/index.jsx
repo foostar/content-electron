@@ -13,7 +13,7 @@ const {Column} = Table;
 
 const mapStateToProps = state => {
     return {
-        upstreams: state.upstreams.data.upstreams
+        upstreams: state.upstreams.data
     };
 };
 const mapDispatchToProps = dispatch => {

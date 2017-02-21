@@ -21,7 +21,7 @@ export const fetchUsers = createCallApi(HUSSIF, {
         data: {$set: payload.result.data}
     }),
     failure: (state, payload) => update(state, {
-        fetching: {$set: true}
+        fetching: {$set: false}
     })
 });
 
@@ -30,15 +30,29 @@ export const createUser = createCallApi(HUSSIF, {
     type: 'CREATE_USER',
     endpoint: '/users',
     method: 'POST',
-    request: (state, payload) => update(state, {
+    request: (state) => update(state, {
         fetching: {$set: true}
     }),
-    success: (state, payload) => {
-        console.log('crate user', payload.result);
-        return state;
-    },
-    failure: (state, payload) => update(state, {
+    success: (state, payload) => update(state, {
+        fetching: {$set: false}
+    }),
+    failure: (state) => update(state, {
+        fetching: {$set: false}
+    })
+});
+
+export const updateUser = createCallApi(HUSSIF, {
+    type: 'UPDATE_USER',
+    endpoint: '/users/:id',
+    method: 'PATCH',
+    request: (state) => update(state, {
         fetching: {$set: true}
+    }),
+    success: (state) => update(state, {
+        fetching: {$set: false}
+    }),
+    failure: (state) => update(state, {
+        fetching: {$set: false}
     })
 });
 
