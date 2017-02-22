@@ -5,6 +5,24 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import * as editorActions from 'reducers/admin/editor';
 
+function createIdImage (mongoId) {
+    const canvas = document.createElement('CANVAS');
+    canvas.width = 2;
+    canvas.height = 3;
+    const ctx = canvas.getContext('2d');
+    const imgData = ctx.createImageData(2, 3);
+
+    mongoId.split('').forEach((d, idx) => {
+        if (isNaN(d)) {
+            imgData.data[idx] = d.charCodeAt();
+        } else {
+            imgData.data[idx] = Number(d);
+        }
+    });
+    ctx.putImageData(imgData, 2, 3);
+    return `<p><img src="${canvas.toDataURL('image/png')}"/></p>`;
+};
+
 const mapDispatchToProps = dispatch => {
     return {
         editorActions: bindActionCreators(editorActions, dispatch)
@@ -30,16 +48,29 @@ class QiE extends Component {
         const res = await this.props.editorActions.getArticle({
             params: this.props.content.id
         });
+
+        const secImg = createIdImage(this.props.content.id);
+
         if (res.type === 'ADMIN_GET_ARTICLE_SUCCESS') {
-            const {title, content} = res.payload.result.data;
-            console.log(content);
-            this.webview.executeJavaScript(`
-                setTimeout(() => {
-                    alert(11111);
-                    document.querySelector('#om-art-normal-title input').value = ${title};
-                    window.frames['ueditor_0'].contentWindow.document.body.innerHTML = \`${content}\`;
-                }, 3000)
-            `);
+            let {title, content} = res.payload.result.data;
+            content += secImg;
+            let t = 0;
+            const interval = setInterval(() => {
+                this.webview.executeJavaScript(`$('#om-art-normal-title input').val()`, done => {
+                    console.log('判断一次是否家在完成!');
+                    t += 1;
+                    if (!done && t < 30) return;
+                    clearInterval(interval);
+
+                    this.webview.executeJavaScript(`
+                        $('#om-art-normal-title input').val(\`${title}\`);
+                        window.frames['ueditor_0'].contentWindow.document.body.innerHTML = \`${content}\`;
+                        $('#edui14_body').click();
+                        $('.layui-layer-btn0').click();
+                        $('.ui-radio[data-id="auto"]').click();
+                    `);
+                });
+            }, 100);
         }
     }
     gotoPublishPage = () => {

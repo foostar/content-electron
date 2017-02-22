@@ -8,7 +8,7 @@ import {merge} from 'lodash';
 import style from './style.styl';
 import {Modal, Steps} from 'antd';
 
-import ChoosePlatform from './ChoosePlatform';
+import ChooseUpstream from './ChooseUpstream';
 import PublishContent from './PublishContent';
 
 const {Step} = Steps;
@@ -86,7 +86,7 @@ class PublishModal extends Component {
                     </Steps>
                     <div className={style['steps-content']}>
                         {current === 0 &&
-                            <ChoosePlatform
+                            <ChooseUpstream
                                 bindUpstreams={bindUpstreams}
                                 upstreams={upstreams}
                                 nextStep={this.nextStep}
