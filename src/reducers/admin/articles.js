@@ -57,7 +57,7 @@ HUSSIF[ showNewTag ] = (state, data) => {
 };
 // 获取文章列表
 export const getArticles = createCallApi(HUSSIF, {
-    type: 'ADMIN_GETARTICLES',
+    type: 'ADMIN_GET_ARTICLES',
     endpoint: '/content/search',
     method: 'GET',
     request: (state, payload) => update(state, {

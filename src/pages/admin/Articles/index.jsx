@@ -6,6 +6,7 @@ import {Link} from 'react-router';
 import {bindActionCreators} from 'redux';
 import Page from 'components/Page';
 import FormSearch from './FormSearch';
+import PublishModal from './PublishModal';
 import * as actions from 'reducers/admin/articles';
 
 const Option = Select.Option;
@@ -68,10 +69,55 @@ export default class extends Component {
             }
         });
     }
+    renderTag = (_, record) => {
+        const tags = record.tags.map((v, index) => {
+            return <Tag className={style.table_tag} key={index} closable afterClose={() => this.removeTag({id: record.id, value: v})}>{v}</Tag>;
+        });
+        const {recentTag} = this.props.articles;
+        const children = recentTag.map((v, index) => {
+            return <Option key={index} value={v}>{v}</Option>;
+        });
+        return (
+            <div>
+                {tags}
+                {!record.inputVisible && <Button size='small' type='dashed' onClick={() => this.showNewTag(record.id)}>+ 新标签</Button>}
+                {record.inputVisible && (
+                    <Select tags
+                        style={{width: '100%'}}
+                        searchPlaceholder='标签模式'
+                        onChange={(value) => this.addTag({id: record.id, value})}
+                        value={record.inputValue}
+                    >
+                        {children}
+                    </Select>
+                )}
+            </div>
+        );
+    }
+    removeTag (data) {
+        this.props.removeTag({
+            params: {
+                id: data.id,
+                tag: data.value
+            }
+        });
+    }
+    handleReset = () => {
+        this.props.form.resetFields();
+        this.props.changeForm({});
+    }
+    showNewTag (id) {
+        this.props.showNewTag({isShow: true, id});
+    }
     columns = [{
         title: '文章id',
         dataIndex: 'id',
         key: 'id'
+    }, {
+        title: '作者',
+        dataIndex: 'author',
+        key: 'author',
+        render: author => author.username
     }, {
         title: '文章标题',
         dataIndex: 'title',
@@ -89,56 +135,18 @@ export default class extends Component {
         dataIndex: 'tag',
         key: 'tag',
         width: 300,
-        render: (text, record) => {
-            const tags = record.tags.map((v, index) => {
-                return <Tag className={style.table_tag} key={index} closable afterClose={() => this.removeTag({id: record.id, value: v})}>{v}</Tag>;
-            });
-            const {recentTag} = this.props.articles;
-            const children = recentTag.map((v, index) => {
-                return <Option key={index} value={v}>{v}</Option>;
-            });
-            return (
-                <div>
-                    {tags}
-                    {!record.inputVisible && <Button size='small' type='dashed' onClick={() => this.showNewTag(record.id)}>+ 新标签</Button>}
-                    {record.inputVisible && (
-                        <Select tags
-                            style={{width: '100%'}}
-                            searchPlaceholder='标签模式'
-                            onChange={(value) => this.addTag({id: record.id, value})}
-                            value={record.inputValue}
-                        >
-                            {children}
-                        </Select>
-                    )}
-                </div>
-            );
-        }
+        render: this.renderTag
     }, {
         title: '操作',
         key: 'action',
-        width: 70,
+        width: 90,
         render: (text, record) => (
             <span>
                 <Link to={`/admin/editor?articleId=${record.id}`}>编辑</Link>
+                &emsp;<PublishModal content={record} />
             </span>
       )
     }]
-    removeTag (data) {
-        this.props.removeTag({
-            params: {
-                id: data.id,
-                tag: data.value
-            }
-        });
-    }
-    handleReset = () => {
-        this.props.form.resetFields();
-        this.props.changeForm({});
-    }
-    showNewTag (id) {
-        this.props.showNewTag({isShow: true, id});
-    }
     render () {
         const {getFieldDecorator} = this.props.form;
         const {contents, count, isFetching, form, expand, recentTag} = this.props.articles;

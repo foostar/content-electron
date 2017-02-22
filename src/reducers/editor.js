@@ -45,6 +45,7 @@ export const addArticle = createCallApi(HUSSIF, {
         isFetching: {$set: false}
     })
 });
+
 // 文章详情
 export const getArticle = createCallApi(HUSSIF, {
     type: 'GETARTICLE',
@@ -62,6 +63,7 @@ export const getArticle = createCallApi(HUSSIF, {
         isFetching: {$set: false}
     })
 });
+
 // 修改文章
 export const editArticle = createCallApi(HUSSIF, {
     type: 'EDITARTICLE',

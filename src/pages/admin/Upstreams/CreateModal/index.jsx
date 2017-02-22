@@ -8,7 +8,7 @@ import CreateDone from './CreateDone';
 
 import style from './style.styl';
 
-const Step = Steps.Step;
+const {Step} = Steps;
 
 class CreateModal extends Component {
     state = {
@@ -32,15 +32,15 @@ class CreateModal extends Component {
             return this.onCancel();
         }
         const {current} = this.state;
-        this.setState({
-            data: merge({}, this.state.data, data)
-        });
-
-        if (current === 3) return;
-        this.setState({current: this.state.current + 1});
+        if (current !== 3) {
+            this.setState({
+                current: this.state.current + 1,
+                data: merge({}, this.state.data, data)
+            });
+        }
     }
     render () {
-        const {current} = this.state;
+        const {current, data} = this.state;
         const steps = [
             '选择平台',
             '填写账号',
@@ -71,17 +71,17 @@ class CreateModal extends Component {
                     </Steps>
 
                     <div className={style['steps-content']}>
-                        {this.state.current === 0 &&
+                        {current === 0 &&
                             <ChoosePlatform nextStep={this.nextStep} />
                         }
-                        {this.state.current === 1 &&
-                            <InputAccount data={this.state.data} nextStep={this.nextStep} />
+                        {current === 1 &&
+                            <InputAccount data={data} nextStep={this.nextStep} />
                         }
-                        {this.state.current === 2 &&
-                            <SigninPlatform data={this.state.data} nextStep={this.nextStep} />
+                        {current === 2 &&
+                            <SigninPlatform data={data} nextStep={this.nextStep} />
                         }
-                        {this.state.current === 3 &&
-                            <CreateDone data={this.state.data} nextStep={this.nextStep} />
+                        {current === 3 &&
+                            <CreateDone data={data} nextStep={this.nextStep} />
                         }
                     </div>
                 </Modal>

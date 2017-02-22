@@ -62,8 +62,9 @@ export default class Editor extends Component {
             this.props.fetching();
             const _content = await this.replaceImg(content);
 
-            const data = Object.assign({}, values, _content, {
-                type: 'article'
+            const data = Object.assign({}, values, {
+                type: 'article',
+                content: _content
             });
 
             const {type} = await this.props.addArticle({

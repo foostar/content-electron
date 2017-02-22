@@ -8,7 +8,10 @@ function createWindow () {
         width: 1024,
         height: 900,
         minWidth: 800,
-        minHeight: 600
+        minHeight: 600,
+        webPreferences: {
+            webSecurity: false
+        }
     });
 
     mainWindow.webContents.session.clearStorageData();

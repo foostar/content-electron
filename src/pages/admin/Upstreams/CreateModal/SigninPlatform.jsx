@@ -3,9 +3,7 @@ import {Alert} from 'antd';
 import WebView from 'components/WebView';
 import {ipcRenderer} from 'electron';
 
-// import style from './style.styl';
-
-class Qie extends Component {
+class QiE extends Component {
     state = {
         partition: `persist:${Date.now()}`
     }
@@ -25,6 +23,9 @@ class Qie extends Component {
         if (url === 'https://om.qq.com/') {
             const session = ipcRenderer.sendSync('GET_COOKIES_BY_PARTITION', {
                 partition: this.state.partition
+            }).map(item => {
+                item.url = 'https://om.qq.com/';
+                return item;
             });
             this.props.nextStep({session});
         }
@@ -41,7 +42,7 @@ class Qie extends Component {
     }
 }
 
-class Baijia extends Component {
+class BaiJia extends Component {
     state = {
         partition: `persist:${Date.now()}`
     }
@@ -80,8 +81,8 @@ class Baijia extends Component {
 class SigninPlatform extends Component {
     render () {
         switch (this.props.data.platform) {
-            case '企鹅号': return <Qie {...this.props} />;
-            case '百家号': return <Baijia {...this.props} />;
+            case '企鹅号': return <QiE {...this.props} />;
+            case '百家号': return <BaiJia {...this.props} />;
             default: return (
                 <Alert
                     type='warning'

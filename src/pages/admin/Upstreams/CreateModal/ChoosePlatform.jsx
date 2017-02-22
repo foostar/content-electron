@@ -7,9 +7,6 @@ import baiJiaLogo from './bai-jia-logo.png';
 import style from './style.styl';
 
 class ChoosePlatform extends Component {
-    choosePlatform = (platform) => {
-        this.props.nextStep({platform});
-    }
     render () {
         const platforms = [{
             name: '企鹅号',
@@ -27,7 +24,7 @@ class ChoosePlatform extends Component {
                         md={6}
                         lg={4}
                         key={item.name}
-                        onClick={() => this.choosePlatform(item.name)}
+                        onClick={() => this.props.nextStep({platform: item.name})}
                     >
                         <Card className={style['platform-card']}>
                             <div

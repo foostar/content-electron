@@ -19,7 +19,7 @@ HUSSIF[ updateModel ] = (state, content) => {
 };
 // 文章详情
 export const getArticle = createCallApi(HUSSIF, {
-    type: 'ADMIN_GETARTICLE',
+    type: 'ADMIN_GET_ARTICLE',
     endpoint: '/content',
     request: (state, payload) => update(state, {
         isFetching: {$set: true}

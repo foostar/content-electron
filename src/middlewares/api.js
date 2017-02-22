@@ -29,6 +29,7 @@ export const apiMiddleware = (opt = {}) => store => next => async action => {
     let url = '';
 
     if (params) {
+        console.log(params);
         if (typeof params === 'string') {
             endpoint = endpoint.replace(/\/$/, '') + `/${params}`;
         } else if (typeof params === 'object') {
