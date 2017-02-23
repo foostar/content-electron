@@ -17,6 +17,34 @@ export default class FormSearch extends Component {
         const children = [<Col span={8} key='1'>
             <FormItem
                 {...formItemLayout}
+                label='包含的标签'
+            >
+                {getFieldDecorator('includeTags', {
+                    rules: [],
+                    initialValue: form.includeTags || []
+                })(
+                    <Select tags placeholder='选择包含的标签'>
+                        {options}
+                    </Select>
+                                )}
+            </FormItem>
+        </Col>, <Col span={8} key='2'>
+            <FormItem
+                {...formItemLayout}
+                label='不包含的标签'
+            >
+                {getFieldDecorator('excludeTags', {
+                    rules: [],
+                    initialValue: form.excludeTags || []
+                })(
+                    <Select tags placeholder='选择不包含的标签'>
+                        {options}
+                    </Select>
+                                )}
+            </FormItem>
+        </Col>, <Col span={8} key='3'>
+            <FormItem
+                {...formItemLayout}
                 label='作者id'
             >
                 {getFieldDecorator('author', {
@@ -26,7 +54,7 @@ export default class FormSearch extends Component {
                     <Input placeholder='作者id' />
                           )}
             </FormItem>
-        </Col>, <Col span={8} key='2'>
+        </Col>, <Col span={8} key='4'>
             <FormItem
                 {...formItemLayout}
                 label='选择分类'
@@ -41,7 +69,7 @@ export default class FormSearch extends Component {
                     </Select>
                                 )}
             </FormItem>
-        </Col>, <Col span={8} key='3'>
+        </Col>, <Col span={8} key='5'>
             <FormItem
                 {...formItemLayout}
                 label='正文关键字'
@@ -53,38 +81,10 @@ export default class FormSearch extends Component {
                     <Input placeholder='正文关键字' />
                           )}
             </FormItem>
-        </Col>, <Col span={8} key='4'>
-            <FormItem
-                {...formItemLayout}
-                label='包含的标签'
-            >
-                {getFieldDecorator('includeTags', {
-                    rules: [],
-                    initialValue: form.includeTags || []
-                })(
-                    <Select tags placeholder='选择包含的标签'>
-                        {options}
-                    </Select>
-                                )}
-            </FormItem>
-        </Col>, <Col span={8} key='5'>
-            <FormItem
-                {...formItemLayout}
-                label='不包含的标签'
-            >
-                {getFieldDecorator('excludeTags', {
-                    rules: [],
-                    initialValue: form.excludeTags || []
-                })(
-                    <Select tags placeholder='选择不包含的标签'>
-                        {options}
-                    </Select>
-                                )}
-            </FormItem>
         </Col>];
-        const shownCount = expand ? children.length : 3;
+        const shownCount = expand ? children.length : 5;
         return (
-            <Row gutter={40}>
+            <Row>
                 {children.slice(0, shownCount)}
             </Row>
         );

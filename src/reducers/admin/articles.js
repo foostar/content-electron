@@ -76,7 +76,7 @@ export const getArticles = createCallApi(HUSSIF, {
         });
     },
     failure: (state, payload) => update(state, {
-        isFetching: {$set: true}
+        isFetching: {$set: false}
     })
 });
 // 获取最近使用的tag
