@@ -4,3 +4,6 @@ dist/
 *.log
 
 .passport
+
+
+.DS_Store

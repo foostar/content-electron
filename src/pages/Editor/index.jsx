@@ -138,23 +138,22 @@ export default class Editor extends Component {
     render () {
         const {content, isFetching, title, category} = this.props.editor;
         const {getFieldDecorator} = this.props.form;
-        const formItemLayout = {
-            labelCol: {span: 6},
-            wrapperCol: {span: 14}
-        };
-        const tailFormItemLayout = {
-            wrapperCol: {
-                span: 14,
-                offset: 6
-            }
-        };
+        // const formItemLayout = {
+        //     labelCol: {span: 3},
+        //     wrapperCol: {span: 21}
+        // };
+        // const tailFormItemLayout = {
+        //     wrapperCol: {
+        //         span: 14,
+        //         offset: 6
+        //     }
+        // };
         return (
             <Page className={style.container}>
                 <Spin spinning={isFetching}>
-                    <Form onSubmit={this.handleSubmit}>
+                    <Form onSubmit={this.handleSubmit} style={{padding: 16}}>
                         <FormItem
-                            {...formItemLayout}
-                            label='标题'
+                            // {...formItemLayout}
                             hasFeedback
                         >
                             {getFieldDecorator('title', {
@@ -167,8 +166,7 @@ export default class Editor extends Component {
                             )}
                         </FormItem>
                         <FormItem
-                            {...formItemLayout}
-                            label='文章分类'
+                            // {...formItemLayout}
                         >
                             {getFieldDecorator('category', {
                                 initialValue: category || 'other'
@@ -179,8 +177,7 @@ export default class Editor extends Component {
                             )}
                         </FormItem>
                         <FormItem
-                            {...formItemLayout}
-                            label='内容'
+                            // {...formItemLayout}
                             hasFeedback
                         >
                             <FroalaEditor
@@ -190,7 +187,9 @@ export default class Editor extends Component {
                                 onModelChange={this.handleEditorChange}
                             />
                         </FormItem>
-                        <FormItem {...tailFormItemLayout}>
+                        <FormItem
+                            // {...tailFormItemLayout}
+                        >
                             <Button type='primary' htmlType='submit' size='large'>提交</Button>
                             <Button className={style.goback} type='primary'><Link to='/articles'>返回</Link></Button>
                         </FormItem>
