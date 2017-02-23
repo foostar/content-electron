@@ -1,6 +1,6 @@
 import {createAction} from 'redux-act';
-
 export const CALL_API = Symbol('CALL_API');
+import {hashHistory} from 'react-router';
 
 export const apiMiddleware = (opt = {}) => store => next => async action => {
     if (!action[CALL_API]) return next(action);
@@ -29,7 +29,6 @@ export const apiMiddleware = (opt = {}) => store => next => async action => {
     let url = '';
 
     if (params) {
-        console.log(params);
         if (typeof params === 'string') {
             endpoint = endpoint.replace(/\/$/, '') + `/${params}`;
         } else if (typeof params === 'object') {
@@ -66,7 +65,12 @@ export const apiMiddleware = (opt = {}) => store => next => async action => {
 
     try {
         const res = await fetch(url, {headers, method, body});
+        if (res.status === 401) {
+            hashHistory.replace('/signin');
+        }
+
         payload.result = await res.json();
+
         if (typeof opt.formatData === 'function') {
             payload.result = opt.formatData(payload.result);
         }

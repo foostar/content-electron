@@ -2,11 +2,19 @@ import React, {Component} from 'react';
 import {hashHistory} from 'react-router';
 import {Menu, Icon} from 'antd';
 import style from './style.styl';
+import {connect} from 'react-redux';
 
-const SubMenu = Menu.SubMenu;
+// const SubMenu = Menu.SubMenu;
 const Item = Menu.Item;
 const MenuItemGroup = Menu.ItemGroup;
 
+const mapStateToProps = state => {
+    return {
+        passport: state.passport.data
+    };
+};
+
+@connect(mapStateToProps)
 export default class LeftMenu extends Component {
     state = {theme: 'dark'}
     handleClick = (e) => {
@@ -20,9 +28,7 @@ export default class LeftMenu extends Component {
         }
     }
     render () {
-        if (this.props.location.pathname == '/admin/editor') {
-            this.props.location.pathname = '/admin/articles';
-        }
+        const {level} = this.props.passport;
         return (
             <Menu
                 mode='inline'
@@ -53,21 +59,24 @@ export default class LeftMenu extends Component {
                 </MenuItemGroup>
 
                 {/* admin 权限 */}
-                <MenuItemGroup title={<span><Icon type='ellipsis' />&emsp;admin</span>}>
-                    <Item key='/admin/upstreams'>
-                        <Icon type='cloud-upload-o' />
-                        Upstream
-                    </Item>
-                    <Item key='/admin/users'>
-                        <Icon type='team' />
-                        用户管理
-                    </Item>
-                    <Item key='/admin/articles'>
-                        <Icon type='book' />
-                        内容管理
-                    </Item>
-                </MenuItemGroup>
+                {(level === 0 || level > 1) &&
+                    <MenuItemGroup title={<span><Icon type='ellipsis' />&emsp;admin</span>}>
+                        <Item key='/admin/upstreams'>
+                            <Icon type='cloud-upload-o' />
+                            <span>上游账号</span>
+                        </Item>
+                        <Item key='/admin/users'>
+                            <Icon type='team' />
+                            <span>用户管理</span>
+                        </Item>
+                        <Item key='/admin/articles'>
+                            <Icon type='book' />
+                            <span>内容管理</span>
+                        </Item>
+                    </MenuItemGroup>
+                }
 
+                {/*
                 <SubMenu
                     key='test-sub'
                     title={<span><Icon type='setting' />测试</span>}
@@ -85,6 +94,7 @@ export default class LeftMenu extends Component {
                         <span>Console2</span>
                     </Item>
                 </SubMenu>
+                */}
 
                 <Item key='/signin'>
                     <Icon type='logout' />

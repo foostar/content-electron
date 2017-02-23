@@ -24,14 +24,13 @@ const mapDispatchToProps = dispatch => {
 @connect(mapStateToProps, mapDispatchToProps)
 class CreateDone extends Component {
     onClick = async (e) => {
-        const {account, session, platform} = this.props.data;
         const {createUpstream, fetchUpstreams} = this.props.actions;
 
         const {type} = await createUpstream({
-            body: {platform, session, account}
+            body: this.props.data
         });
         if (type === 'CREATE_UPSTREAM_SUCCESS') {
-            message.success('创建 Upstream 成功!');
+            message.success('更新/创建 Upstream 成功!');
             await fetchUpstreams();
             this.props.nextStep('success');
         }

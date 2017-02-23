@@ -12,15 +12,16 @@ class QiE extends Component {
         console.info('企鹅号:', url);
 
         // 登录界面
-        if (url === 'https://om.qq.com/userAuth/index') {
+        if (url.startsWith('https://om.qq.com/userAuth/index')) {
             this.webview.executeJavaScript(`
                 document.querySelector('#LEmail').value = '${this.props.data.account}';
                 document.querySelector('#LPassword').value = '${this.props.data.password}';
+                document.querySelector('.btnLogin').click();
             `);
         }
 
         // 登录成功, 获取 cookies
-        if (url === 'https://om.qq.com/') {
+        if (url.startsWith('https://om.qq.com/')) {
             const session = ipcRenderer.sendSync('GET_COOKIES_BY_PARTITION', {
                 partition: this.state.partition
             }).map(item => {
@@ -51,17 +52,22 @@ class BaiJia extends Component {
         console.info('百家号:', url);
 
         // 登录界面
-        if (url === 'http://baijiahao.baidu.com/builder/app/login') {
+        if (url.startsWith('http://baijiahao.baidu.com/builder/app/login') && !this.inputValue) {
+            this.inputValue = true;
             this.webview.executeJavaScript(`
                 document.querySelector('#TANGRAM__PSP_4__userName').value = '${this.props.data.account}';
                 document.querySelector('#TANGRAM__PSP_4__password').value = '${this.props.data.password}';
+                document.querySelector('#TANGRAM__PSP_4__submit').click();
             `);
         }
 
         // 登录成功, 获取 cookies
-        if (url === 'http://baijiahao.baidu.com/') {
+        if (url.startsWith('http://baijiahao.baidu.com/')) {
             const session = ipcRenderer.sendSync('GET_COOKIES_BY_PARTITION', {
                 partition: this.state.partition
+            }).map(item => {
+                item.url = 'http://baijiahao.baidu.com/';
+                return item;
             });
             this.props.nextStep({session});
         }

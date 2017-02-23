@@ -21,7 +21,7 @@ class InputAccount extends Component {
                 <Form className={style['account-form']} onSubmit={this.onSubmit}>
                     <FormItem>
                         {getFieldDecorator('account', {
-                            initialValue: 'mameiling@goyoo.com',
+                            // initialValue: 'mameiling@goyoo.com',
                             rules: [{required: true, message: '输入 upstream 账号!'}]
                         })(
                             <Input addonBefore={<Icon type='user' />} placeholder='upstream 账号' />
@@ -29,7 +29,7 @@ class InputAccount extends Component {
                     </FormItem>
                     <FormItem>
                         {getFieldDecorator('password', {
-                            initialValue: 'zxc123456',
+                            // initialValue: 'zxc123456',
                             rules: [{required: true, message: '输入 upstream 密码!'}]
                         })(
                             <Input addonBefore={<Icon type='lock' />} placeholder='upstram 密码' />

@@ -8,6 +8,7 @@ import Page from 'components/Page';
 import FormSearch from './FormSearch';
 import PublishModal from './PublishModal';
 import * as actions from 'reducers/admin/articles';
+import moment from 'moment';
 
 const Option = Select.Option;
 const mapStateToProps = state => {
@@ -71,7 +72,15 @@ export default class extends Component {
     }
     renderTag = (_, record) => {
         const tags = record.tags.map((v, index) => {
-            return <Tag className={style.table_tag} key={index} closable afterClose={() => this.removeTag({id: record.id, value: v})}>{v}</Tag>;
+            return (
+                <Tag
+                    closable
+                    className={style['table-tag']}
+                    key={index}
+                    afterClose={() => this.removeTag({id: record.id, value: v})}>
+                    {v}
+                </Tag>
+            );
         });
         const {recentTag} = this.props.articles;
         const children = recentTag.map((v, index) => {
@@ -80,9 +89,19 @@ export default class extends Component {
         return (
             <div>
                 {tags}
-                {!record.inputVisible && <Button size='small' type='dashed' onClick={() => this.showNewTag(record.id)}>+ 新标签</Button>}
+                {!record.inputVisible &&
+                    <Button
+                        size='small'
+                        type='dashed'
+                        onClick={() => this.showNewTag(record.id)}
+                    >
+                        + 新标签
+                    </Button>
+                }
                 {record.inputVisible && (
-                    <Select tags
+                    <Select
+                        tags
+                        ref={`select-${record.id}`}
                         style={{width: '100%'}}
                         searchPlaceholder='标签模式'
                         onChange={(value) => this.addTag({id: record.id, value})}
@@ -110,18 +129,14 @@ export default class extends Component {
         this.props.showNewTag({isShow: true, id});
     }
     columns = [{
-        title: '文章id',
-        dataIndex: 'id',
-        key: 'id'
+        title: '文章标题',
+        dataIndex: 'title',
+        key: 'title'
     }, {
         title: '作者',
         dataIndex: 'author',
         key: 'author',
         render: author => author.username
-    }, {
-        title: '文章标题',
-        dataIndex: 'title',
-        key: 'title'
     }, {
         title: '文章分类',
         dataIndex: 'category',
@@ -129,7 +144,8 @@ export default class extends Component {
     }, {
         title: '创建时间',
         dataIndex: 'createdAt',
-        key: 'createdAt'
+        key: 'createdAt',
+        render: (time) => moment(time).format('LLL')
     }, {
         title: '文章标签',
         dataIndex: 'tag',

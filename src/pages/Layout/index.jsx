@@ -1,31 +1,19 @@
 import React, {Component} from 'react';
-import ReactCSSTransitionGroup from 'react/lib/ReactCSSTransitionGroup';
+// import ReactCSSTransitionGroup from 'react/lib/ReactCSSTransitionGroup';
 import LeftMenu from './LeftMenu';
 import style from './style.styl';
 
-// const mapStateToProps = state => {
-//     return {
-//         platforms: state.platforms
-//     };
-// };
-// const mapDispatchToProps = dispatch => {
-//     return {
-//         actions: bindActionCreators(actions, dispatch)
-//     };
-// };
-// @connect(mapStateToProps, mapDispatchToProps)
-
 export default class Layout extends Component {
-    // componentDidMount () {
-    //     this.props.actions.fetchPlatforms();
-    // }
-
     render () {
         const {location} = this.props;
         return (
             <div className={style.container}>
                 <LeftMenu location={location} />
                 <div className={style.content}>
+                    <div className={style.inner}>
+                        {this.props.children}
+                    </div>
+                    {/*
                     <ReactCSSTransitionGroup
                         component='main'
                         className={style.inner}
@@ -40,6 +28,7 @@ export default class Layout extends Component {
                             )
                         }
                     </ReactCSSTransitionGroup>
+                    */}
                 </div>
             </div>
         );

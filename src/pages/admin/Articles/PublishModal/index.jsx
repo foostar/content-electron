@@ -6,7 +6,7 @@ import * as upstreamsActions from 'reducers/upstreams';
 import {merge} from 'lodash';
 
 import style from './style.styl';
-import {Modal, Steps} from 'antd';
+import {Modal, Steps, Alert, Button} from 'antd';
 
 import ChooseUpstream from './ChooseUpstream';
 import PublishContent from './PublishContent';
@@ -67,8 +67,6 @@ class PublishModal extends Component {
             '发布文章',
             '确认完成'
         ];
-        console.log('@@@@@@@@@@@@', this.props);
-
         return (
             <span>
                 <a onClick={this.showModal}>发布</a>
@@ -98,6 +96,18 @@ class PublishModal extends Component {
                                 content={content}
                                 nextStep={this.nextStep}
                             />
+                        }
+                        {current === 2 &&
+                            <div style={{width: 500, margin: 'auto'}}>
+                                <Alert
+                                    message={`${content.title} 发布成功`}
+                                    description='请记得增加标签'
+                                    type='success'
+                                />
+                                <Button style={{width: '100%'}} onClick={this.onCancel}>
+                                    点击关闭
+                                </Button>
+                            </div>
                         }
                     </div>
                 </Modal>

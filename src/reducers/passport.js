@@ -7,20 +7,18 @@ import update from 'react/lib/update';
 
 const HUSSIF = {};
 
-let token;
+let data = {};
+
 try {
-    token = fs.readFileSync(path.resolve('.token'), 'utf-8');
-    console.log(token);
+    data = JSON.parse(fs.readFileSync(path.resolve('.passport'), 'utf-8'));
+    console.log(data);
 } catch (err) {
     console.log(err, 'no token file');
 }
 
 const INITAL = {
     fetching: false,
-    data: {
-        // token: localStorage.getItem('token')
-        token
-    }
+    data: data
 };
 
 export const signin = createCallApi(HUSSIF, {
@@ -32,8 +30,7 @@ export const signin = createCallApi(HUSSIF, {
     }),
     success: (state, payload) => {
         const {data} = payload.result;
-        localStorage.setItem('token', data.token);
-        fs.writeFile(path.resolve('.token'), data.token);
+        fs.writeFile(path.resolve('.passport'), JSON.stringify(data));
         return update(state, {
             fetching: {$set: false},
             data: {$set: data}
@@ -47,8 +44,7 @@ export const signin = createCallApi(HUSSIF, {
 export const signout = createAction('SIGN_OUT');
 
 HUSSIF[signout] = (state) => {
-    fs.writeFile(path.resolve('.token'), '');
-    localStorage.clear();
+    fs.writeFile(path.resolve('.passport'), '');
     return update(state, {
         data: {$set: {}}
     });

@@ -45,6 +45,10 @@ class ModifyModal extends Component {
     handleSubmit = (e) => {
         this.props.form.validateFields(async (err, values) => {
             if (err) return;
+
+            if (!values.password) {
+                delete values.password;
+            }
             const {type} = await this.props.userActions.updateUser({
                 body: values,
                 params: {
@@ -76,6 +80,9 @@ class ModifyModal extends Component {
                 }
             }
         });
+    }
+    afterClose = () => {
+        this.props.form.resetFields();
     }
     renderForm () {
         const {getFieldDecorator} = this.props.form;
