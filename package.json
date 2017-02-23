@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "lint": "eslint --ext js,jsx src",
-    "build:webpack": "NODE_ENV=procution webpack -p",
+    "build:webpack": "rm -rf dist && NODE_ENV=procution webpack -p",
     "dev": "concurrently --kill-others 'npm run dev:electron' 'npm run dev:webpack'",
     "dev:electron": "electron main.dev.js",
     "dev:webpack": "webpack-dev-server"
