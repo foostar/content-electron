@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {hashHistory, Link} from 'react-router';
-import {Form, Button, Spin, Input, Select, notification} from 'antd';
+import {Form, Button, Spin, Input, Select, notification, Upload, Icon, message} from 'antd';
 import * as actions from 'reducers/admin/editor';
 
 import Page from 'components/Page';
@@ -34,6 +34,9 @@ export default class Editor extends Component {
         const {articleId} = this.props.router.location.query;
         if (articleId) {
             this.props.getArticle({params: articleId});
+            const foolbar = document.querySelector('.fr-dropdown-menu');
+            foolbar.appendChild(this.refs.upload);
+            this.refs.upload.parentNode.style.width = '85px';
         }
     }
     handleSubmit = (e) => {
@@ -48,8 +51,15 @@ export default class Editor extends Component {
                     message: '请输入文章内容'
                 });
             }
+            this.props.fetching();
+            const _content = await this.replaceImg(content);
+
+            const data = Object.assign({}, values, {
+                type: 'article',
+                content: _content
+            });
             const {type} = await this.props.editArticle({
-                body: values,
+                body: data,
                 params: articleId
             });
             if (type === 'ADMIN_EDITARTICLE_SUCCESS') {
@@ -57,12 +67,99 @@ export default class Editor extends Component {
             }
         });
     }
+    replaceImg (content) {
+        const modelDom = this.refs.model;
+        modelDom.innerHTML = content;
+        const aImgs = modelDom.getElementsByTagName('img');
+        let oImg = null;
+        if (aImgs.length < 1) return new Promise((resolve, reject) => resolve(content));
+        const beforeImgs = [];
+        for (let i = 0; i < aImgs.length; i++) {
+            let src = aImgs[i].getAttribute('src');
+            beforeImgs.push({
+                index: i,
+                url: src
+            });
+        }
+        return Promise.all(beforeImgs.map((v) => {
+            return this.fetchImg(v);
+        }))
+        .then(newUrls => {
+            newUrls = newUrls.sort((a, b) => {
+                return a.index - b.index;
+            });
+            for (let i = 0; i < aImgs.length; i++) {
+                oImg = aImgs[i];
+                if (!/ofsyr49wg/.test(oImg.getAttribute('src'))) {
+                    oImg.setAttribute('src', newUrls[i].url);
+                }
+                if (oImg.getAttribute('data-fr-image-pasted')) {
+                    oImg.removeAttribute('data-fr-image-pasted');
+                }
+            }
+            return modelDom.innerHTML;
+        });
+    }
+    async fetchImg (item) {
+        if (/ofsyr49wg/.test(item.url)) {
+            return item;
+        }
+        const {token, key} = await this.getToken();
+        const blob = await this.getImg(item.url);
+        const formData = new FormData();
+        formData.append('key', key);
+        formData.append('token', token);
+        formData.append('file', blob);
+        return fetch('http://upload.qiniu.com/', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(json => {
+            const {key} = json;
+            return {
+                index: item.index,
+                url: `http://ofsyr49wg.bkt.clouddn.com/${key}`
+            };
+        });
+    }
+    getImg (url) {
+        return fetch(url)
+        .then(response => response.blob())
+        .then(blob => blob);
+    }
+    getToken () {
+        const url = `http://baijia.rss.apps.xiaoyun.com/api/qiniu/uptoken`;
+        return fetch(url)
+        .then(response => response.json())
+        .then(json => json);
+    }
     handleEditorChange = (content) => {
         this.props.updateModel(content);
+    }
+    editorConfig = {
+        placeholderText: '写点什么吧!',
+        toolbarButtons: ['fullscreen', 'print', 'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', 'fontFamily', 'fontSize', '|', 'specialCharacters', 'color', 'emoticons', 'inlineStyle', 'paragraphStyle', '|', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', '-', 'insertLink', 'insertVideo', 'insertFile', 'insertTable', 'undo', 'redo', 'clearFormatting', 'selectAll', 'html'],
+        toolbarButtonsMD: ['fullscreen', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'paragraphStyle', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', 'insertLink', 'insertVideo', 'insertFile', 'insertTable', 'undo', 'redo', 'clearFormatting'],
+        events: {
+            'froalaEditor.initialized': (e, editor) => {
+                if (!this.$editor) {
+                    this.$editor = editor;
+                }
+            },
+            'froalaEditor.image.beforePasteUpload': (e, editor) => {
+                return false;
+            },
+            'froalaEditor.image.beforeUpload': (e, editor) => {
+                editor.tooltip.hide();
+                return false;
+            }
+        }
     }
     render () {
         const {content, isFetching, title, category} = this.props.editor;
         const {getFieldDecorator} = this.props.form;
+        const self = this;
         const formItemLayout = {
             labelCol: {span: 6},
             wrapperCol: {span: 14}
@@ -71,6 +168,33 @@ export default class Editor extends Component {
             wrapperCol: {
                 span: 14,
                 offset: 6
+            }
+        };
+        const props = {
+            name: 'file',
+            action: 'http://upload.qiniu.com/',
+            accept: 'image/png, image/jpeg, image/gif',
+            data: {},
+            imageInfo: {},
+            showUploadList: false,
+            beforeUpload (file) {
+                const url = `http://baijia.rss.apps.xiaoyun.com/api/qiniu/uptoken`;
+                return fetch(url)
+                .then(response => response.json())
+                .then(json => {
+                    props.data = Object.assign(props.data, json);
+                });
+            },
+            onChange (info) {
+                if (info.file.status === 'uploading') {
+                    self.props.fetching();
+                }
+                if (info.file.status === 'done') {
+                    self.props.fetching(false);
+                    self.$editor.html.insert(`<img src='http://ofsyr49wg.bkt.clouddn.com/${info.file.response.key}'/>`, true);
+                } else if (info.file.status === 'error') {
+                    message.error('图片上传失败，请重试！');
+                }
             }
         };
         return (
@@ -110,6 +234,7 @@ export default class Editor extends Component {
                         >
                             <FroalaEditor
                                 tag='textarea'
+                                config={this.editorConfig}
                                 charCounterCount={false}
                                 model={content}
                                 onModelChange={this.handleEditorChange}
@@ -119,6 +244,13 @@ export default class Editor extends Component {
                             <Button type='primary' htmlType='submit' size='large'>提交</Button>
                             <Button className={style.goback} type='primary'><Link to='/admin/articles'>返回</Link></Button>
                         </FormItem>
+                        <div ref='upload' className={style.upload}>
+                            <Upload {...props}>
+                                <Button>
+                                    <Icon type='picture' />上传
+                                </Button>
+                            </Upload>
+                        </div>
                         <div className={style.disappear} ref='model' />
                     </Form>
                 </Spin>

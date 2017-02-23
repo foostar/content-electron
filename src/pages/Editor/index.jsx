@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {hashHistory, Link} from 'react-router';
-import {Form, Button, Spin, Input, Select, notification} from 'antd';
+import {Form, Button, Spin, Input, Select, notification, Upload, Icon, message} from 'antd';
 import * as actions from 'reducers/editor';
 
 import Page from 'components/Page';
@@ -14,13 +14,13 @@ import 'froala-editor/css/froala_editor.pkgd.min.css';
 import 'font-awesome/css/font-awesome.css';
 
 import FroalaEditor from 'react-froala-wysiwyg';
-
 const FormItem = Form.Item;
 const Option = Select.Option;
 
 const mapStateToProps = state => {
     return {
-        editor: state.editor
+        editor: state.editor,
+        passport: state.passport
     };
 };
 const mapDispatchToProps = dispatch => {
@@ -32,6 +32,9 @@ const mapDispatchToProps = dispatch => {
 export default class Editor extends Component {
     componentDidMount () {
         const {articleId} = this.props.router.location.query;
+        const foolbar = document.querySelector('.fr-dropdown-menu');
+        foolbar.appendChild(this.refs.upload);
+        this.refs.upload.parentNode.style.width = '85px';
         if (articleId) {
             return this.props.getArticle({params: articleId});
         }
@@ -49,9 +52,17 @@ export default class Editor extends Component {
                     message: '请输入文章内容'
                 });
             }
+            this.props.fetching();
+            const _content = await this.replaceImg(content);
+
+            const data = Object.assign({}, values, {
+                type: 'article',
+                content: _content
+            });
+
             if (articleId) {
                 const {type} = await this.props.editArticle({
-                    body: values,
+                    body: data,
                     params: articleId
                 });
                 if (type === 'EDITARTICLE_SUCCESS') {
@@ -59,12 +70,6 @@ export default class Editor extends Component {
                 }
                 return;
             }
-            this.props.fetching();
-            const _content = await this.replaceImg(content);
-
-            const data = Object.assign({}, values, _content, {
-                type: 'article'
-            });
 
             const {type} = await this.props.addArticle({
                 body: data
@@ -78,6 +83,7 @@ export default class Editor extends Component {
         const modelDom = this.refs.model;
         modelDom.innerHTML = content;
         const aImgs = modelDom.getElementsByTagName('img');
+        let oImg = null;
         if (aImgs.length < 1) return new Promise((resolve, reject) => resolve(content));
         const beforeImgs = [];
         for (let i = 0; i < aImgs.length; i++) {
@@ -95,12 +101,21 @@ export default class Editor extends Component {
                 return a.index - b.index;
             });
             for (let i = 0; i < aImgs.length; i++) {
-                aImgs[i].setAttribute('src', newUrls[i].url);
+                oImg = aImgs[i];
+                if (!/ofsyr49wg/.test(oImg.getAttribute('src'))) {
+                    oImg.setAttribute('src', newUrls[i].url);
+                }
+                if (oImg.getAttribute('data-fr-image-pasted')) {
+                    oImg.removeAttribute('data-fr-image-pasted');
+                }
             }
             return modelDom.innerHTML;
         });
     }
     async fetchImg (item) {
+        if (/ofsyr49wg/.test(item.url)) {
+            return item;
+        }
         const {token, key} = await this.getToken();
         const blob = await this.getImg(item.url);
         const formData = new FormData();
@@ -125,6 +140,25 @@ export default class Editor extends Component {
         .then(response => response.blob())
         .then(blob => blob);
     }
+    editorConfig = {
+        placeholderText: '写点什么吧!',
+        toolbarButtons: ['fullscreen', 'print', 'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', 'fontFamily', 'fontSize', '|', 'specialCharacters', 'color', 'emoticons', 'inlineStyle', 'paragraphStyle', '|', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', '-', 'insertLink', 'insertVideo', 'insertFile', 'insertTable', 'undo', 'redo', 'clearFormatting', 'selectAll', 'html'],
+        toolbarButtonsMD: ['fullscreen', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'paragraphStyle', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', 'insertLink', 'insertVideo', 'insertFile', 'insertTable', 'undo', 'redo', 'clearFormatting'],
+        events: {
+            'froalaEditor.initialized': (e, editor) => {
+                if (!this.$editor) {
+                    this.$editor = editor;
+                }
+            },
+            'froalaEditor.image.beforePasteUpload': (e, editor) => {
+                return false;
+            },
+            'froalaEditor.image.beforeUpload': (e, editor) => {
+                editor.tooltip.hide();
+                return false;
+            }
+        }
+    }
     getToken () {
         const url = `http://baijia.rss.apps.xiaoyun.com/api/qiniu/uptoken`;
         return fetch(url)
@@ -137,6 +171,7 @@ export default class Editor extends Component {
     render () {
         const {content, isFetching, title, category} = this.props.editor;
         const {getFieldDecorator} = this.props.form;
+        const self = this;
         const formItemLayout = {
             labelCol: {span: 6},
             wrapperCol: {span: 14}
@@ -145,6 +180,33 @@ export default class Editor extends Component {
             wrapperCol: {
                 span: 14,
                 offset: 6
+            }
+        };
+        const props = {
+            name: 'file',
+            action: 'http://upload.qiniu.com/',
+            accept: 'image/png, image/jpeg, image/gif',
+            data: {},
+            imageInfo: {},
+            showUploadList: false,
+            beforeUpload (file) {
+                const url = `http://baijia.rss.apps.xiaoyun.com/api/qiniu/uptoken`;
+                return fetch(url)
+                .then(response => response.json())
+                .then(json => {
+                    props.data = Object.assign(props.data, json);
+                });
+            },
+            onChange (info) {
+                if (info.file.status === 'uploading') {
+                    self.props.fetching();
+                }
+                if (info.file.status === 'done') {
+                    self.props.fetching(false);
+                    self.$editor.html.insert(`<img src='http://ofsyr49wg.bkt.clouddn.com/${info.file.response.key}'/>`, true);
+                } else if (info.file.status === 'error') {
+                    message.error('图片上传失败，请重试！');
+                }
             }
         };
         return (
@@ -184,15 +246,22 @@ export default class Editor extends Component {
                         >
                             <FroalaEditor
                                 tag='textarea'
-                                charCounterCount={false}
                                 model={content}
+                                config={this.editorConfig}
                                 onModelChange={this.handleEditorChange}
                             />
                         </FormItem>
                         <FormItem {...tailFormItemLayout}>
                             <Button type='primary' htmlType='submit' size='large'>提交</Button>
-                            <Button className={style.goback} type='primary'><Link to='/articles'>返回</Link></Button>
+                            <Button className={style.goback} onClick={this.insertImage} type='primary'><Link to='/articles'>返回</Link></Button>
                         </FormItem>
+                        <div ref='upload' className={style.upload}>
+                            <Upload {...props}>
+                                <Button>
+                                    <Icon type='picture' />上传
+                                </Button>
+                            </Upload>
+                        </div>
                         <div className={style.disappear} ref='model' />
                     </Form>
                 </Spin>
