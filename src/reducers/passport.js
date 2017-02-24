@@ -14,9 +14,9 @@ const HUSSIF = {};
 
 let data = {};
 
-try {
+if (!fs.existsSync(datDir)) {
     fs.mkdirSync(datDir);
-} catch (err) {}
+}
 
 try {
     data = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
