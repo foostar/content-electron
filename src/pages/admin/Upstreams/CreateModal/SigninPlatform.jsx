@@ -21,7 +21,7 @@ class QiE extends Component {
         }
 
         // 登录成功, 获取 cookies
-        if (url.startsWith('https://om.qq.com/')) {
+        if (url === 'https://om.qq.com/') {
             const session = ipcRenderer.sendSync('GET_COOKIES_BY_PARTITION', {
                 partition: this.state.partition
             }).map(item => {
@@ -62,7 +62,7 @@ class BaiJia extends Component {
         }
 
         // 登录成功, 获取 cookies
-        if (url.startsWith('http://baijiahao.baidu.com/')) {
+        if (url === 'http://baijiahao.baidu.com/') {
             const session = ipcRenderer.sendSync('GET_COOKIES_BY_PARTITION', {
                 partition: this.state.partition
             }).map(item => {
