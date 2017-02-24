@@ -5,9 +5,9 @@
   "main": "main.js",
   "scripts": {
     "lint": "eslint --ext js,jsx src",
-    "build": "rm -rf dist client-* && npm run build:webpack && npm run build:electron",
+    "build": "npm run build:webpack && npm run build:electron",
     "build:electron": "electron-packager . client --ignore=node_modules ",
-    "build:webpack": "rm -rf dist && NODE_ENV=production webpack",
+    "build:webpack": "NODE_ENV=production webpack",
     "dev": "concurrently --kill-others 'npm run dev:electron' 'npm run dev:webpack'",
     "dev:electron": "electron main.dev.js",
     "dev:webpack": "webpack-dev-server"
