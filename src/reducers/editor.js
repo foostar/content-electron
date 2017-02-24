@@ -7,7 +7,7 @@ const INITAL = {
     isFetching: false,
     content: '',
     title: '',
-    category: 'other'
+    category: '搞笑'
 };
 // 更新编辑器里的内容
 export const updateModel = createAction('UPDATE_MODEL');
