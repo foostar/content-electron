@@ -15,9 +15,12 @@ const HUSSIF = {};
 let data = {};
 
 try {
+    fs.mkdirSync(datDir);
+} catch (err) {}
+
+try {
     data = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
 } catch (err) {
-    fs.mkdirSync(datDir);
     console.log(err, 'no token file');
 }
 
