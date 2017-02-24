@@ -203,7 +203,7 @@ export default class Editor extends Component {
                                 }],
                                 initialValue: title || ''
                             })(
-                                <Input plplaceholder='标题' />
+                                <Input placeholder='标题' />
                             )}
                         </FormItem>
                         <FormItem
