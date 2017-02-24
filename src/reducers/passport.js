@@ -2,17 +2,22 @@ import fs from 'fs';
 import path from 'path';
 import {createCallApi} from 'middlewares/api';
 import {createAction, createReducer} from 'redux-act';
-
 import update from 'react/lib/update';
+
+import {remote} from 'electron';
+
+const app = remote.app;
+const dataPath = path.join(app.getPath('appData'), 'xiaoyun', '.passport');
+const datDir = path.join(app.getPath('appData'), 'xiaoyun');
 
 const HUSSIF = {};
 
 let data = {};
 
 try {
-    data = JSON.parse(fs.readFileSync(path.resolve('.passport'), 'utf-8'));
-    console.log(data);
+    data = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
 } catch (err) {
+    fs.mkdirSync(datDir);
     console.log(err, 'no token file');
 }
 
@@ -30,7 +35,7 @@ export const signin = createCallApi(HUSSIF, {
     }),
     success: (state, payload) => {
         const {data} = payload.result;
-        fs.writeFile(path.resolve('.passport'), JSON.stringify(data));
+        fs.writeFile(dataPath, JSON.stringify(data));
         return update(state, {
             fetching: {$set: false},
             data: {$set: data}
@@ -44,7 +49,7 @@ export const signin = createCallApi(HUSSIF, {
 export const signout = createAction('SIGN_OUT');
 
 HUSSIF[signout] = (state) => {
-    fs.writeFile(path.resolve('.passport'), '');
+    fs.writeFile(dataPath, '');
     return update(state, {
         data: {$set: {}}
     });

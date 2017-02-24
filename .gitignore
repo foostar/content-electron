@@ -5,5 +5,6 @@ dist/
 
 .passport
 
+client-*
 
 .DS_Store

@@ -5,7 +5,9 @@
   "main": "main.js",
   "scripts": {
     "lint": "eslint --ext js,jsx src",
-    "build:webpack": "rm -rf dist && NODE_ENV=procution webpack -p",
+    "build": "rm -rf dist client-* && npm run build:webpack && npm run build:electron",
+    "build:electron": "electron-packager . client --ignore=node_modules ",
+    "build:webpack": "rm -rf dist && NODE_ENV=production webpack",
     "dev": "concurrently --kill-others 'npm run dev:electron' 'npm run dev:webpack'",
     "dev:electron": "electron main.dev.js",
     "dev:webpack": "webpack-dev-server"
@@ -52,6 +54,7 @@
   "devDependencies": {
     "babel-eslint": "^7.1.1",
     "concurrently": "^3.3.0",
+    "electron-packager": "^8.5.2",
     "eslint": "^3.15.0",
     "eslint-config-standard": "^6.2.1",
     "eslint-config-standard-react": "^4.2.0",
