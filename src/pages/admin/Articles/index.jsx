@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Table, Form, Button, Select, Tag, Row, Col, Icon} from 'antd';
+import {Table, Form, Button, Select, Tag, Row, Col} from 'antd';
 import style from './style.styl';
 import {connect} from 'react-redux';
 import {Link} from 'react-router';
@@ -28,8 +28,6 @@ export default class extends Component {
     }
     fetchData (page) {
         page = (page - 1) || 0;
-        const {isFetching} = this.props.articles;
-        if (isFetching) return;
         const fromData = this.props.form.getFieldsValue();
         this.props.changeForm(fromData);
         const data = this.getFormData(fromData, page);
@@ -165,21 +163,21 @@ export default class extends Component {
     }]
     render () {
         const {getFieldDecorator} = this.props.form;
-        const {contents, count, isFetching, form, expand, recentTag} = this.props.articles;
+        const {contents, count, isFetching, form, recentTag} = this.props.articles;
         return (
             <Page className={style.container}>
-                <div className={style.tableform}>
+                <div>
                     <Form onSubmit={this.handleSubmit} className={style['ant-advanced-search-form']}>
-                        <FormSearch form={form} getFieldDecorator={getFieldDecorator} recentTag={recentTag} expand={expand} />
+                        <FormSearch form={form} getFieldDecorator={getFieldDecorator} recentTag={recentTag} />
                         <Row>
                             <Col span={24} style={{textAlign: 'right'}}>
                                 <Button type='primary' htmlType='submit'>搜索</Button>
                                 <Button style={{marginLeft: 8}} onClick={this.handleReset}>
                                     清空
                                 </Button>
-                                <a style={{marginLeft: 8, fontSize: 12}} onClick={this.props.toggle}>
+                                { /* <a style={{marginLeft: 8, fontSize: 12}} onClick={this.props.toggle}>
                                     {expand ? '合上' : '展开'} <Icon type={expand ? 'up' : 'down'} />
-                                </a>
+                                </a> */ }
                             </Col>
                         </Row>
                     </Form>

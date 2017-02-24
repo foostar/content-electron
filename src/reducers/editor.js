@@ -5,9 +5,9 @@ import update from 'react/lib/update';
 const HUSSIF = {};
 const INITAL = {
     isFetching: false,
-    content: '<p>请输入文章内容...</p>',
+    content: '',
     title: '',
-    category: 'other'
+    category: '搞笑'
 };
 // 更新编辑器里的内容
 export const updateModel = createAction('UPDATE_MODEL');
@@ -22,9 +22,14 @@ HUSSIF[ updateModel ] = (state, content) => {
     });
 };
 
-HUSSIF[ fetching ] = (state) => {
+HUSSIF[ fetching ] = (state, isFetching) => {
+    if (isFetching == false) {
+        isFetching = false;
+    } else {
+        isFetching = true;
+    }
     return Object.assign({}, state, {
-        isFetching: true
+        isFetching
     });
 };
 
