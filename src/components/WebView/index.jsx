@@ -3,7 +3,7 @@ import {Spin, Icon} from 'antd';
 import style from './style.styl';
 import _ from 'lodash';
 
-import {WEBVIEW_EVENT, AVAILABLE_SETATTRIBUTES} from './util';
+import {WEBVIEW_EVENT, AVAILABLE_ATTRIBUTES} from './util';
 
 export default class extends React.Component {
     state = {loading: true}
@@ -24,7 +24,7 @@ export default class extends React.Component {
         Object.entries(
             _.pickBy(
                 this.props,
-                (value, key) => AVAILABLE_SETATTRIBUTES.includes(key)
+                (value, key) => AVAILABLE_ATTRIBUTES.includes(key)
             )
         ).map(([k, v]) => {
             this.refs.webview.setAttribute(k, v);

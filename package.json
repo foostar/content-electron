@@ -5,8 +5,11 @@
   "main": "main.js",
   "scripts": {
     "lint": "eslint --ext js,jsx src",
-    "dev": "concurrently --kill-others 'npm run dev:eletron' 'npm run dev:webpack'",
-    "dev:eletron": "electron main.dev.js",
+    "build": "rm -rf dist client-* && npm run build:webpack && npm run build:electron",
+    "build:electron": "electron-packager . client --ignore=node_modules ",
+    "build:webpack": "rm -rf dist && NODE_ENV=production webpack",
+    "dev": "concurrently --kill-others 'npm run dev:electron' 'npm run dev:webpack'",
+    "dev:electron": "electron main.dev.js",
     "dev:webpack": "webpack-dev-server"
   },
   "pre-commit": [
@@ -28,7 +31,10 @@
     "electron": "^1.4.15",
     "file-loader": "^0.10.0",
     "html-webpack-plugin": "^2.28.0",
+    "less": "^2.7.2",
+    "less-loader": "^2.2.3",
     "lodash": "^4.17.4",
+    "moment": "^2.17.1",
     "purecss": "^0.6.2",
     "ramda": "^0.23.0",
     "react": "^15.4.2",
@@ -37,6 +43,7 @@
     "react-redux": "^5.0.2",
     "react-router": "^3.0.2",
     "redux": "^3.6.0",
+    "redux-act": "^1.1.0",
     "redux-logger": "^2.8.1",
     "style-loader": "^0.13.1",
     "stylus": "^0.54.5",
@@ -47,6 +54,7 @@
   "devDependencies": {
     "babel-eslint": "^7.1.1",
     "concurrently": "^3.3.0",
+    "electron-packager": "^8.5.2",
     "eslint": "^3.15.0",
     "eslint-config-standard": "^6.2.1",
     "eslint-config-standard-react": "^4.2.0",

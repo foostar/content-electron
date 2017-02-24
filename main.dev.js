@@ -1,30 +1,20 @@
 require('./message');
-const {BrowserWindow, app, session} = require('electron');
+const {BrowserWindow, app} = require('electron');
 
 let mainWindow;
 
-function setCookies (cookies) {
-    cookies.forEach(cookie => {
-        session.defaultSession.cookies.set(cookie, (error) => {
-            if (error) console.error(error);
-        });
-    });
-}
-
 function createWindow () {
-    setCookies([
-        {
-            url: 'https://github.com',
-            name: 'user_session',
-            value: 'COz6RpLclOx4QoXjG8pUqd0_f5_vohtP7ier9RZiboiIb-TA'
-        }
-    ]);
-
     mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
-        nodeIntegration: false
+        width: 1024,
+        height: 900,
+        minWidth: 800,
+        minHeight: 600,
+        webPreferences: {
+            webSecurity: false
+        }
     });
+
+    mainWindow.webContents.session.clearStorageData();
 
     mainWindow.loadURL('http://localhost:8000/');
 

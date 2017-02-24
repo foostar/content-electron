@@ -1,18 +1,19 @@
 import React, {Component} from 'react';
-import ReactCSSTransitionGroup from 'react/lib/ReactCSSTransitionGroup';
+// import ReactCSSTransitionGroup from 'react/lib/ReactCSSTransitionGroup';
 import LeftMenu from './LeftMenu';
-import {Link} from 'react-router';
-import {Button} from 'antd';
-// import logo from '../../images/xiaoyun-logo@2x.png';
 import style from './style.styl';
 
 export default class Layout extends Component {
     render () {
-        const {pathname} = this.props.location;
+        const {location} = this.props;
         return (
             <div className={style.container}>
-                <LeftMenu pathname={pathname} />
+                <LeftMenu location={location} />
                 <div className={style.content}>
+                    <div className={style.inner}>
+                        {this.props.children}
+                    </div>
+                    {/*
                     <ReactCSSTransitionGroup
                         component='main'
                         className={style.inner}
@@ -23,10 +24,11 @@ export default class Layout extends Component {
                         {
                             React.cloneElement(
                                 this.props.children,
-                                {key: pathname}
+                                {key: location.pathname}
                             )
                         }
                     </ReactCSSTransitionGroup>
+                    */}
                 </div>
             </div>
         );
