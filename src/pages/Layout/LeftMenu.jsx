@@ -16,7 +16,7 @@ const mapStateToProps = state => {
 
 @connect(mapStateToProps)
 export default class LeftMenu extends Component {
-    state = {theme: 'dark'}
+    state = {theme: 'light'}
     handleClick = (e) => {
         hashHistory.push(e.key);
     }

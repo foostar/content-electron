@@ -52,5 +52,11 @@ export const createUpstream = createCallApi(HUSSIF, {
     })
 });
 
+export const updateUpstream = createCallApi(HUSSIF, {
+    type: 'UPDATE_UPSTREAM',
+    endpoint: '/upstream/:id',
+    method: 'PATCH'
+});
+
 export default createReducer(HUSSIF, INITAL);
 

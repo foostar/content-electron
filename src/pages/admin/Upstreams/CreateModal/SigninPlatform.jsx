@@ -28,7 +28,11 @@ class QiE extends Component {
                 item.url = 'https://om.qq.com/';
                 return item;
             });
-            this.props.nextStep({session});
+            this.webview.executeJavaScript(`
+                document.querySelector('.header-login-inner .name').innerText
+            `, (nickname) => {
+                this.props.nextStep({session, nickname});
+            });
         }
     }
     render () {
@@ -69,7 +73,11 @@ class BaiJia extends Component {
                 item.url = 'http://baijiahao.baidu.com/';
                 return item;
             });
-            this.props.nextStep({session});
+            this.webview.executeJavaScript(`
+                document.querySelector('.mp-header-user .author .name').innerText;
+            `, (nickname) => {
+                this.props.nextStep({nickname, session});
+            });
         }
     }
     render () {

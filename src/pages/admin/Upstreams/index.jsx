@@ -43,21 +43,22 @@ class AdminUsers extends Component {
                     rowKey='id'
                     pagination={false}
                     dataSource={this.props.upstreams}
-                    scroll={{y: 'calc(100vh - 55px)'}}
                 >
                     <Column
+                        title='昵称'
+                        width='20%'
+                        dataIndex='nickname'
+                        key='nickname'
+                    />
+                    <Column
                         title='账号'
-                        width='40%'
+                        width='25%'
                         dataIndex='account'
                         key='account'
-                        render={(text, record) => {
-                            // return <Link to={`/admin/upstreams/${record.id}`}>{text}</Link>;
-                            return <a>{text}</a>;
-                        }}
                     />
                     <Column
                         title='平台'
-                        width='40%'
+                        width='20%'
                         dataIndex='platform'
                         key='platform'
                         filters={platforms}
@@ -70,8 +71,13 @@ class AdminUsers extends Component {
                         }}
                     />
                     <Column
+                        title='备注'
+                        key='custom'
+                        dataIndex='custom'
+                        width='25%'
+                    />
+                    <Column
                         title={<CreateModal />}
-                        width='20%'
                         key='action'
                         render={(_, record) => (
                             <Button disabled type='danger' shape='circle' size='small'>

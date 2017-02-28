@@ -126,7 +126,7 @@ class CreateModal extends Component {
                                         ? <Tag color='purple'>{item.platform}</Tag>
                                         : <Tag color='blue'>{item.platform}</Tag>
                                     }
-                                    {item.account}
+                                    {item.nickname}
                                 </Option>
                             )}
 

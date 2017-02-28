@@ -1,4 +1,5 @@
 const {session, ipcMain} = require('electron');
+const querystring = require('querystring');
 
 ipcMain.on('GET_COOKIES_BY_PARTITION', (event, {partition, opt = {}} = {}) => {
     if (!partition) {
@@ -20,7 +21,7 @@ ipcMain.on('GET_COOKIES_BY_PARTITION', (event, {partition, opt = {}} = {}) => {
     });
 });
 
-ipcMain.on('SET_PARTITION_COOKIES', (event, {partition, cookies = []} = {}) => {
+ipcMain.on('SET_PARTITION_COOKIES', (event, {partition, cookies = []}) => {
     if (!partition) {
         event.returnValue = {
             error: true,
@@ -37,3 +38,16 @@ ipcMain.on('SET_PARTITION_COOKIES', (event, {partition, cookies = []} = {}) => {
     event.returnValue = true;
 });
 
+ipcMain.on('HANDLE_BEFORE_REQUEST_BY_PARTITION', (event, {partition, filter = {}}) => {
+    function handler (details, cb) {
+        let uploadData = [];
+        if (details.uploadData) {
+            uploadData = details.uploadData.map(
+                item => querystring.parse(item.bytes.toString('utf-8'))
+            );
+        }
+        event.sender.send(`HANDLE_BEFORE_REQUEST_${partition}`, uploadData);
+        cb({cancel: false});
+    }
+    session.fromPartition(partition).webRequest.onBeforeRequest(filter, handler);
+});

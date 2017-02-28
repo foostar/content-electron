@@ -28,7 +28,7 @@ class ChoosePlatform extends Component {
                                 style={{backgroundImage: `url(${BG_LOGO[upstream.platform]})`}}
                             >
                                 <Tag color='green-inverse' className={style['upstream-tag']}>
-                                    {upstream.account}
+                                    {upstream.nickname}
                                 </Tag>
                                 {bindUpstreams.includes(upstream.id) &&
                                     <Tag color='blue' className={style['bind-tag']}>作者绑定平台</Tag>

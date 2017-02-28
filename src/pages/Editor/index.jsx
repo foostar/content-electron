@@ -190,9 +190,9 @@ export default class Editor extends Component {
             }
         };
         return (
-            <Page className={style.container}>
+            <Page>
                 <Spin spinning={isFetching}>
-                    <Form onSubmit={this.handleSubmit} style={{padding: 16}}>
+                    <Form onSubmit={this.handleSubmit} style={{padding: 12}}>
                         <FormItem
                             // {...formItemLayout}
                             hasFeedback

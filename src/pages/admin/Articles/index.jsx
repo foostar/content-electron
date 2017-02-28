@@ -134,7 +134,7 @@ export default class extends Component {
         title: '作者',
         dataIndex: 'author',
         key: 'author',
-        render: author => author.username
+        render: author => author ? author.username : '作者已被删除'
     }, {
         title: '文章分类',
         dataIndex: 'category',

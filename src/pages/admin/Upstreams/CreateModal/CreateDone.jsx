@@ -36,15 +36,21 @@ class CreateDone extends Component {
         }
     }
     render () {
-        const {account, session, platform} = this.props.data;
+        const {account, session, platform, nickname, custom} = this.props.data;
         return (
             <div className={style['create-done']}>
                 <Row gutter={8}>
-                    <Col xs={24} md={12}>
+                    <Col xs={24} md={8}>
                         <Alert type='info' message={`平台: ${platform}`} />
                     </Col>
-                    <Col xs={24} md={12}>
+                    <Col xs={24} md={8}>
                         <Alert type='info' message={`账号: ${account}`} />
+                    </Col>
+                    <Col xs={24} md={8}>
+                        <Alert type='info' message={`昵称: ${nickname}`} />
+                    </Col>
+                    <Col xs={24} md={8}>
+                        <Alert type='info' message={`备注: ${custom}`} />
                     </Col>
                 </Row>
                 <Collapse>
