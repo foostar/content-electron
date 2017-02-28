@@ -52,6 +52,7 @@ class QiE extends Component {
     }
     onDidStopLoading = () => {
         const url = this.webview.getURL();
+
         if (url === 'about:blank') {
             this.gotoPublishPage();
         }
@@ -59,16 +60,7 @@ class QiE extends Component {
         // 进入首页, 获取 cookies
         if (url === 'https://om.qq.com/') {
             this.updateCookies();
-
             this.webview.loadURL('https://om.qq.com/article/articlePublish');
-        }
-
-        if (url.startsWith('https://om.qq.com/article/articlePublish') && !this.injected) {
-            this.injectPublishScript();
-        }
-
-        if (url.startsWith('https://om.qq.com/article/articleManage')) {
-            // this.props.nextStep();
         }
 
         if (url.startsWith('https://om.qq.com/userAuth/index')) {
@@ -78,6 +70,14 @@ class QiE extends Component {
                 document.querySelector('#LPassword').value = '${this.props.upstream.password}';
                 document.querySelector('.btnLogin').click();
             `);
+        }
+
+        if (url.startsWith('https://om.qq.com/article/articlePublish') && !this.injected) {
+            this.injectPublishScript();
+        }
+
+        if (url.startsWith('https://om.qq.com/article/articleManage')) {
+            // this.props.nextStep();
         }
     }
     injectPublishScript = async () => {
@@ -92,20 +92,46 @@ class QiE extends Component {
 
         content += createIdImage(this.props.content.id);
 
-        // 通知主进程监听发布文章的接口
-        ipcRenderer.send('HANDLE_BEFORE_REQUEST_BY_PARTITION', {
-            partition: this.state.partition,
-            filter: {
-                urls: [
-                    'https://om.qq.com/editorCache/update?relogin=1', // 草稿缓存更新接口 (测试用)
-                    'https://om.qq.com/article/publish?relogin=1'     // 发布接口
-                ]
+        const _debugger = this.webview.getWebContents().debugger;
+        _debugger.attach('1.1');
+        _debugger.on('message', (event, method, {response, requestId, type}) => {
+            if (method === 'Network.responseReceived' && type === 'XHR') {
+                console.log(response.url);
+                if (response.url !== 'https://om.qq.com/editorCache/update?relogin=1') return;
+                _debugger.sendCommand('Network.getResponseBody', {requestId}, (err, res) => {
+                    if (err) console.log(err);
+                    window.alert(res.body);
+                });
             }
         });
+        _debugger.sendCommand('Network.enable');
 
-        ipcRenderer.on(`HANDLE_BEFORE_REQUEST_${this.state.partition}`, (event, data) => {
-            console.log('HANDLE_BEFORE_REQUEST_', data);
-        });
+        // ipcRenderer.send('GET_REPONSE_BODY_BY_ID', {
+        //     id: webviewId,
+        //     url: 'https://om.qq.com/editorCache/update?relogin=1'
+        // });
+
+        // 通知主进程监听发布文章的接口
+        // ipcRenderer.send('HANDLE_BEFORE_REQUEST_BY_PARTITION', {
+        //     partition: this.state.partition,
+        //     filter: {
+        //         urls: [
+        //             'https://om.qq.com/editorCache/update?relogin=1', // 草稿缓存更新接口 (测试用)
+        //             'https://om.qq.com/article/publish?relogin=1'     // 发布接口
+        //         ]
+        //     }
+        // });
+
+        // ipcRenderer.on(`HANDLE_BEFORE_REQUEST_${this.state.partition}`, (event, data) => {
+        //     console.log('HANDLE_BEFORE_REQUEST_', data);
+        //     // this.webview.executeJavaScript(`
+        //     //     $.ajax({
+        //     //         method: 'POST',
+        //     //         url: 'https://om.qq.com/article/publish?relogin=1',
+        //     //         data: ${JSON.stringify(data)}
+        //     //     })
+        //     // `);
+        // });
 
         const interval = setInterval(() => {
             this.webview.executeJavaScript(`document.querySelector('#ueditor_0')`, done => {
@@ -140,6 +166,7 @@ class QiE extends Component {
             partition: this.state.partition,
             cookies
         });
+
         if (ok) {
             this.webview.loadURL('https://om.qq.com/article/articlePublish');
         }
@@ -262,7 +289,7 @@ class PublishContent extends Component {
 export default PublishContent;
 
 // const publishData = {
-//     content: '',
+//     content: '<html />',
 //     video: '',
 //     music: '',
 //     title: '为什么说妻子决定了一个家庭的幸福',

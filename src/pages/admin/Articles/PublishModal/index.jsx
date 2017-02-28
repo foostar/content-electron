@@ -58,7 +58,6 @@ class PublishModal extends Component {
         });
     }
     render () {
-        console.log(this.state.data);
         const {content, upstreams} = this.props;
         const {bindUpstreams = []} = content.author || {};
         const {current, visible, data} = this.state;

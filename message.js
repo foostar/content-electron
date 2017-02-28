@@ -1,5 +1,6 @@
-const {session, ipcMain} = require('electron');
-const querystring = require('querystring');
+const {session, ipcMain, webContents} = require('electron');
+// const querystring = require('querystring');
+// const request = require('request');
 
 ipcMain.on('GET_COOKIES_BY_PARTITION', (event, {partition, opt = {}} = {}) => {
     if (!partition) {
@@ -38,16 +39,64 @@ ipcMain.on('SET_PARTITION_COOKIES', (event, {partition, cookies = []}) => {
     event.returnValue = true;
 });
 
-ipcMain.on('HANDLE_BEFORE_REQUEST_BY_PARTITION', (event, {partition, filter = {}}) => {
-    function handler (details, cb) {
-        let uploadData = [];
-        if (details.uploadData) {
-            uploadData = details.uploadData.map(
-                item => querystring.parse(item.bytes.toString('utf-8'))
-            );
-        }
-        event.sender.send(`HANDLE_BEFORE_REQUEST_${partition}`, uploadData);
-        cb({cancel: false});
-    }
-    session.fromPartition(partition).webRequest.onBeforeRequest(filter, handler);
+ipcMain.on('GET_REPONSE_BODY_BY_ID', (event, {id, url}) => {
+    console.log(typeof id, id);
+    console.log(webContents.getAllWebContents());
+    const contents = webContents.fromId(id);
+    console.log(contents);
+
+    // try {
+    //     contents.debugger.attach('1.1');
+    // } catch (err) {
+    //     console.log('Debugger attach failed : ', err);
+    // }
+
+    // contents.debugger.on('detach', (event, reason) => {
+    //     console.log('Debugger detached due to : ', reason);
+    // });
+
+    // contents.debugger.on('message', (event, method, params) => {
+    //     if (method == 'Network.responseReceived' && params.type == 'XHR') {
+    //         // Code here.
+    //         console.log(params);
+    //     }
+    // });
+
+    // contents.debugger.sendCommand('Network.enable');
 });
+
+// ipcMain.on('HANDLE_BEFORE_REQUEST_BY_PARTITION', (event, {partition, filter = {}}) => {
+//     console.log({partition});
+//     const {webContents} = session.  (partition);
+//     console.log(webContents);
+
+    // webRequest.onBeforeSendHeaders(filter, beforeSendHeadersHandler);
+    // webRequest.onBeforeRequest(filter, beforeRequestHandler);
+
+    // function beforeSendHeadersHandler (details, cb) {
+    //     requestHeaders = details.requestHeaders;
+    //     cb({cancel: false});
+    // }
+
+    // function beforeRequestHandler (details, cb) {
+    //     let uploadData;
+    //     const {url, method} = details;
+    //     if (details.uploadData) {
+    //         uploadData = details.uploadData.map(
+    //             item => querystring.parse(item.bytes.toString('utf-8'))
+    //         );
+    //     }
+    //     // console.log({uploadData});
+    //     console.log(Object.keys(uploadData[0]));
+    //     console.log({url, method, requestHeaders});
+    //     request({url, method, headers: requestHeaders, formData: uploadData[0]}, (err, res, body) => {
+    //         if (err) {
+    //             console.log(err);
+    //         }
+    //         console.log('-----------------------------');
+    //         console.log(body);
+    //         console.log('+++++++++++++++++++++++++++++');
+    //     });
+    //     cb({cancel: true});
+    // }
+// });

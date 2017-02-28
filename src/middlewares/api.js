@@ -33,7 +33,6 @@ export const apiMiddleware = (opt = {}) => store => next => async action => {
             endpoint = endpoint.replace(/\/$/, '') + `/${params}`;
         } else if (typeof params === 'object') {
             Object.entries(params).forEach(([k, v]) => {
-                console.log({k, v});
                 endpoint = endpoint.replace(new RegExp(`:${k}`, 'i'), v);
             });
         }
