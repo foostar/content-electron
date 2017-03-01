@@ -111,14 +111,14 @@ class CreateModal extends Component {
                         )}
                 </FormItem>
 
-                <FormItem label='Upstreams' labelCol={{span: 5}} wrapperCol={{span: 17}}>
+                <FormItem label='绑定平台账号' labelCol={{span: 5}} wrapperCol={{span: 17}}>
                     {getFieldDecorator('bindUpstreams', {
                         initialValue: []
                     })(
                         <Select
                             multiple
                             style={{width: '100%'}}
-                            placeholder='请选择 Upstreams'
+                            placeholder='请选择平台账号'
                         >
                             {this.props.upstreams.map(item =>
                                 <Option key={item.id}>
@@ -140,12 +140,12 @@ class CreateModal extends Component {
         return (
             <div>
                 <Button
-                    type='primary'
-                    size='small'
-                    shape='circle'
                     icon='plus'
                     onClick={this.showModal}
-                />
+                >
+                    添加新用户
+                </Button>
+
                 <Modal
                     title='创建用户'
                     okText='创建'

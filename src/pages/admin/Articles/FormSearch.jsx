@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Form, Input, Select, Row, Col} from 'antd';
+import {Form, Input, Select} from 'antd';
 import style from './style.styl';
 
 const FormItem = Form.Item;
@@ -7,8 +7,8 @@ const Option = Select.Option;
 export default class FormSearch extends Component {
     render () {
         const formItemLayout = {
-            labelCol: {span: 8},
-            wrapperCol: {span: 16}
+            labelCol: {span: 0},
+            wrapperCol: {span: 24}
         };
 
         const {recentTag, getFieldDecorator, form, expand} = this.props;
@@ -17,20 +17,36 @@ export default class FormSearch extends Component {
         });
 
         const children = [
-            <Col span={8} key='1'>
+            <div key='1'>
+                <div className={style['form-item-label']}>作者ID</div>
                 <FormItem
                     {...formItemLayout}
-                    label='作者id'
+                    label='作者ID'
                 >
                     {getFieldDecorator('author', {
                         rules: [],
                         initialValue: form.author || ''
                     })(
-                        <Input placeholder='作者id' />
+                        <Input />
                             )}
                 </FormItem>
-            </Col>,
-            <Col span={8} key='2'>
+            </div>,
+            <div key='2'>
+                <div className={style['form-item-label']}>正文关键字</div>
+                <FormItem
+                    {...formItemLayout}
+                    label='正文关键字'
+                >
+                    {getFieldDecorator('keyword', {
+                        rules: [],
+                        initialValue: form.keyword || ''
+                    })(
+                        <Input />
+                    )}
+                </FormItem>
+            </div>,
+            <div key='3'>
+                <div className={style['form-item-label']}>分类</div>
                 <FormItem
                     {...formItemLayout}
                     label='选择分类'
@@ -45,21 +61,9 @@ export default class FormSearch extends Component {
                         </Select>
                     )}
                 </FormItem>
-            </Col>,
-            <Col span={8} key='3'>
-                <FormItem
-                    {...formItemLayout}
-                    label='正文关键字'
-                >
-                    {getFieldDecorator('keyword', {
-                        rules: [],
-                        initialValue: form.keyword || ''
-                    })(
-                        <Input placeholder='正文关键字' />
-                    )}
-                </FormItem>
-            </Col>,
-            <Col span={8} key='4'>
+            </div>,
+            <div key='4'>
+                <div className={style['form-item-label']}>包含的标签</div>
                 <FormItem
                     {...formItemLayout}
                     label='包含的标签'
@@ -68,13 +72,14 @@ export default class FormSearch extends Component {
                         rules: [],
                         initialValue: form.includeTags || []
                     })(
-                        <Select tags placeholder='选择包含的标签'>
+                        <Select tags>
                             {options}
                         </Select>
                     )}
                 </FormItem>
-            </Col>,
-            <Col span={8} key='5'>
+            </div>,
+            <div key='5'>
+                <div className={style['form-item-label']}>不包含的标签</div>
                 <FormItem
                     {...formItemLayout}
                     label='不包含的标签'
@@ -83,19 +88,19 @@ export default class FormSearch extends Component {
                         rules: [],
                         initialValue: form.excludeTags || []
                     })(
-                        <Select tags placeholder='选择不包含的标签'>
+                        <Select tags>
                             {options}
                         </Select>
                 )}
                 </FormItem>
-            </Col>
+            </div>
         ];
 
         const shownCount = expand ? children.length : 3;
         return (
-            <Row gutter={40}>
+            <div>
                 {children.slice(0, shownCount)}
-            </Row>
+            </div>
         );
     }
 }

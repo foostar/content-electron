@@ -9,6 +9,10 @@ function createWindow () {
         height: 900,
         minWidth: 800,
         minHeight: 600,
+        // autoHideMenuBar: true,
+        useContentSize: true,
+        // frame: false,
+        // titleBarStyle: 'hidden-inset',
         webPreferences: {
             webSecurity: false
         }

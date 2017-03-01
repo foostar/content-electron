@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Table, Form, Button, Select, Tag, Row, Col} from 'antd';
+import {Table, Form, Button, Select, Tag, Layout} from 'antd';
 import style from './style.styl';
 import {connect} from 'react-redux';
 import {Link} from 'react-router';
@@ -143,12 +143,12 @@ export default class extends Component {
         title: '创建时间',
         dataIndex: 'createdAt',
         key: 'createdAt',
-        render: (time) => moment(time).format('LLL')
+        render: (time) => moment(time).format('YY-M-D h:m')
     }, {
         title: '文章标签',
         dataIndex: 'tag',
         key: 'tag',
-        width: 300,
+        width: 200,
         render: this.renderTag
     }, {
         title: '操作',
@@ -166,29 +166,33 @@ export default class extends Component {
         const {contents, count, isFetching, form, recentTag} = this.props.articles;
         return (
             <Page className={style.container}>
-                <div>
-                    <Form onSubmit={this.handleSubmit} className={style['ant-advanced-search-form']}>
-                        <FormSearch form={form} getFieldDecorator={getFieldDecorator} recentTag={recentTag} />
-                        <Row>
-                            <Col span={24} style={{textAlign: 'right'}}>
-                                <Button type='primary' htmlType='submit'>搜索</Button>
-                                <Button style={{marginLeft: 8}} onClick={this.handleReset}>
+                <Layout className={style.layout}>
+                    <Layout.Sider width='200' className={style.sider}>
+                        <h3>搜索条件</h3>
+                        <Form onSubmit={this.handleSubmit}>
+                            <FormSearch form={form} getFieldDecorator={getFieldDecorator} recentTag={recentTag} />
+                            <div className={style.buttons}>
+                                <Button onClick={this.handleReset}>
                                     清空
                                 </Button>
+                                <Button type='primary' htmlType='submit'>搜索</Button>
                                 { /* <a style={{marginLeft: 8, fontSize: 12}} onClick={this.props.toggle}>
                                     {expand ? '合上' : '展开'} <Icon type={expand ? 'up' : 'down'} />
                                 </a> */ }
-                            </Col>
-                        </Row>
-                    </Form>
-                </div>
-                <Table
-                    rowSelection={this.rowSelection}
-                    columns={this.columns}
-                    dataSource={contents}
-                    pagination={{total: count, onChange: this.pageChange, pageSize: 10}}
-                    loading={isFetching}
-                />
+                            </div>
+                        </Form>
+                    </Layout.Sider>
+                    <Layout.Content className={style.content}>
+                        <Table
+                            bordered
+                            rowSelection={this.rowSelection}
+                            columns={this.columns}
+                            dataSource={contents}
+                            pagination={{total: count, onChange: this.pageChange, pageSize: 10}}
+                            loading={isFetching}
+                        />
+                    </Layout.Content>
+                </Layout>
             </Page>
         );
     }

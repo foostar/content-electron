@@ -2,13 +2,63 @@
     height 100vh
     position relative
     display flex
+    flex-direction column
     overflow hidden
 
+.topbar
+    height 60px
+    width 100%
+    background #F6F7F8
+    display flex
+    -webkit-user-select none
+    box-shadow 0 0 1px #CCC
+    .brand
+        width 200px
+        min-width 200px
+        padding 0 20px
+        display flex
+        align-items center
+        font-size 24px
+        line-height 60px
+        color #CCC
+        font-weight 300
+        cursor default
+        span
+            padding-right 5px
+            font-weight normal
+            margin-top 0
+            color #F96868
+    .user-board
+        width 200px
+        min-width 200px
+        padding 0 20px
+        display flex
+        justify-content flex-end
+        align-items center
+        .username
+            margin 10px 0
+            height 40px
+            line-height 40px
+    :global
+        .ant-menu
+            background none
+        .ant-menu-horizontal
+            border-bottom 0
+
 .menu
-    width 200px
     height 100%
-    overflow-x hidden
-    overflow-y auto
+    display flex
+    flex 1
+    align-items center
+    justify-content center
+
+    .menu-btn
+        margin 0 6px
+        border 0
+        background none
+    .active .menu-btn, .menu-btn:hover
+        background-color #F96868
+        color #FFF
 
 .header
     width 100%

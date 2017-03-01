@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import {Table} from 'antd';
+import {Table, Layout, Button} from 'antd';
+import moment from 'moment';
 import style from './style.styl';
 import {connect} from 'react-redux';
 import {Link} from 'react-router';
@@ -34,21 +35,18 @@ export default class extends Component {
         this.fetchData(page);
     }
     columns = [{
-        title: '文章id',
-        dataIndex: 'id',
-        key: 'id'
-    }, {
-        title: '文章标题',
+        title: '标题',
         dataIndex: 'title',
         key: 'title'
     }, {
-        title: '文章分类',
+        title: '分类',
         dataIndex: 'category',
         key: 'category'
     }, {
         title: '创建时间',
         dataIndex: 'createdAt',
-        key: 'createdAt'
+        key: 'createdAt',
+        render: (time) => moment(time).format('YY-M-D h:m')
     }, {
         title: '操作',
         key: 'action',
@@ -62,13 +60,28 @@ export default class extends Component {
         const {contents, count, isFetching} = this.props.articles;
         return (
             <Page className={style.container}>
-                <Table
-                    rowSelection={this.rowSelection}
-                    columns={this.columns}
-                    dataSource={contents}
-                    pagination={{total: count, onChange: this.pageChange, pageSize: 10}}
-                    loading={isFetching}
-                />
+                <Layout className={style.layout}>
+                    <Layout.Header className={style.header}>
+                        <Link to='/editor'>
+                            <Button
+                                icon='plus'
+                                onClick={() => this.setState({visible: true})}
+                            >
+                                发表新文章
+                            </Button>
+                        </Link>
+                    </Layout.Header>
+                    <Layout.Content className={style.content}>
+                        <Table
+                            bordered
+                            rowSelection={this.rowSelection}
+                            columns={this.columns}
+                            dataSource={contents}
+                            pagination={{total: count, onChange: this.pageChange, pageSize: 10}}
+                            loading={isFetching}
+                        />
+                    </Layout.Content>
+                </Layout>
             </Page>
         );
     }

@@ -2,8 +2,8 @@ import React, {Component} from 'react';
 
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {hashHistory, Link} from 'react-router';
-import {Form, Button, Spin, Input, Select, notification, Upload, Icon, message} from 'antd';
+import {hashHistory} from 'react-router';
+import {Form, Button, Input, Select, notification, Upload, Icon, message, Layout} from 'antd';
 import * as actions from 'reducers/editor';
 
 import Page from 'components/Page';
@@ -159,7 +159,7 @@ export default class Editor extends Component {
         this.props.updateModel(content);
     }
     render () {
-        const {content, isFetching, title, category} = this.props.editor;
+        const {content, title, category} = this.props.editor;
         const {getFieldDecorator} = this.props.form;
         const self = this;
         const props = {
@@ -191,92 +191,95 @@ export default class Editor extends Component {
         };
         return (
             <Page className={style.container}>
-                <Spin spinning={isFetching}>
-                    <Form onSubmit={this.handleSubmit} style={{padding: 16}}>
-                        <FormItem
-                            // {...formItemLayout}
-                            hasFeedback
-                        >
-                            {getFieldDecorator('title', {
-                                rules: [{
-                                    required: true, message: '请输入标题'
-                                }],
-                                initialValue: title || ''
-                            })(
-                                <Input placeholder='标题' />
-                            )}
-                        </FormItem>
-                        <FormItem
-                            // {...formItemLayout}
-                        >
-                            {getFieldDecorator('category', {
-                                initialValue: category || '搞笑'
-                            })(
-                                <Select>
-                                    <OptGroup label='搞笑'>
-                                        <Option value='搞笑'>搞笑</Option>
-                                        <Option value='美图'>美图</Option>
-                                        <Option value='科学'>科学</Option>
-                                        <Option value='历史'>历史</Option>
-                                    </OptGroup>
-                                    <OptGroup label='科技互联网'>
-                                        <Option value='互联网'>互联网</Option>
-                                        <Option value='科技'>科技</Option>
-                                    </OptGroup>
-                                    <OptGroup label='两性健康'>
-                                        <Option value='两性'>两性</Option>
-                                        <Option value='情感'>情感</Option>
-                                        <Option value='女人'>女人</Option>
-                                        <Option value='健康'>健康</Option>
-                                    </OptGroup>
-                                    <OptGroup label='国际社会'>
-                                        <Option value='社会'>社会</Option>
-                                        <Option value='三农'>三农</Option>
-                                        <Option value='军事'>军事</Option>
-                                        <Option value='游戏'>游戏</Option>
-                                        <Option value='娱乐'>娱乐</Option>
-                                        <Option value='体育'>体育</Option>
-                                    </OptGroup>
-                                    <OptGroup label='生活服务'>
-                                        <Option value='宠物'>宠物</Option>
-                                        <Option value='家居'>家居</Option>
-                                        <Option value='时尚'>时尚</Option>
-                                        <Option value='育儿'>育儿</Option>
-                                        <Option value='美食'>美食</Option>
-                                        <Option value='旅游'>旅游</Option>
-                                        <Option value='汽车'>汽车</Option>
-                                        <Option value='生活'>生活</Option>
-                                    </OptGroup>
-                                </Select>
-                            )}
-                        </FormItem>
-                        <FormItem
-                            // {...formItemLayout}
-                            hasFeedback
-                        >
-                            <FroalaEditor
-                                tag='textarea'
-                                model={content}
-                                config={this.editorConfig}
-                                onModelChange={this.handleEditorChange}
-                            />
-                        </FormItem>
-                        <FormItem
-                            // {...tailFormItemLayout}
-                        >
-                            <Button type='primary' htmlType='submit' size='large'>提交</Button>
-                            <Button className={style.goback} onClick={this.insertImage} type='primary'><Link to='/articles'>返回</Link></Button>
-                        </FormItem>
-                        <div ref='upload' className={style.upload}>
-                            <Upload {...props}>
-                                <Button>
-                                    <Icon type='picture' />上传
-                                </Button>
-                            </Upload>
-                        </div>
-                        <div className={style.disappear} ref='model' />
-                    </Form>
-                </Spin>
+                <Layout className={style.layout}>
+                    <Layout.Content className={style.content}>
+                        <Form onSubmit={this.handleSubmit}>
+                            <FormItem
+                                // {...formItemLayout}
+                                hasFeedback
+                            >
+                                {getFieldDecorator('title', {
+                                    rules: [{
+                                        required: true, message: '请输入标题'
+                                    }],
+                                    initialValue: title || ''
+                                })(
+                                    <Input placeholder='输入文章标题' />
+                                )}
+                            </FormItem>
+                            <FormItem
+                                // {...formItemLayout}
+                            >
+                                {getFieldDecorator('category', {
+                                    initialValue: category || '搞笑'
+                                })(
+                                    <Select>
+                                        <OptGroup label='搞笑'>
+                                            <Option value='搞笑'>搞笑</Option>
+                                            <Option value='美图'>美图</Option>
+                                            <Option value='科学'>科学</Option>
+                                            <Option value='历史'>历史</Option>
+                                        </OptGroup>
+                                        <OptGroup label='科技互联网'>
+                                            <Option value='互联网'>互联网</Option>
+                                            <Option value='科技'>科技</Option>
+                                        </OptGroup>
+                                        <OptGroup label='两性健康'>
+                                            <Option value='两性'>两性</Option>
+                                            <Option value='情感'>情感</Option>
+                                            <Option value='女人'>女人</Option>
+                                            <Option value='健康'>健康</Option>
+                                        </OptGroup>
+                                        <OptGroup label='国际社会'>
+                                            <Option value='社会'>社会</Option>
+                                            <Option value='三农'>三农</Option>
+                                            <Option value='军事'>军事</Option>
+                                            <Option value='游戏'>游戏</Option>
+                                            <Option value='娱乐'>娱乐</Option>
+                                            <Option value='体育'>体育</Option>
+                                        </OptGroup>
+                                        <OptGroup label='生活服务'>
+                                            <Option value='宠物'>宠物</Option>
+                                            <Option value='家居'>家居</Option>
+                                            <Option value='时尚'>时尚</Option>
+                                            <Option value='育儿'>育儿</Option>
+                                            <Option value='美食'>美食</Option>
+                                            <Option value='旅游'>旅游</Option>
+                                            <Option value='汽车'>汽车</Option>
+                                            <Option value='生活'>生活</Option>
+                                        </OptGroup>
+                                    </Select>
+                                )}
+                            </FormItem>
+                            <FormItem
+                                // {...formItemLayout}
+                                hasFeedback
+                            >
+                                <FroalaEditor
+                                    tag='textarea'
+                                    model={content}
+                                    config={this.editorConfig}
+                                    onModelChange={this.handleEditorChange}
+                                />
+                            </FormItem>
+                            <FormItem
+                                // {...tailFormItemLayout}
+                             />
+                            <div ref='upload' className={style.upload}>
+                                <Upload {...props}>
+                                    <Button>
+                                        <Icon type='picture' />上传
+                                    </Button>
+                                </Upload>
+                            </div>
+                            <div className={style.disappear} ref='model' />
+                        </Form>
+                    </Layout.Content>
+                    <Layout.Footer className={style.footer}>
+                        <Button>清空</Button>
+                        <Button type='primary' htmlType='submit'>提交</Button>
+                    </Layout.Footer>
+                </Layout>
             </Page>
         );
     }

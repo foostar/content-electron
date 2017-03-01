@@ -3,6 +3,8 @@ import {Alert} from 'antd';
 import WebView from 'components/WebView';
 import {ipcRenderer} from 'electron';
 
+import {platformsById} from 'utils/consts';
+
 class QiE extends Component {
     state = {
         partition: `persist:${Date.now()}`
@@ -87,8 +89,8 @@ class BaiJia extends Component {
 class SigninPlatform extends Component {
     render () {
         switch (this.props.data.platform) {
-            case '企鹅号': return <QiE {...this.props} />;
-            case '百家号': return <BaiJia {...this.props} />;
+            case platformsById.omqq.id: return <QiE {...this.props} />;
+            case platformsById.baijia.id: return <BaiJia {...this.props} />;
             default: return (
                 <Alert
                     type='warning'

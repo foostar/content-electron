@@ -2,6 +2,21 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+const pkg = require('./package.json');
+
+let theme = {};
+if (pkg.theme && typeof pkg.theme === 'string') {
+    let cfgPath = pkg.theme;
+    // relative path
+    if (cfgPath.charAt(0) === '.') {
+        cfgPath = path.resolve(__dirname, cfgPath);
+    }
+    const getThemeConfig = require(cfgPath);
+    theme = getThemeConfig();
+} else if (pkg.theme && typeof pkg.theme === 'object') {
+    theme = pkg.theme;
+}
+
 const config = {
     entry: './src/app.jsx',
     output: {
@@ -25,7 +40,7 @@ const config = {
                 use: [
                     'style-loader',
                     'css-loader',
-                    'less-loader'
+                    `less-loader?{"modifyVars":${JSON.stringify(theme)}}`
                 ]
             },
             {

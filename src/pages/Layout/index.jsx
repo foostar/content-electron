@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 // import ReactCSSTransitionGroup from 'react/lib/ReactCSSTransitionGroup';
-import LeftMenu from './LeftMenu';
+import Topbar from './Topbar';
 import style from './style.styl';
 
 export default class Layout extends Component {
@@ -8,7 +8,7 @@ export default class Layout extends Component {
         const {location} = this.props;
         return (
             <div className={style.container}>
-                <LeftMenu location={location} />
+                <Topbar location={location} />
                 <div className={style.content}>
                     <div className={style.inner}>
                         {this.props.children}

@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 
-import qieLogo from 'pages/admin/Upstreams/CreateModal/qi-e-logo.png';
-import baiJiaLogo from 'pages/admin/Upstreams/CreateModal/bai-jia-logo.png';
+// import qieLogo from 'pages/admin/Upstreams/CreateModal/qi-e-logo.png';
+// import baiJiaLogo from 'pages/admin/Upstreams/CreateModal/bai-jia-logo.png';
 
 const BG_LOGO = {
-    '企鹅号': qieLogo,
-    '百家号': baiJiaLogo
+    '企鹅号': '',
+    '百家号': ''
 };
 
 import style from './style.styl';

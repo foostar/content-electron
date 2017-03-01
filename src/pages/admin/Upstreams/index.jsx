@@ -6,7 +6,7 @@ import {bindActionCreators} from 'redux';
 import * as actions from 'reducers/upstreams';
 import Page from 'components/Page';
 import CreateModal from './CreateModal';
-import {Button, Table, Icon, Tag} from 'antd';
+import {Button, Table, Icon, Tag, Layout} from 'antd';
 import style from './style.styl';
 
 const {Column} = Table;
@@ -39,47 +39,55 @@ class AdminUsers extends Component {
         });
         return (
             <Page className={style.container}>
-                <Table
-                    rowKey='id'
-                    pagination={false}
-                    dataSource={this.props.upstreams}
-                    scroll={{y: 'calc(100vh - 55px)'}}
-                >
-                    <Column
-                        title='账号'
-                        width='40%'
-                        dataIndex='account'
-                        key='account'
-                        render={(text, record) => {
-                            // return <Link to={`/admin/upstreams/${record.id}`}>{text}</Link>;
-                            return <a>{text}</a>;
-                        }}
-                    />
-                    <Column
-                        title='平台'
-                        width='40%'
-                        dataIndex='platform'
-                        key='platform'
-                        filters={platforms}
-                        onFilter={(value, record) => record.platform.includes(value)}
-                        render={(text, record) => {
-                            if (record.platform === '企鹅号') {
-                                return <Tag color='purple'>{text}</Tag>;
-                            }
-                            return <Tag color='blue'>{text}</Tag>;
-                        }}
-                    />
-                    <Column
-                        title={<CreateModal />}
-                        width='20%'
-                        key='action'
-                        render={(_, record) => (
-                            <Button disabled type='danger' shape='circle' size='small'>
-                                <Icon type='delete' />
-                            </Button>
-                        )}
-                    />
-                </Table>
+                <Layout className={style.layout}>
+                    <Layout.Header className={style.header}>
+                        <CreateModal />
+                    </Layout.Header>
+                    <Layout.Content className={style.content}>
+                        <Table
+                            bordered
+                            rowKey='id'
+                            pagination={false}
+                            dataSource={this.props.upstreams}
+                            scroll={{y: 'calc(100vh - 55px)'}}
+                        >
+                            <Column
+                                title='账号'
+                                width='40%'
+                                dataIndex='account'
+                                key='account'
+                                render={(text, record) => {
+                                    // return <Link to={`/admin/upstreams/${record.id}`}>{text}</Link>;
+                                    return <a>{text}</a>;
+                                }}
+                            />
+                            <Column
+                                title='平台'
+                                width='40%'
+                                dataIndex='platform'
+                                key='platform'
+                                filters={platforms}
+                                onFilter={(value, record) => record.platform.includes(value)}
+                                render={(text, record) => {
+                                    if (record.platform === '企鹅号') {
+                                        return <Tag color='purple'>{text}</Tag>;
+                                    }
+                                    return <Tag color='blue'>{text}</Tag>;
+                                }}
+                            />
+                            <Column
+                                title='操作'
+                                width='20%'
+                                key='action'
+                                render={(_, record) => (
+                                    <Button disabled type='danger' shape='circle' size='small'>
+                                        <Icon type='delete' />
+                                    </Button>
+                                )}
+                            />
+                        </Table>
+                    </Layout.Content>
+                </Layout>
             </Page>
         );
     }

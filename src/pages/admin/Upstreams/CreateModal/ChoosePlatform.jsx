@@ -1,40 +1,26 @@
 import React, {Component} from 'react';
-import {Row, Col, Card} from 'antd';
-
-import qieLogo from './qi-e-logo.png';
-import baiJiaLogo from './bai-jia-logo.png';
+import {Card} from 'antd';
 
 import style from './style.styl';
+import {platforms} from 'utils/consts';
 
 class ChoosePlatform extends Component {
     render () {
-        const platforms = [{
-            name: '企鹅号',
-            logo: qieLogo
-        }, {
-            name: '百家号',
-            logo: baiJiaLogo
-        }];
         return (
-            <Row gutter={16} style={{padding: 3}}>
-                {platforms.map(item => (
-                    <Col
-                        xs={12}
-                        sm={8}
-                        md={6}
-                        lg={4}
+            <div className={style.platforms}>
+                {platforms.map(item =>
+                    <Card
                         key={item.name}
-                        onClick={() => this.props.nextStep({platform: item.name})}
-                    >
-                        <Card className={style['platform-card']}>
-                            <div
-                                className={style.logo}
-                                style={{backgroundImage: `url(${item.logo})`}}
-                            />
-                        </Card>
-                    </Col>
-                ))}
-            </Row>
+                        className={style['platform-card'] + (item.disabled ? ` ${style['platform-disabled']}` : '')}
+                        onClick={() => item.disabled || this.props.nextStep({platform: item.id})}>
+                        <div
+                            className={style.logo}
+                            style={{backgroundImage: `url(${item.logo})`}}
+                        />
+                        <div className={style['platform-name']}>{item.name}</div>
+                    </Card>
+                )}
+            </div>
         );
     }
 }

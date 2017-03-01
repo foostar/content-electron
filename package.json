@@ -63,5 +63,6 @@
     "eslint-plugin-standard": "^2.0.1",
     "pre-commit": "^1.2.2",
     "webpack-dev-server": "^2.3.0"
-  }
+  },
+  "theme": "./src/theme.js"
 }

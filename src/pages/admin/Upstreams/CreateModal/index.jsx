@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Modal, Steps, Button, Icon} from 'antd';
+import {Modal, Steps, Button} from 'antd';
 import {merge} from 'lodash';
 import ChoosePlatform from './ChoosePlatform';
 import InputAccount from './InputAccount';
@@ -50,12 +50,10 @@ class CreateModal extends Component {
         return (
             <div>
                 <Button
-                    type='primary'
-                    shape='circle'
-                    size='small'
+                    icon='plus'
                     onClick={() => this.setState({visible: true})}
                 >
-                    <Icon type='plus' />
+                    添加平台账号
                 </Button>
                 <Modal
                     title={steps[this.state.current]}
@@ -66,7 +64,7 @@ class CreateModal extends Component {
                     afterClose={this.clearData}
                     footer={null}
                 >
-                    <Steps current={current}>
+                    <Steps className={style.steps} current={current}>
                         {steps.map(title => <Step key={title} title={title} />)}
                     </Steps>
 
