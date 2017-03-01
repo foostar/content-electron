@@ -10,9 +10,11 @@ export default class Layout extends Component {
             <div className={style.container}>
                 <Topbar location={location} />
                 <div className={style.content}>
-                    {/* <div className={style.inner}>
-                        {this.props.children}
-                    </div> */}
+                    {/*
+                        <div className={style.inner}>
+                            {this.props.children}
+                        </div>
+                    */}
                     <ReactCSSTransitionGroup
                         component='main'
                         className={style.inner}
