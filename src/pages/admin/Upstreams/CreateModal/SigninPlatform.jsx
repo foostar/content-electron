@@ -23,14 +23,18 @@ class QiE extends Component {
         }
 
         // 登录成功, 获取 cookies
-        if (url.startsWith('https://om.qq.com/')) {
+        if (url === 'https://om.qq.com/') {
             const session = ipcRenderer.sendSync('GET_COOKIES_BY_PARTITION', {
                 partition: this.state.partition
             }).map(item => {
                 item.url = 'https://om.qq.com/';
                 return item;
             });
-            this.props.nextStep({session});
+            this.webview.executeJavaScript(`
+                document.querySelector('.header-login-inner .name').innerText
+            `, (nickname) => {
+                this.props.nextStep({session, nickname});
+            });
         }
     }
     render () {
@@ -64,14 +68,18 @@ class BaiJia extends Component {
         }
 
         // 登录成功, 获取 cookies
-        if (url.startsWith('http://baijiahao.baidu.com/')) {
+        if (url === 'http://baijiahao.baidu.com/') {
             const session = ipcRenderer.sendSync('GET_COOKIES_BY_PARTITION', {
                 partition: this.state.partition
             }).map(item => {
                 item.url = 'http://baijiahao.baidu.com/';
                 return item;
             });
-            this.props.nextStep({session});
+            this.webview.executeJavaScript(`
+                document.querySelector('.mp-header-user .author .name').innerText;
+            `, (nickname) => {
+                this.props.nextStep({nickname, session});
+            });
         }
     }
     render () {

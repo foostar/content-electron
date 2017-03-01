@@ -47,8 +47,8 @@ class InputAccount extends Component {
                                 )}
                             </FormItem>
                             <FormItem>
-                                {getFieldDecorator('password', {
-                                    // initialValue: 'zxc123456',
+                                {getFieldDecorator('custom', {
+                                    // rules: [{required: true, message: `输入 ${platform} 昵称!`}]
                                 })(
                                     <Input placeholder='备注(可留空)' />
                                 )}

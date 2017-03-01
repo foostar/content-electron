@@ -32,7 +32,7 @@ HUSSIF[ fetching ] = (state, isFetching) => {
 // 文章详情
 export const getArticle = createCallApi(HUSSIF, {
     type: 'ADMIN_GET_ARTICLE',
-    endpoint: '/content',
+    endpoint: '/contents',
     request: (state, payload) => update(state, {
         isFetching: {$set: true}
     }),
@@ -49,7 +49,7 @@ export const getArticle = createCallApi(HUSSIF, {
 // 修改文章
 export const editArticle = createCallApi(HUSSIF, {
     type: 'ADMIN_EDITARTICLE',
-    endpoint: '/content',
+    endpoint: '/contents',
     method: 'PATCH',
     request: (state, payload) => update(state, {
         isFetching: {$set: true}

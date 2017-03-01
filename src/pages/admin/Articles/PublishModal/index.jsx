@@ -59,7 +59,7 @@ class PublishModal extends Component {
     }
     render () {
         const {content, upstreams} = this.props;
-        const {bindUpstreams} = content.author;
+        const {bindUpstreams = []} = content.author || {};
         const {current, visible, data} = this.state;
 
         const steps = [
@@ -67,6 +67,12 @@ class PublishModal extends Component {
             '发布文章',
             '确认完成'
         ];
+
+        let title = steps[current];
+        try {
+            title = `[${data.upstream.platform}] ${data.upstream.nickname}`;
+        } catch (err) {}
+
         return (
             <span>
                 <a onClick={this.showModal}>发布</a>
@@ -75,7 +81,7 @@ class PublishModal extends Component {
                     width='auto'
                     footer={false}
                     visible={visible}
-                    title='发布文章'
+                    title={title}
                     onCancel={this.onCancel}
                     afterClose={this.clearData}
                 >

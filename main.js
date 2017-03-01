@@ -172,10 +172,10 @@ function createWindow () {
     Menu.setApplicationMenu(menu);
 
     mainWindow = new BrowserWindow({
-        width: 1024,
-        height: 900,
-        minWidth: 800,
-        minHeight: 600,
+        width: 1280,
+        height: 800,
+        minWidth: 960,
+        minHeight: 640,
         webPreferences: {
             webSecurity: false
         }

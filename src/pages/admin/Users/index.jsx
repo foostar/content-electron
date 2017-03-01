@@ -51,7 +51,7 @@ class AdminUsers extends Component {
                             >
                                 {item.platform}
                             </Tag>
-                            <Tag>{item.account}</Tag>
+                            <Tag>{item.nickname}</Tag>
                         </div>
                     )
                 }
@@ -84,18 +84,16 @@ class AdminUsers extends Component {
                     </Layout.Header>
                     <Layout.Content className={style.content}>
                         <Table
-                            bordered
                             pagination={false}
                             rowKey='id'
                             dataSource={this.props.users}
-                            scroll={{y: 'calc(100vh - 55px)'}}
                         >
                             <Column
                                 key='username'
                                 title='用户名'
-                                width='20%'
+                                width='15%'
                                 dataIndex='username'
-                                render={username => <a>{username}</a>}
+                                // render={username => <a>{username}</a>}
                             />
                             <Column
                                 key='level'
@@ -115,8 +113,8 @@ class AdminUsers extends Component {
                             />
                             <Column
                                 key='bindUpstreams'
-                                title='平台账号'
-                                width='25%'
+                                title='绑定的上游账号'
+                                width='30%'
                                 dataIndex='bindUpstreams'
                                 filters={upstreamTypes}
                                 sorter={(a, b) => a.bindUpstreams.length - b.bindUpstreams.length}
@@ -138,7 +136,7 @@ class AdminUsers extends Component {
                             />
                             <Column
                                 key='action'
-                                title='操作'
+                                title={<CreateModal />}
                                 width='10%'
                                 render={(_, record) => <ModifyModal data={record} />}
                             />

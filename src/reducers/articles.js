@@ -20,7 +20,7 @@ HUSSIF[ pageChange ] = (state, skip) => {
 // 获取文章列表
 export const getArticles = createCallApi(HUSSIF, {
     type: 'GETARTICLES',
-    endpoint: '/content',
+    endpoint: '/contents',
     method: 'GET',
     request: (state, payload) => update(state, {
         isFetching: {$set: true}
