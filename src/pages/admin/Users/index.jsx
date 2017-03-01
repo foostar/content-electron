@@ -7,6 +7,7 @@ import {uniqBy} from 'lodash';
 import {bindActionCreators} from 'redux';
 import * as usersActions from 'reducers/users';
 import * as upstreamsActions from 'reducers/upstreams';
+import {platformsById} from 'utils/consts';
 
 import {Table, Tag, Layout} from 'antd';
 import CreateModal from './CreateModal';
@@ -47,11 +48,9 @@ class AdminUsers extends Component {
                         <div key={item.id} className={style['bind-upstream-tag']}>
                             <Tag
                                 key={item.id}
-                                color={item.platform === '企鹅号' ? 'purple' : 'blue'}
                             >
-                                {item.platform}
+                                [{platformsById[item.platform].name}] {item.nickname}
                             </Tag>
-                            <Tag>{item.nickname}</Tag>
                         </div>
                     )
                 }
@@ -68,7 +67,7 @@ class AdminUsers extends Component {
         const upstreamTypes = uniqBy(this.props.upstreams, 'platform')
             .map(upstream => {
                 return {
-                    text: upstream.platform,
+                    text: platformsById[upstream.platform].name,
                     value: upstream.id
                 };
             })
@@ -136,7 +135,7 @@ class AdminUsers extends Component {
                             />
                             <Column
                                 key='action'
-                                title={<CreateModal />}
+                                title='操作'
                                 width='10%'
                                 render={(_, record) => <ModifyModal data={record} />}
                             />

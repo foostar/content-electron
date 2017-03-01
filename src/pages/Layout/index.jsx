@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-// import ReactCSSTransitionGroup from 'react/lib/ReactCSSTransitionGroup';
+import ReactCSSTransitionGroup from 'react/lib/ReactCSSTransitionGroup';
 import Topbar from './Topbar';
 import style from './style.styl';
 
@@ -10,10 +10,9 @@ export default class Layout extends Component {
             <div className={style.container}>
                 <Topbar location={location} />
                 <div className={style.content}>
-                    <div className={style.inner}>
+                    {/* <div className={style.inner}>
                         {this.props.children}
-                    </div>
-                    {/*
+                    </div> */}
                     <ReactCSSTransitionGroup
                         component='main'
                         className={style.inner}
@@ -28,7 +27,6 @@ export default class Layout extends Component {
                             )
                         }
                     </ReactCSSTransitionGroup>
-                    */}
                 </div>
             </div>
         );

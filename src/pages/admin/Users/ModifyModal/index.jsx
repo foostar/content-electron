@@ -3,10 +3,11 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import * as usersActions from 'reducers/users';
 import * as upstreamsActions from 'reducers/upstreams';
+import {platformsById} from 'utils/consts';
 
 import {
     Modal, Button, Form, Input,
-    Radio, Tag, Select, Alert, message
+    Radio, Select, Alert, message
 } from 'antd';
 
 const FormItem = Form.Item;
@@ -106,22 +107,18 @@ class ModifyModal extends Component {
                     )}
                 </FormItem>
 
-                <FormItem label='Upstreams' labelCol={{span: 5}} wrapperCol={{span: 17}}>
+                <FormItem label='绑定平台账号' labelCol={{span: 5}} wrapperCol={{span: 17}}>
                     {getFieldDecorator('bindUpstreams', {
                         initialValue: bindUpstreams
                     })(
                         <Select
                             multiple
                             style={{width: '100%'}}
-                            placeholder='请选择 Upstreams'
+                            placeholder='请选择平台账号'
                         >
                             {this.props.upstreams.map(item =>
                                 <Option key={item.id}>
-                                    {item.platform === '企鹅号'
-                                        ? <Tag color='purple'>{item.platform}</Tag>
-                                        : <Tag color='blue'>{item.platform}</Tag>
-                                    }
-                                    {item.account}
+                                    [{platformsById[item.platform].name}] {item.nickname}
                                 </Option>
                             )}
                         </Select>

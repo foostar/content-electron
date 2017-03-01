@@ -22,9 +22,7 @@ class InputAccount extends Component {
         return (
             <Form className={style['account-form']} onSubmit={this.onSubmit}>
                 <Layout className={style['account-form-wrapper']}>
-                    <Layout.Header className={style.header}>
-                        <h3>添加 {platform.name} 账号</h3>
-                    </Layout.Header>
+                    <Layout.Header className={style.header} />
                     <Layout className={style['content-container']}>
                         <Layout.Sider className={style.sider} width='150'>
                             <img src={platform.logo} />

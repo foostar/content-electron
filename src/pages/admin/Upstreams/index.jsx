@@ -8,6 +8,7 @@ import Page from 'components/Page';
 import CreateModal from './CreateModal';
 import {Button, Table, Icon, Tag, Layout} from 'antd';
 import style from './style.styl';
+import {platformsById} from 'utils/consts';
 
 const {Column} = Table;
 
@@ -32,9 +33,10 @@ class AdminUsers extends Component {
     }
     render () {
         const platforms = uniqBy(this.props.upstreams, 'platform').map(item => {
+            const platform = platformsById[item.platform];
             return {
-                text: item.platform,
-                value: item.platform
+                text: platform.name,
+                value: platform.id
             };
         });
         return (
@@ -75,10 +77,7 @@ class AdminUsers extends Component {
                                 filters={platforms}
                                 onFilter={(value, record) => record.platform.includes(value)}
                                 render={(text, record) => {
-                                    if (record.platform === '企鹅号') {
-                                        return <Tag color='purple'>{text}</Tag>;
-                                    }
-                                    return <Tag color='blue'>{text}</Tag>;
+                                    return <Tag>{platformsById[text].name}</Tag>;
                                 }}
                             />
                             <Column

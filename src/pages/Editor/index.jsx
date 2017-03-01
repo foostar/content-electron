@@ -193,7 +193,7 @@ export default class Editor extends Component {
             <Page className={style.container}>
                 <Layout className={style.layout}>
                     <Layout.Content className={style.content}>
-                        <Form onSubmit={this.handleSubmit}>
+                        <Form onSubmit={this.handleSubmit} className={style.editor}>
                             <FormItem
                                 // {...formItemLayout}
                                 hasFeedback
@@ -276,7 +276,6 @@ export default class Editor extends Component {
                         </Form>
                     </Layout.Content>
                     <Layout.Footer className={style.footer}>
-                        <Button>清空</Button>
                         <Button type='primary' htmlType='submit'>提交</Button>
                     </Layout.Footer>
                 </Layout>
