@@ -40,7 +40,7 @@ HUSSIF[ clearArticle ] = (state, content) => {
 // 新增文章
 export const addArticle = createCallApi(HUSSIF, {
     type: 'ADDARTICLE',
-    endpoint: '/content',
+    endpoint: '/contents',
     method: 'POST',
     request: (state, payload) => update(state, {
         isFetching: {$set: true}
@@ -54,7 +54,7 @@ export const addArticle = createCallApi(HUSSIF, {
 // 文章详情
 export const getArticle = createCallApi(HUSSIF, {
     type: 'GETARTICLE',
-    endpoint: '/content',
+    endpoint: '/contents',
     request: (state, payload) => update(state, {
         isFetching: {$set: true}
     }),
@@ -72,7 +72,7 @@ export const getArticle = createCallApi(HUSSIF, {
 // 修改文章
 export const editArticle = createCallApi(HUSSIF, {
     type: 'EDITARTICLE',
-    endpoint: '/content',
+    endpoint: '/contents',
     method: 'PATCH',
     request: (state, payload) => update(state, {
         isFetching: {$set: true}

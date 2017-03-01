@@ -21,7 +21,7 @@ export const setPartitionCookies = createCallIpc(HUSSIF, {
 
 export const fetchUpstreams = createCallApi(HUSSIF, {
     type: 'FETCH_UPSTREAMS',
-    endpoint: '/upstream',
+    endpoint: '/upstreams',
     method: 'GET',
     request: (state) => update(state, {
         fetching: {$set: true}
@@ -39,7 +39,7 @@ export const fetchUpstreams = createCallApi(HUSSIF, {
 
 export const createUpstream = createCallApi(HUSSIF, {
     type: 'CREATE_UPSTREAM',
-    endpoint: '/upstream',
+    endpoint: '/upstreams',
     method: 'POST',
     request: (state) => update(state, {
         fetching: {$set: true}
@@ -54,7 +54,7 @@ export const createUpstream = createCallApi(HUSSIF, {
 
 export const updateUpstream = createCallApi(HUSSIF, {
     type: 'UPDATE_UPSTREAM',
-    endpoint: '/upstream/:id',
+    endpoint: '/upstreams/:id',
     method: 'PATCH'
 });
 

@@ -58,7 +58,7 @@ HUSSIF[ showNewTag ] = (state, data) => {
 // 获取文章列表
 export const getArticles = createCallApi(HUSSIF, {
     type: 'ADMIN_GET_ARTICLES',
-    endpoint: '/content/search',
+    endpoint: '/contents/search',
     method: 'GET',
     request: (state, payload) => update(state, {
         isFetching: {$set: true}
@@ -82,7 +82,7 @@ export const getArticles = createCallApi(HUSSIF, {
 // 获取最近使用的tag
 export const getRecentTag = createCallApi(HUSSIF, {
     type: 'ADMIN_GETRECENTTAG',
-    endpoint: '/content/most-common-tags',
+    endpoint: '/contents/most-common-tags',
     method: 'GET',
     request: (state, payload) => update(state, {
         isFetching: {$set: true}
@@ -101,7 +101,7 @@ export const getRecentTag = createCallApi(HUSSIF, {
 // 增加tag
 export const addTag = createCallApi(HUSSIF, {
     type: 'ADMIN_ADDTAG',
-    endpoint: '/content/:id/tag/:tag',
+    endpoint: '/contents/:id/tag/:tag',
     method: 'POST',
     request: (state, payload) => update(state, {
         isFetching: {$set: true}
@@ -133,7 +133,7 @@ export const addTag = createCallApi(HUSSIF, {
 // 删除tag
 export const removeTag = createCallApi(HUSSIF, {
     type: 'ADMIN_REMOVETAG',
-    endpoint: '/content/:id/tag/:tag',
+    endpoint: '/contents/:id/tag/:tag',
     method: 'DELETE',
     request: (state, payload) => update(state, {
         isFetching: {$set: true}

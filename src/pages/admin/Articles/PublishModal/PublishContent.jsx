@@ -77,7 +77,7 @@ class QiE extends Component {
         }
 
         if (url.startsWith('https://om.qq.com/article/articleManage')) {
-            // this.props.nextStep();
+            this.props.nextStep();
         }
     }
     injectPublishScript = async () => {
@@ -90,21 +90,20 @@ class QiE extends Component {
 
         let {title, content} = res.payload.result.data;
 
-        content += createIdImage(this.props.content.id);
-
-        const _debugger = this.webview.getWebContents().debugger;
-        _debugger.attach('1.1');
-        _debugger.on('message', (event, method, {response, requestId, type}) => {
-            if (method === 'Network.responseReceived' && type === 'XHR') {
-                console.log(response.url);
-                if (response.url !== 'https://om.qq.com/editorCache/update?relogin=1') return;
-                _debugger.sendCommand('Network.getResponseBody', {requestId}, (err, res) => {
-                    if (err) console.log(err);
-                    window.alert(res.body);
-                });
-            }
-        });
-        _debugger.sendCommand('Network.enable');
+        // content += createIdImage(this.props.content.id);
+        // const _debugger = this.webview.getWebContents().debugger;
+        // _debugger.attach('1.1');
+        // _debugger.on('message', (event, method, {response, requestId, type}) => {
+        //     if (method === 'Network.responseReceived' && type === 'XHR') {
+        //         console.log(response.url);
+        //         if (response.url !== 'https://om.qq.com/editorCache/update?relogin=1') return;
+        //         _debugger.sendCommand('Network.getResponseBody', {requestId}, (err, res) => {
+        //             if (err) console.log(err);
+        //             window.alert(res.body);
+        //         });
+        //     }
+        // });
+        // _debugger.sendCommand('Network.enable');
 
         // ipcRenderer.send('GET_REPONSE_BODY_BY_ID', {
         //     id: webviewId,
