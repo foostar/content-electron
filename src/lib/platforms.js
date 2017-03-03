@@ -1,3 +1,6 @@
+import OMQQPlatform from 'lib/omqq-platform';
+import BaijiaPlatform from 'lib/baijia-platform';
+
 import qieLogo from './logos/platform-omqq.png';
 import baijiaLogo from './logos/platform-baijiahao.png';
 import toutiaoLogo from './logos/platform-toutiao.png';
@@ -10,14 +13,16 @@ import weiboLogo from './logos/platform-weibo.png';
 import zhihuLogo from './logos/platform-zhihu.png';
 import jianshuLogo from './logos/platform-jianshu.png';
 
-export const platforms = [{
+const platforms = [{
     id: 'baijia',
     name: '百家号',
-    logo: baijiaLogo
+    logo: baijiaLogo,
+    Class: BaijiaPlatform
 }, {
     id: 'omqq',
     name: '企鹅媒体平台',
-    logo: qieLogo
+    logo: qieLogo,
+    Class: OMQQPlatform
 }, {
     id: 'toutiao',
     name: '头条号',
@@ -68,6 +73,7 @@ export const platforms = [{
 const platformsById = {};
 platforms.forEach(x => (platformsById[x.id] = x));
 
+export default platforms;
 export {
     platformsById
 };

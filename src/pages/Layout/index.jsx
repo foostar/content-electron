@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import ReactCSSTransitionGroup from 'react/lib/ReactCSSTransitionGroup';
 import Topbar from './Topbar';
+// import PlatformMananger from 'components/PlatformManager';
 import style from './style.styl';
 
 export default class Layout extends Component {
@@ -14,6 +15,9 @@ export default class Layout extends Component {
                         <div className={style.inner}>
                             {this.props.children}
                         </div>
+                    */}
+                    {/*
+                        <PlatformMananger />
                     */}
                     <ReactCSSTransitionGroup
                         component='main'

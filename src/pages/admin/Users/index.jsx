@@ -7,7 +7,7 @@ import {uniqBy} from 'lodash';
 import {bindActionCreators} from 'redux';
 import * as usersActions from 'reducers/users';
 import * as upstreamsActions from 'reducers/upstreams';
-import {platformsById} from 'utils/consts';
+import {platformsById} from 'lib/platforms';
 
 import {Table, Tag, Layout} from 'antd';
 import CreateModal from './CreateModal';
@@ -85,6 +85,7 @@ class AdminUsers extends Component {
                         <Table
                             pagination={false}
                             rowKey='id'
+                            bordered
                             dataSource={this.props.users}
                         >
                             <Column

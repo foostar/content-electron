@@ -1,28 +1,30 @@
 import React, {Component} from 'react';
-import WebView from 'components/WebView';
-import {ipcRenderer} from 'electron';
+// import WebView from 'components/WebView';
+// import {ipcRenderer} from 'electron';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import * as editorActions from 'reducers/admin/editor';
 import * as upstreamsActions from 'reducers/upstreams';
+import {platformsById} from 'lib/platforms';
+import style from './style.styl';
 
-function createIdImage (mongoId) {
-    const canvas = document.createElement('CANVAS');
-    canvas.width = 2;
-    canvas.height = 3;
-    const ctx = canvas.getContext('2d');
-    const imgData = ctx.createImageData(2, 3);
+// function createIdImage (mongoId) {
+//     const canvas = document.createElement('CANVAS');
+//     canvas.width = 2;
+//     canvas.height = 3;
+//     const ctx = canvas.getContext('2d');
+//     const imgData = ctx.createImageData(2, 3);
 
-    mongoId.split('').forEach((d, idx) => {
-        if (isNaN(d)) {
-            imgData.data[idx] = d.charCodeAt();
-        } else {
-            imgData.data[idx] = Number(d);
-        }
-    });
-    ctx.putImageData(imgData, 2, 3);
-    return `<p><img src="${canvas.toDataURL('image/png')}"/></p>`;
-};
+//     mongoId.split('').forEach((d, idx) => {
+//         if (isNaN(d)) {
+//             imgData.data[idx] = d.charCodeAt();
+//         } else {
+//             imgData.data[idx] = Number(d);
+//         }
+//     });
+//     ctx.putImageData(imgData, 2, 3);
+//     return `<p><img src="${canvas.toDataURL('image/png')}"/></p>`;
+// };
 
 const mapDispatchToProps = dispatch => {
     return {
@@ -31,6 +33,7 @@ const mapDispatchToProps = dispatch => {
     };
 };
 
+/*
 @connect(null, mapDispatchToProps)
 class QiE extends Component {
     state = {
@@ -273,15 +276,29 @@ class BaiJia extends Component {
             />
         );
     }
-}
+} */
 
+@connect(null, mapDispatchToProps)
 class PublishContent extends Component {
-    render () {
-        const {nextStep, content, data: {upstream}} = this.props;
-        switch (upstream.platform) {
-            case '企鹅号': return <QiE nextStep={nextStep} content={content} upstream={upstream} />;
-            case '百家号': return <BaiJia nextStep={nextStep} content={content} upstream={upstream} />;
+    async componentDidMount () {
+        const {account, password, session: cookies, platform: platformId} = this.props.data.upstream;
+        const platform = new platformsById[platformId].Class(account, password, cookies);
+        this.refs.wrap.appendChild(platform.webview);
+        try {
+            const res = await this.props.editorActions.getArticle({
+                params: this.props.content.id
+            });
+            let {title, content} = res.payload.result.data;
+            const data = await platform.publish(title, {content});
+            this.props.nextStep(data);
+        } catch (err) {
+            console.log(err);
         }
+    }
+    render () {
+        return (
+            <div className={style['webview-wrap']} ref='wrap' />
+        );
     }
 }
 

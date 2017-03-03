@@ -66,5 +66,8 @@
     "webpack": "^2.2.1",
     "webpack-dev-server": "^2.3.0"
   },
-  "theme": "./src/theme.js"
+  "theme": "./src/theme.js",
+  "dependencies": {
+    "debug": "^2.6.1"
+  }
 }

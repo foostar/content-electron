@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Card} from 'antd';
 
 import style from './style.styl';
-import {platforms} from 'utils/consts';
+import {platforms} from 'lib/platforms';
 
 class ChoosePlatform extends Component {
     render () {

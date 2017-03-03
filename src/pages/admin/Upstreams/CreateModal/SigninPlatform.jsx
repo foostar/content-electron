@@ -1,10 +1,14 @@
 import React, {Component} from 'react';
 import {Alert} from 'antd';
-import WebView from 'components/WebView';
-import {ipcRenderer} from 'electron';
+// import WebView from 'components/WebView';
+// import {ipcRenderer} from 'electron';
+import style from './style.styl';
 
-import {platformsById} from 'utils/consts';
+import {platformsById} from 'lib/platforms';
 
+// import OMQQPlatform from 'lib/omqq-platform';
+
+/*
 class QiE extends Component {
     state = {
         partition: `persist:${Date.now()}`
@@ -47,9 +51,9 @@ class QiE extends Component {
             />
         );
     }
-}
+} */
 
-class BaiJia extends Component {
+/* class BaiJia extends Component {
     state = {
         partition: `persist:${Date.now()}`
     }
@@ -92,13 +96,40 @@ class BaiJia extends Component {
             />
         );
     }
-}
-
+} */
+// class QiE extends Component {
+//     async componentDidMount () {
+//         const {account, password} = this.props.data;
+//         const platform = new OMQQPlatform(account, password);
+//         // this.refs.wrap.appendChild(platform.webview);
+//         try {
+//             const data = await platform.login();
+//             console.log(data);
+//             this.props.nextStep(data);
+//         } catch (err) {
+//             console.log(err);
+//         }
+//     }
+//     render () {
+//         return <div ref='wrap' />;
+//     }
+// }
 class SigninPlatform extends Component {
+    async componentDidMount () {
+        const {account, password, platform: platformId} = this.props.data;
+        const platform = new platformsById[platformId].Class(account, password);
+        this.refs.wrap.appendChild(platform.webview);
+        try {
+            const data = await platform.login();
+            this.props.nextStep(data);
+        } catch (err) {
+            console.log(err);
+        }
+    }
     render () {
         switch (this.props.data.platform) {
-            case platformsById.omqq.id: return <QiE {...this.props} />;
-            case platformsById.baijia.id: return <BaiJia {...this.props} />;
+            case platformsById.omqq.id: return <div className={style['webview-wrap']} ref='wrap' />;
+            case platformsById.baijia.id: return <div className={style['webview-wrap']} ref='wrap' />;
             default: return (
                 <Alert
                     type='warning'

@@ -31,7 +31,7 @@ export default class Topbar extends Component {
                 <div className={style['user-board']}>
                     <Dropdown overlay={menu} trigger={['click']}>
                         <Button>
-                            {username} <Icon type='down' />
+                            用户名：{username} <Icon type='down' />
                         </Button>
                     </Dropdown>
                 </div>

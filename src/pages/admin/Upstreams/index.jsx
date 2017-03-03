@@ -8,7 +8,7 @@ import Page from 'components/Page';
 import CreateModal from './CreateModal';
 import {Button, Table, Icon, Tag, Layout} from 'antd';
 import style from './style.styl';
-import {platformsById} from 'utils/consts';
+import {platformsById} from 'lib/platforms';
 
 const {Column} = Table;
 
@@ -51,7 +51,7 @@ class AdminUsers extends Component {
                             rowKey='id'
                             pagination={false}
                             dataSource={this.props.upstreams}
-                            scroll={{y: 'calc(100vh - 55px)'}}
+                            // scroll={{y: 'calc(100vh - 55px)'}}
                         >
                             <Column
                                 title='昵称'
