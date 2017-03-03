@@ -3,16 +3,14 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {hashHistory} from 'react-router';
-import {Form, Button, Input, Select, notification, Upload, Icon, message, Layout} from 'antd';
+import {Form, Button, Input, Select, notification, Upload, Icon, message, Layout, Spin} from 'antd';
 import * as actions from 'reducers/editor';
 
 import Page from 'components/Page';
 import style from './style.styl';
-
 import 'froala-editor/js/froala_editor.pkgd.min.js';
 import 'froala-editor/css/froala_editor.pkgd.min.css';
 import 'font-awesome/css/font-awesome.css';
-
 import FroalaEditor from 'react-froala-wysiwyg';
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -27,22 +25,20 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return bindActionCreators(actions, dispatch);
 };
-
 @Form.create()
 @connect(mapStateToProps, mapDispatchToProps)
 export default class Editor extends Component {
     componentDidMount () {
         const {articleId} = this.props.router.location.query;
-        const foolbar = document.querySelector('.fr-dropdown-menu');
+        const foolbar = document.querySelector('.fr-toolbar');
         foolbar.appendChild(this.refs.upload);
-        this.refs.upload.parentNode.style.width = '85px';
         if (articleId) {
             return this.props.getArticle({params: articleId});
         }
         this.props.clearArticle();
     }
     handleSubmit = (e) => {
-        // const {articleId} = this.props.router.location.query;
+        const {articleId} = this.props.router.location.query;
         e.preventDefault();
         this.props.form.validateFields(async (err, values) => {
             const {content, isFetching} = this.props.editor;
@@ -60,6 +56,17 @@ export default class Editor extends Component {
                 type: 'article',
                 content: _content
             });
+
+            if (articleId) {
+                const {type} = await this.props.editArticle({
+                    body: data,
+                    params: articleId
+                });
+                if (type === 'EDITARTICLE_SUCCESS') {
+                    hashHistory.replace('/articles');
+                }
+                return;
+            }
 
             const {type} = await this.props.addArticle({
                 body: data
@@ -106,8 +113,16 @@ export default class Editor extends Component {
         if (/ofsyr49wg/.test(item.url)) {
             return item;
         }
-        const {token, key} = await this.getToken();
         const blob = await this.getImg(item.url);
+        const url = await this.uploadImg(blob);
+        return {
+            index: item.index,
+            url
+        };
+    }
+    async uploadImg (file) {
+        const {token, key} = await this.getToken();
+        const blob = file;
         const formData = new FormData();
         formData.append('key', key);
         formData.append('token', token);
@@ -117,13 +132,7 @@ export default class Editor extends Component {
             body: formData
         })
         .then(response => response.json())
-        .then(json => {
-            const {key} = json;
-            return {
-                index: item.index,
-                url: `http://ofsyr49wg.bkt.clouddn.com/${key}`
-            };
-        });
+        .then(json => `http://ofsyr49wg.bkt.clouddn.com/${json.key}`);
     }
     getImg (url) {
         return fetch(url)
@@ -132,22 +141,38 @@ export default class Editor extends Component {
     }
     editorConfig = {
         placeholderText: '写点什么吧!',
-        toolbarButtons: ['fullscreen', 'print', 'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', 'fontFamily', 'fontSize', '|', 'specialCharacters', 'color', 'emoticons', 'inlineStyle', 'paragraphStyle', '|', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', '-', 'insertLink', 'insertVideo', 'insertFile', 'insertTable', 'undo', 'redo', 'clearFormatting', 'selectAll', 'html'],
-        toolbarButtonsMD: ['fullscreen', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'paragraphStyle', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', 'insertLink', 'insertVideo', 'insertFile', 'insertTable', 'undo', 'redo', 'clearFormatting'],
+        dragInline: false,
+        tooltips: false,
+        imagePasteProcess: false,
+        imageRoundPercent: false,
+        quickInsertButtons: [ 'table', 'ul', 'ol', 'hr' ],
+        toolbarButtonsSM: ['fullscreen', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'insertLink', 'insertTable', 'undo', 'redo'],
+        toolbarButtons: ['print', 'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', 'fontFamily', 'fontSize', '|', 'specialCharacters', 'color', 'emoticons', 'inlineStyle', 'paragraphStyle', '|', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', '-', 'insertLink', 'insertVideo', 'insertFile', 'insertTable', 'undo', 'redo', 'clearFormatting', 'selectAll', 'html'],
+        toolbarButtonsMD: ['bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'paragraphStyle', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', 'insertLink', 'insertVideo', 'insertFile', 'insertTable', 'undo', 'redo', 'clearFormatting'],
         events: {
             'froalaEditor.initialized': (e, editor) => {
+                editor.tooltip.hide();
                 if (!this.$editor) {
                     this.$editor = editor;
                 }
             },
-            'froalaEditor.image.beforePasteUpload': (e, editor) => {
+            'froalaEditor.image.beforePasteUpload': (e, editor, img) => {
                 return false;
             },
-            'froalaEditor.image.beforeUpload': (e, editor) => {
-                editor.tooltip.hide();
+            'froalaEditor.image.beforeUpload': (e, editor, img) => {
+                this.props.fetching();
+                this.dropUpload(img);
                 return false;
             }
         }
+    }
+    async dropUpload (imgs) {
+        this.$editor.popups.hideAll();
+        this.$editor.html.cleanEmptyTags();
+        document.querySelector('.fr-drag-helper').remove();
+        const blob = imgs[0];
+        const url = await this.uploadImg(blob);
+        this.$editor.html.insert(`<img src='${url}'/>`, true);
     }
     getToken () {
         const url = `http://baijia.rss.apps.xiaoyun.com/api/qiniu/uptoken`;
@@ -159,7 +184,7 @@ export default class Editor extends Component {
         this.props.updateModel(content);
     }
     render () {
-        const {content, title, category} = this.props.editor;
+        const {content, title, category, isFetching} = this.props.editor;
         const {getFieldDecorator} = this.props.form;
         const self = this;
         const props = {
@@ -191,94 +216,93 @@ export default class Editor extends Component {
         };
         return (
             <Page className={style.container}>
-                <Layout className={style.layout}>
-                    <Layout.Content className={style.content}>
+                <Spin spinning={isFetching}>
+                    <Layout className={style.layout}>
                         <Form onSubmit={this.handleSubmit} className={style.editor}>
-                            <FormItem
-                                // {...formItemLayout}
-                                hasFeedback
-                            >
-                                {getFieldDecorator('title', {
-                                    rules: [{
-                                        required: true, message: '请输入标题'
-                                    }],
-                                    initialValue: title || ''
-                                })(
-                                    <Input placeholder='输入文章标题' />
-                                )}
-                            </FormItem>
-                            <FormItem
-                                // {...formItemLayout}
-                            >
-                                {getFieldDecorator('category', {
-                                    initialValue: category || '搞笑'
-                                })(
-                                    <Select>
-                                        <OptGroup label='搞笑'>
-                                            <Option value='搞笑'>搞笑</Option>
-                                            <Option value='美图'>美图</Option>
-                                            <Option value='科学'>科学</Option>
-                                            <Option value='历史'>历史</Option>
-                                        </OptGroup>
-                                        <OptGroup label='科技互联网'>
-                                            <Option value='互联网'>互联网</Option>
-                                            <Option value='科技'>科技</Option>
-                                        </OptGroup>
-                                        <OptGroup label='两性健康'>
-                                            <Option value='两性'>两性</Option>
-                                            <Option value='情感'>情感</Option>
-                                            <Option value='女人'>女人</Option>
-                                            <Option value='健康'>健康</Option>
-                                        </OptGroup>
-                                        <OptGroup label='国际社会'>
-                                            <Option value='社会'>社会</Option>
-                                            <Option value='三农'>三农</Option>
-                                            <Option value='军事'>军事</Option>
-                                            <Option value='游戏'>游戏</Option>
-                                            <Option value='娱乐'>娱乐</Option>
-                                            <Option value='体育'>体育</Option>
-                                        </OptGroup>
-                                        <OptGroup label='生活服务'>
-                                            <Option value='宠物'>宠物</Option>
-                                            <Option value='家居'>家居</Option>
-                                            <Option value='时尚'>时尚</Option>
-                                            <Option value='育儿'>育儿</Option>
-                                            <Option value='美食'>美食</Option>
-                                            <Option value='旅游'>旅游</Option>
-                                            <Option value='汽车'>汽车</Option>
-                                            <Option value='生活'>生活</Option>
-                                        </OptGroup>
-                                    </Select>
-                                )}
-                            </FormItem>
-                            <FormItem
-                                // {...formItemLayout}
-                                hasFeedback
-                            >
-                                <FroalaEditor
-                                    tag='textarea'
-                                    model={content}
-                                    config={this.editorConfig}
-                                    onModelChange={this.handleEditorChange}
-                                />
-                            </FormItem>
-                            <FormItem
-                                // {...tailFormItemLayout}
-                             />
-                            <div ref='upload' className={style.upload}>
-                                <Upload {...props}>
-                                    <Button>
-                                        <Icon type='picture' />上传
-                                    </Button>
-                                </Upload>
-                            </div>
-                            <div className={style.disappear} ref='model' />
+                            <Layout.Content className={style.content}>
+                                <FormItem
+                                    // {...formItemLayout}
+                                    hasFeedback
+                                >
+                                    {getFieldDecorator('title', {
+                                        rules: [{
+                                            required: true, message: '请输入标题'
+                                        }],
+                                        initialValue: title || ''
+                                    })(
+                                        <Input placeholder='输入文章标题' />
+                                    )}
+                                </FormItem>
+                                <FormItem
+                                    // {...formItemLayout}
+                                >
+                                    {getFieldDecorator('category', {
+                                        initialValue: category || '搞笑'
+                                    })(
+                                        <Select>
+                                            <OptGroup label='搞笑'>
+                                                <Option value='搞笑'>搞笑</Option>
+                                                <Option value='美图'>美图</Option>
+                                                <Option value='科学'>科学</Option>
+                                                <Option value='历史'>历史</Option>
+                                            </OptGroup>
+                                            <OptGroup label='科技互联网'>
+                                                <Option value='互联网'>互联网</Option>
+                                                <Option value='科技'>科技</Option>
+                                            </OptGroup>
+                                            <OptGroup label='两性健康'>
+                                                <Option value='两性'>两性</Option>
+                                                <Option value='情感'>情感</Option>
+                                                <Option value='女人'>女人</Option>
+                                                <Option value='健康'>健康</Option>
+                                            </OptGroup>
+                                            <OptGroup label='国际社会'>
+                                                <Option value='社会'>社会</Option>
+                                                <Option value='三农'>三农</Option>
+                                                <Option value='军事'>军事</Option>
+                                                <Option value='游戏'>游戏</Option>
+                                                <Option value='娱乐'>娱乐</Option>
+                                                <Option value='体育'>体育</Option>
+                                            </OptGroup>
+                                            <OptGroup label='生活服务'>
+                                                <Option value='宠物'>宠物</Option>
+                                                <Option value='家居'>家居</Option>
+                                                <Option value='时尚'>时尚</Option>
+                                                <Option value='育儿'>育儿</Option>
+                                                <Option value='美食'>美食</Option>
+                                                <Option value='旅游'>旅游</Option>
+                                                <Option value='汽车'>汽车</Option>
+                                                <Option value='生活'>生活</Option>
+                                            </OptGroup>
+                                        </Select>
+                                    )}
+                                </FormItem>
+
+                                <FormItem
+                                    hasFeedback
+                                >
+                                    <FroalaEditor
+                                        tag='textarea'
+                                        model={content}
+                                        config={this.editorConfig}
+                                        onModelChange={this.handleEditorChange}
+                                    />
+                                </FormItem>
+                                <div ref='upload' className={style.upload}>
+                                    <Upload {...props}>
+                                        <Button>
+                                            <Icon type='picture' />上传
+                                        </Button>
+                                    </Upload>
+                                </div>
+                                <div className={style.disappear} ref='model' />
+                            </Layout.Content>
+                            <Layout.Footer className={style.footer}>
+                                <Button type='primary' htmlType='submit'>提交</Button>
+                            </Layout.Footer>
                         </Form>
-                    </Layout.Content>
-                    <Layout.Footer className={style.footer}>
-                        <Button type='primary' htmlType='submit'>提交</Button>
-                    </Layout.Footer>
-                </Layout>
+                    </Layout>
+                </Spin>
             </Page>
         );
     }

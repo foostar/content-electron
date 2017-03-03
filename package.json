@@ -66,5 +66,9 @@
     "webpack": "^2.2.1",
     "webpack-dev-server": "^2.3.0"
   },
-  "theme": "./src/theme.js"
+  "theme": "./src/theme.js",
+  "dependencies": {
+    "exports-loader": "^0.6.4",
+    "trix": "^0.10.1"
+  }
 }

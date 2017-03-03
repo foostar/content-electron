@@ -3,10 +3,10 @@
 .goback
     margin-left 30px
 .upload
-    position relative
-    top 2px
-    left 8px
-
+    position absolute
+    top 40px
+    left 180px
+    z-index 100
 .layout
     height 100%
 .content
@@ -27,3 +27,7 @@
     :global
         .ant-btn
             margin 0 5px
+@media (max-width 990px) 
+    .upload 
+        top 3px
+        left 425px
