@@ -24,9 +24,9 @@ export default class Platform extends Events {
         });
         container.appendChild(webview);
         // document.body.appendChild(webview);
-        this._readyPromise.then(() => {
-            webview.openDevTools();
-        });
+        // this._readyPromise.then(() => {
+        //     webview.openDevTools();
+        // });
     }
     getCookies (opt = {}) {
         return new Promise((resolve, reject) => {
