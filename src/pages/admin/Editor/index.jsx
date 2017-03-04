@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {hashHistory, Link} from 'react-router';
-import {Form, Button, Spin, Input, Select, notification, Upload, Icon, message} from 'antd';
+import {Form, Button, Spin, Input, Tag, Select, notification, Upload, Icon, message} from 'antd';
 import * as actions from 'reducers/admin/editor';
 
 import Page from 'components/Page';
@@ -159,7 +159,7 @@ export default class Editor extends Component {
     }
     render () {
         const {content, isFetching, title, category} = this.props.editor;
-        const {getFieldDecorator} = this.props.form;
+        const {getFieldDecorator, getFieldValue} = this.props.form;
         const self = this;
         const formItemLayout = {
             labelCol: {span: 6},
@@ -205,7 +205,6 @@ export default class Editor extends Component {
                         <FormItem
                             {...formItemLayout}
                             label='标题'
-                            hasFeedback
                         >
                             {getFieldDecorator('title', {
                                 rules: [{
@@ -215,6 +214,9 @@ export default class Editor extends Component {
                             })(
                                 <Input />
                             )}
+                            <Tag className={style['text-num']} color='blue'>
+                                已输入 {(getFieldValue('title') || {}).length || '0'} 个字
+                            </Tag>
                         </FormItem>
                         <FormItem
                             {...formItemLayout}
@@ -275,7 +277,7 @@ export default class Editor extends Component {
                             />
                         </FormItem>
                         <FormItem {...tailFormItemLayout}>
-                            <Button type='primary' htmlType='submit' size='large'>提交</Button>
+                            <Button type='primary' htmlType='submit' size='large'>保存</Button>
                             <Button className={style.goback} type='primary'><Link to='/admin/articles'>返回</Link></Button>
                         </FormItem>
                         <div ref='upload' className={style.upload}>

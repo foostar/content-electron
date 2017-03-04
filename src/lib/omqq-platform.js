@@ -3,6 +3,7 @@ import Platform from './platform';
 export default class OMQQPlatform extends Platform {
     loginUrl = 'https://om.qq.com/userAuth/index'
     publishUrl = 'https://om.qq.com/article/articlePublish'
+    statsUrl = 'https://om.qq.com/statistic/ArticleReal?media=5394191&channel=0&page=2&num=8&btime=1&relogin=1'
     _login () {
         return new Promise((resolve, reject) => {
             const {webview, loginUrl, account, password} = this;
@@ -82,19 +83,19 @@ export default class OMQQPlatform extends Platform {
             const didDomReady = async () => {
                 const url = webview.getURL();
                 if (url.startsWith(publishUrl)) {
-                    this.injectPublishScript();
+                    this.webview.openDevTools();
+                    this.injectPublishScript(title, data);
+                    try {
+                        const res = await this.getRresponse('https://om.qq.com/article/publish?relogin=1');
+                        const data = JSON.parse(res.body);
+                        resolve(data);
+                    } catch (err) {
+                        reject(err);
+                    } finally {
+                        webview.removeEventListener('dom-ready', didDomReady);
+                    }
                 }
             };
-
-            try {
-                const res = await this.getRresponse('https://om.qq.com/article/publish?relogin=1');
-                const data = JSON.parse(res.body);
-                resolve(data);
-            } catch (err) {
-                reject(err);
-            } finally {
-                webview.removeEventListener('dom-ready', didDomReady);
-            }
 
             webview.addEventListener('dom-ready', didDomReady);
         });
@@ -125,4 +126,44 @@ export default class OMQQPlatform extends Platform {
             })();
         `);
     }
+
+    _stats () {
+        return new Promise((resolve, reject) => {
+            const {webview} = this;
+            let page = 1;
+            let result = [];
+            const injectGetStatsScript = async () => {
+                const res = await this.executeJavaScript(`
+                    fetch('https://om.qq.com/statistic/ArticleReal?channel=0&page=${page}&num=100&btime=1&relogin=1', {
+                        credentials: 'include'
+                    }).then(res => res.json())
+                `);
+
+                const {statistic = []} = res.data;
+
+                result.push(...statistic);
+
+                if (statistic.length === 100) {
+                    page += 1;
+                    return await injectGetStatsScript();
+                }
+
+                this.webview.removeEventListener('dom-ready', injectGetStatsScript);
+
+                result = result.map(item => {
+                    return {
+                        id: encodeURIComponent(`kuaibao.qq.com/s/${item.articleId}`),
+                        view: item.read,
+                        title: item.title,
+                        custom: item
+                    };
+                });
+
+                resolve(result);
+            };
+            webview.loadURL('https://om.qq.com/');
+            webview.addEventListener('dom-ready', injectGetStatsScript);
+        });
+    }
+
 }

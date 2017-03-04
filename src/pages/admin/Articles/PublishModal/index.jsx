@@ -7,6 +7,7 @@ import {merge} from 'lodash';
 
 import style from './style.styl';
 import {Modal, Steps, Alert, Button} from 'antd';
+import {platformsById} from 'lib/platforms';
 
 import ChooseUpstream from './ChooseUpstream';
 import PublishContent from './PublishContent';
@@ -15,7 +16,9 @@ const {Step} = Steps;
 
 const mapStateToProps = (state, props) => {
     return {
-        upstreams: state.upstreams.data
+        upstreams: state.upstreams.data,
+        myBindUpstreams: state.passport.data.bindUpstreams,
+        myLevel: state.passport.data.level
     };
 };
 const mapDispatchToProps = dispatch => {
@@ -59,8 +62,20 @@ class PublishModal extends Component {
     }
     render () {
         const {content, upstreams} = this.props;
-        const {bindUpstreams = []} = content.author || {};
         const {current, visible, data} = this.state;
+
+        const authorBindUpstreams = (content.author || {}).bindUpstreams || [];
+        const {myBindUpstreams = []} = this.props;
+
+        let visibleUpstreams;
+
+        if (this.props.myLevel === 0) {
+            visibleUpstreams = null;
+        } else if (authorBindUpstreams.length === 0) {
+            visibleUpstreams = myBindUpstreams;
+        } else {
+            visibleUpstreams = visibleUpstreams.filter(u => myBindUpstreams.includes(u));
+        }
 
         const steps = [
             '选择平台',
@@ -70,7 +85,7 @@ class PublishModal extends Component {
 
         let title = steps[current];
         try {
-            title = `[${data.upstream.platform}] ${data.upstream.nickname}`;
+            title = `[${platformsById[data.upstream.platform].name}] ${data.upstream.nickname}`;
         } catch (err) {}
 
         return (
@@ -91,7 +106,7 @@ class PublishModal extends Component {
                     <div className={style['steps-content']}>
                         {current === 0 &&
                             <ChooseUpstream
-                                bindUpstreams={bindUpstreams}
+                                visibleUpstreams={visibleUpstreams}
                                 upstreams={upstreams}
                                 nextStep={this.nextStep}
                             />

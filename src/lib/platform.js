@@ -10,23 +10,27 @@ export default class Platform extends Events {
     constructor (account, password, cookies) {
         super();
         if (!account || !password) throw new Error('缺少用户名或密码');
-        // this.partition = `persist:${++count}`;
+
         this.account = account;
         this.password = password;
         this.cookies = cookies;
+        this.partition = `persist:${Date.now()}`;
+
         const webview = this.webview = document.createElement('webview');
+
         webview.style.height = '100%';
-        // document.body.innerHTML = '';
-        // webview.setAttribute('partition', this.partition);
+
         webview.setAttribute('src', 'about:blank');
+        webview.setAttribute('partition', this.partition);
+
         this._readyPromise = new Promise(resolve => {
-            webview.addEventListener('dom-ready', resolve);
+            webview.addEventListener('dom-ready', () => {
+                // webview.openDevTools();
+                this.cookies && this.setCookies(this.cookies);
+                resolve();
+            });
         });
         container.appendChild(webview);
-        // document.body.appendChild(webview);
-        // this._readyPromise.then(() => {
-        //     webview.openDevTools();
-        // });
     }
     getCookies (opt = {}) {
         return new Promise((resolve, reject) => {
@@ -37,14 +41,15 @@ export default class Platform extends Events {
             });
         });
     }
-    setCookies (cookies) {
-        return new Promise((resolve, reject) => {
-            this.webview.getWebContents().session.cookies.set(cookies, (err) => {
+    async setCookies (cookies) {
+        const actions = cookies.map(cookie => new Promise((resolve, reject) => {
+            this.webview.getWebContents().session.cookies.set(cookie, (err) => {
                 if (err) return reject(err);
-                this.cookies = cookies;
                 resolve();
             });
-        });
+        }));
+        await Promise.all(actions);
+        this.cookies = cookies;
     }
     ready () {
         return this._readyPromise;

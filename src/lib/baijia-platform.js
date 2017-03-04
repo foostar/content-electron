@@ -1,4 +1,5 @@
 import Platform from './platform';
+import moment from 'moment';
 
 export default class BaijiaPlatform extends Platform {
     loginUrl = 'http://baijiahao.baidu.com/builder/app/login'
@@ -8,9 +9,10 @@ export default class BaijiaPlatform extends Platform {
             const {webview, loginUrl, account, password} = this;
             webview.loadURL(loginUrl);
 
-            const timer = setTimeout(() => {
-                reject(new Error('timeout'));
-            }, 10000);
+            // 登录会有输入验证码的情况, 不能做超时
+            // const timer = setTimeout(() => {
+            //     reject(new Error('timeout'));
+            // }, 10000);
 
             const didDomReady = async () => {
                 const url = webview.getURL();
@@ -40,7 +42,7 @@ export default class BaijiaPlatform extends Platform {
                     } catch (err) {
                         reject(err);
                     } finally {
-                        clearTimeout(timer);
+                        // clearTimeout(timer);
                         webview.removeEventListener('dom-ready', didDomReady);
                     }
                 }
@@ -78,7 +80,6 @@ export default class BaijiaPlatform extends Platform {
             (function() {
                 const el = document.querySelector('#ueditor_0');
                 if (!el) return setTimeout(arguments.callee, 200);
-                console.log(el)
                 document.querySelector('#header-wrapper').remove();
                 document.querySelector('.aside').remove();
                 document.querySelector('.post-article-tips-wrap').remove();
@@ -98,4 +99,70 @@ export default class BaijiaPlatform extends Platform {
         webview.cut();
         webview.paste();
     }
+
+    _stats (startTime, endTime) {
+        return new Promise(async (resolve, reject) => {
+            if (startTime) {
+                if (!moment(startTime, 'YYYYMMDD').isValid()) return reject('startTime 格式不正确');
+            } else {
+                startTime = moment().subtract(30, 'days').format('YYYYMMDD');
+            }
+
+            if (endTime) {
+                if (!moment(endTime, 'YYYYMMDD').isValid()) return reject('endTime 格式不正确');
+            } else {
+                endTime = moment().format('YYYYMMDD');
+            }
+
+            const {webview} = this;
+
+            let page = 1;
+            let result = [];
+            let id;
+
+            const injectGetStatsScript = async () => {
+                if (!id) {
+                    id = await this.executeJavaScript(`
+                        (function() {
+                            el = document.querySelector("a.aside-action");
+                            if (!el) return setTimeout(arguments.callee, 200);
+                            return el.getAttribute("href").match(/app_id=(\\d+)/)[1];
+                        })();
+                    `);
+                }
+
+                const res = await this.executeJavaScript(`
+                    fetch('http://baijiahao.baidu.com/builderinner/api/content/analysis/getArticleList?app_id=${id}&start=${startTime}&end=${endTime}&page=${page}&page_size=100', {
+                        credentials: 'include'
+                    }).then(res => res.json())
+                `);
+
+                const {list = []} = res.data;
+
+                result.push(...list);
+
+                const {total_page, cur_page} = res.data;
+
+                if (cur_page < total_page) { // eslint-disable-line
+                    page += 1;
+                    return await injectGetStatsScript();
+                }
+
+                this.webview.removeEventListener('dom-ready', injectGetStatsScript);
+
+                result = result.map(item => {
+                    return {
+                        id: encodeURIComponent(`baijiahao.baidu.com/builder/preview/s?id=${item.article_id}`),
+                        view: item.view_times,
+                        title: item.title,
+                        custom: item
+                    };
+                });
+                resolve(result);
+            };
+            webview.loadURL('http://baijiahao.baidu.com/');
+            webview.addEventListener('dom-ready', injectGetStatsScript);
+        });
+    }
 }
+

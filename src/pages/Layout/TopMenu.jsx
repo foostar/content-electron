@@ -20,7 +20,7 @@ export default class TopMenu extends Component {
             name: '我的文章',
             router: '/articles'
         }, {
-            name: '账号',
+            name: '平台账号',
             level: l => l === 0 || l > 1,
             router: '/admin/upstreams'
         }, {
@@ -31,6 +31,9 @@ export default class TopMenu extends Component {
             name: '内容库',
             level: l => l === 0 || l > 1,
             router: '/admin/articles'
+        }, {
+            name: '统计',
+            router: '/admin/stat'
         }];
         return (
             <div className={style.menu}>
