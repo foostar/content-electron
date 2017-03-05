@@ -8,7 +8,7 @@ import {platformsById} from 'lib/platforms';
 import style from './style.styl';
 import {Card} from 'antd';
 
-class ChoosePlatform extends Component {
+class ChooseUpstream extends Component {
     render () {
         const {visibleUpstreams, upstreams} = this.props;
 
@@ -18,8 +18,8 @@ class ChoosePlatform extends Component {
 
         return (
             <div>
-                {list.map(upstream => (
-                    <Card className={style['platform-card']} onClick={() => this.props.nextStep({upstream})}>
+                {list.map((upstream, idx) => (
+                    <Card key={idx} className={style['platform-card']} onClick={() => this.props.nextStep({upstream})}>
                         <div
                             className={style.logo}
                             style={{backgroundImage: `url(${platformsById[upstream.platform].logo})`}}
@@ -35,4 +35,4 @@ class ChoosePlatform extends Component {
     }
 }
 
-export default ChoosePlatform;
+export default ChooseUpstream;

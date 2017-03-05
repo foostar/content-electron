@@ -52,10 +52,15 @@ export const apiMiddleware = (opt = {}) => store => next => async action => {
     let nextAction = failure;
 
     if (query) {
-        url += Object.entries(query)
+        let _q = Object.entries(query)
             .map(([k, v]) => `&${k}=${v}`)
-            .join('')
-            .replace(/^&/, '?');
+            .join('');
+
+        if (!url.match(/\?.+=/)) {
+            _q = _q.replace(/^&/, '?');
+        }
+
+        url += _q;
     }
 
     if (method !== 'GET' && body) body = JSON.stringify(body);

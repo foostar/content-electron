@@ -30,14 +30,21 @@ const mapDispatchToProps = dispatch => {
 
 @connect(mapStateToProps, mapDispatchToProps)
 class PublishModal extends Component {
+    static defaultProps = {
+        beforeShowModal () {
+            return true;
+        }
+    }
     state = {
         visible: false,
         current: 0,
         data: {}
     }
-    showModal = () => {
-        this.props.upstreamsActions.fetchUpstreams();
-        this.setState({visible: true});
+    showModal = async () => {
+        if (await this.props.beforeShowModal()) {
+            this.props.upstreamsActions.fetchUpstreams();
+            this.setState({visible: true});
+        }
     }
     onCancel = () => {
         this.setState({visible: false});
@@ -90,7 +97,9 @@ class PublishModal extends Component {
 
         return (
             <span>
-                <a onClick={this.showModal}>发布</a>
+                <span onClick={this.showModal}>
+                    {this.props.children}
+                </span>
                 <Modal
                     className={style['publish-modal']}
                     width='auto'

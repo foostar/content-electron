@@ -4,11 +4,12 @@ import update from 'react/lib/update';
 
 const HUSSIF = {};
 const INITAL = {
-    feching: false,
-    upstream: {}
+    fetching: false,
+    upstream: {},
+    redactor: {}
 };
 
-export const fetchStat = createCallApi(HUSSIF, {
+export const fetchStatGroupByUpstream = createCallApi(HUSSIF, {
     type: 'FETCH_STAT_BY_UPSTREAM',
     endpoint: '/reproduction/stat?groupBy=upstream',
     request: (state) => update(state, {
@@ -17,7 +18,8 @@ export const fetchStat = createCallApi(HUSSIF, {
     success: (state, payload) => {
         return update(state, {
             fetching: {$set: false},
-            upstream: {$apply: ups => {
+            upstream: {$apply: () => {
+                const ups = {};
                 payload.result.data.forEach(item => {
                     ups[item.upstream] = item;
                 });
@@ -30,7 +32,32 @@ export const fetchStat = createCallApi(HUSSIF, {
     })
 });
 
-export const fetchStatWithUpstreams = createCallApi(HUSSIF, {
+export const fetchStatGroupByRedactor = createCallApi(HUSSIF, {
+    type: 'FETCH_STAT_BY_READACTOR',
+    endpoint: '/reproduction/stat?groupBy=publisher',
+    request: (state) => update(state, {
+        fetching: {$set: true}
+    }),
+    success: (state, payload) => {
+        return update(state, {
+            fetching: {$set: false},
+            redactor: {
+                $apply: () => {
+                    const radactor = {};
+                    payload.result.data.filter(r => r.publisher).map(item => {
+                        radactor[item.publisher] = item;
+                    });
+                    return radactor;
+                }
+            }
+        });
+    },
+    failure: (state) => update(state, {
+        fetching: {$set: false}
+    })
+});
+
+export const fetchStat = createCallApi(HUSSIF, {
     type: 'FETCH_STAT_WITH_UPSTREAM',
     endpoint: '/reproduction/stat'
 });

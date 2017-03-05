@@ -110,7 +110,7 @@ export default class extends Component {
         title: '操作',
         key: 'action',
         width: 90,
-        render: (text, record) => <PublishModal content={record} />
+        render: (text, record) => <PublishModal content={record} ><a>发布</a></PublishModal>
     }]
     render () {
         const {getFieldDecorator} = this.props.form;
