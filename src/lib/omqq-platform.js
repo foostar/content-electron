@@ -9,9 +9,9 @@ export default class OMQQPlatform extends Platform {
             const {webview, loginUrl, account, password} = this;
             webview.loadURL(loginUrl);
 
-            const timer = setTimeout(() => {
-                reject(new Error('timeout'));
-            }, 10000);
+            // const timer = setTimeout(() => {
+            //     reject(new Error('timeout'));
+            // }, 10000);
 
             const didDomReady = async () => {
                 const url = webview.getURL();
@@ -41,7 +41,7 @@ export default class OMQQPlatform extends Platform {
                     } catch (err) {
                         reject(err);
                     } finally {
-                        clearTimeout(timer);
+                        // clearTimeout(timer);
                         webview.removeEventListener('dom-ready', didDomReady);
                     }
                 }
