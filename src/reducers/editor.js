@@ -7,7 +7,10 @@ const INITAL = {
     isFetching: false,
     content: '',
     title: '',
-    category: '搞笑'
+    category: '搞笑',
+    modalVisible: false,
+    isAlter: false,
+    originSrc: ''
 };
 // 更新编辑器里的内容
 export const updateModel = createAction('UPDATE_MODEL');
@@ -15,6 +18,10 @@ export const updateModel = createAction('UPDATE_MODEL');
 export const fetching = createAction('FETCHING');
 // 清空表单
 export const clearArticle = createAction('CLEARARTICLE');
+// 关闭图像处理
+export const modalCancel = createAction('MODALCANCEL');
+// 开启图像处理
+export const handleImg = createAction('HANDLEIMG');
 
 HUSSIF[ updateModel ] = (state, content) => {
     return Object.assign({}, state, {
@@ -37,6 +44,20 @@ HUSSIF[ clearArticle ] = (state, content) => {
     return Object.assign({}, state, INITAL);
 };
 
+HUSSIF[ modalCancel ] = (state, content) => {
+    return Object.assign({}, state, {
+        modalVisible: false,
+        isAlter: false
+    });
+};
+
+HUSSIF[ handleImg ] = (state, src) => {
+    return Object.assign({}, state, {
+        modalVisible: true,
+        isAlter: true,
+        originSrc: src
+    });
+};
 // 新增文章
 export const addArticle = createCallApi(HUSSIF, {
     type: 'ADDARTICLE',

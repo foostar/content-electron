@@ -4,7 +4,8 @@
     "globals": {
         "FormData": true,
         "fetch": true,
-        "localStorage": true
+        "localStorage": true,
+        "$": true
     },
     "rules": {
         "indent": ["error", 4, {"SwitchCase": 1}],

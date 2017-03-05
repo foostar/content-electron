@@ -8,6 +8,7 @@ import * as actions from 'reducers/editor';
 
 import Page from 'components/Page';
 import style from './style.styl';
+import ImgEditor from 'components/ImgEditor';
 import 'froala-editor/js/froala_editor.pkgd.min.js';
 import 'froala-editor/css/froala_editor.pkgd.min.css';
 import 'font-awesome/css/font-awesome.css';
@@ -155,6 +156,7 @@ export default class Editor extends Component {
                 if (!this.$editor) {
                     this.$editor = editor;
                 }
+                this.bindImgEditor();
             },
             'froalaEditor.image.beforePasteUpload': (e, editor, img) => {
                 return false;
@@ -165,6 +167,25 @@ export default class Editor extends Component {
                 return false;
             }
         }
+    }
+    bindImgEditor () {
+        $('.fr-element').on('mouseover', (e) => {
+            if (e.target.nodeName == 'IMG') {
+                const Img = $(e.target);
+                const parent = Img.parent();
+                parent.css({position: 'relative'}).append('<i style="margin-left:3px" class="editor fa fa-pencil-square-o fa-2x" aria-hidden="true"></i>');
+                Img.unbind('mouseout');
+                Img.on('mouseout', () => {
+                    setTimeout(() => {
+                        $('.editor').remove();
+                    }, 500);
+                });
+                $('.editor').on('click', () => {
+                    $('.editor').remove();
+                    this.props.handleImg(Img.attr('src'));
+                });
+            };
+        });
     }
     async dropUpload (imgs) {
         this.$editor.popups.hideAll();
@@ -183,8 +204,19 @@ export default class Editor extends Component {
     handleEditorChange = (content) => {
         this.props.updateModel(content);
     }
+    imageProcess = async (src, blob) => {
+        this.props.fetching();
+        const url = await this.uploadImg(blob);
+        const html = this.$editor.html.get().replace(src, url);
+        this.handleEditorChange(html);
+        this.props.modalCancel();
+        this.props.fetching(false);
+    }
+    handleImg = () => {
+        this.props.handleImg();
+    }
     render () {
-        const {content, title, category, isFetching} = this.props.editor;
+        const {content, title, category, isFetching, modalVisible, isAlter, originSrc} = this.props.editor;
         const {getFieldDecorator} = this.props.form;
         const self = this;
         const props = {
@@ -234,7 +266,6 @@ export default class Editor extends Component {
                                     )}
                                 </FormItem>
                                 <FormItem
-                                    // {...formItemLayout}
                                 >
                                     {getFieldDecorator('category', {
                                         initialValue: category || '搞笑'
@@ -277,7 +308,6 @@ export default class Editor extends Component {
                                         </Select>
                                     )}
                                 </FormItem>
-
                                 <FormItem
                                     hasFeedback
                                 >
@@ -295,11 +325,21 @@ export default class Editor extends Component {
                                         </Button>
                                     </Upload>
                                 </div>
+                                { isAlter && <ImgEditor
+                                    src={originSrc}
+                                    isFetching={isFetching}
+                                    modalCancel={this.props.modalCancel}
+                                    modalVisible={modalVisible}
+                                    imageProcess={this.imageProcess}
+                                /> }
                                 <div className={style.disappear} ref='model' />
                             </Layout.Content>
                             <Layout.Footer className={style.footer}>
                                 <Button type='primary' htmlType='submit'>提交</Button>
                             </Layout.Footer>
+                            <Button className='editbutton' style={{display: 'none'}}>
+                                <Icon type='edit' /> 编辑
+                            </Button>
                         </Form>
                     </Layout>
                 </Spin>
