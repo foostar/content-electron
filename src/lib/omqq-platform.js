@@ -83,7 +83,6 @@ export default class OMQQPlatform extends Platform {
             const didDomReady = async () => {
                 const url = webview.getURL();
                 if (url.startsWith(publishUrl)) {
-                    this.webview.openDevTools();
                     this.injectPublishScript(title, data);
                     try {
                         const res = await this.getRresponse('https://om.qq.com/article/publish?relogin=1');
