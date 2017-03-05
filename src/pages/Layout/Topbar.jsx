@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-// import {hashHistory} from 'react-router';
+import {hashHistory} from 'react-router';
 import style from './style.styl';
 import {Button, Dropdown, Icon, Menu} from 'antd';
 import {connect} from 'react-redux';
@@ -13,13 +13,20 @@ const mapStateToProps = state => {
 
 @connect(mapStateToProps)
 export default class Topbar extends Component {
+    userAction = ({key}) => {
+        if (key === 'signout') {
+            hashHistory.replace('/signin');
+        }
+    }
     render () {
         const {username} = this.props.passport;
         const menu = (
-            <Menu>
+            <Menu onClick={this.userAction}>
+                {/*
                 <Menu.Item key='2'>修改密码</Menu.Item>
+                */}
                 <Menu.Divider />
-                <Menu.Item key='3'>退出登录</Menu.Item>
+                <Menu.Item key='signout'>退出登录</Menu.Item>
             </Menu>
         );
         return (
@@ -31,7 +38,7 @@ export default class Topbar extends Component {
                 <div className={style['user-board']}>
                     <Dropdown overlay={menu} trigger={['click']}>
                         <Button>
-                            用户名：{username} <Icon type='down' />
+                            {username} <Icon type='down' />
                         </Button>
                     </Dropdown>
                 </div>

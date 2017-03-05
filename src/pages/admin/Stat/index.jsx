@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 import moment from 'moment';
 import {bindActionCreators} from 'redux';
 import {uniqBy} from 'lodash';
+import {Link} from 'react-router';
 import {Layout, Table, Button, message} from 'antd';
 import * as upstreamsActions from 'reducers/upstreams';
 import * as reproductionActions from 'reducers/reproduction';
@@ -85,14 +86,17 @@ class Stats extends Component {
         return (
             <Page>
                 <Layout className={style.layout}>
+                    {/*
                     <Layout.Sider width='200' className={style.sider}>
                         <h3>搜索条件</h3>
                         <h1>form</h1>
                     </Layout.Sider>
+                    */}
                     <Layout.Content className={style.content}>
                         <Table
                             bordered
                             rowKey='id'
+                            pagination={false}
                             dataSource={this.props.upstreams}
                         >
                             <Column
@@ -103,9 +107,9 @@ class Stats extends Component {
                                 filterMultiple={false}
                                 onFilter={(value, record) => value === record.platform}
                                 render={(p, recod) => (
-                                    <a>
+                                    <Link to={`/admin/stat/${recod.id}`}>
                                         [{platformsById[p].name}] {recod.nickname}
-                                    </a>
+                                    </Link>
                                 )}
                             />
                             <Column
@@ -131,7 +135,7 @@ class Stats extends Component {
                                 render={id => {
                                     const stat = this.props.statByUpstream[id] || {};
                                     return (
-                                        <span>{moment(stat.lastUpdate).format('MM-DD a h:mm')}</span>
+                                        <span>{moment(stat.lastUpdate).format('YYYY-MM-DD HH:mm')}</span>
                                     );
                                 }}
                             />

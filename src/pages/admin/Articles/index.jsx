@@ -82,8 +82,9 @@ export default class extends Component {
     columns = [{
         title: '文章标题',
         dataIndex: 'title',
-        width: 200,
-        key: 'title'
+        width: 300,
+        key: 'title',
+        render: (title, record) => <Link to={`/admin/articles/editor?articleId=${record.id}`}>{title}</Link>
     }, {
         title: '作者',
         dataIndex: 'author',
@@ -109,12 +110,7 @@ export default class extends Component {
         title: '操作',
         key: 'action',
         width: 90,
-        render: (text, record) => (
-            <span>
-                <Link to={`/admin/editor?articleId=${record.id}`}>编辑</Link>
-                &emsp;<PublishModal content={record} />
-            </span>
-      )
+        render: (text, record) => <PublishModal content={record} />
     }]
     render () {
         const {getFieldDecorator} = this.props.form;

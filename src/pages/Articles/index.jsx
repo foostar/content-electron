@@ -37,7 +37,8 @@ export default class extends Component {
     columns = [{
         title: '标题',
         dataIndex: 'title',
-        key: 'title'
+        key: 'title',
+        render: (title, record) => <Link to={`/editor?articleId=${record.id}`}>{title}</Link>
     }, {
         title: '分类',
         dataIndex: 'category',
@@ -50,11 +51,7 @@ export default class extends Component {
     }, {
         title: '操作',
         key: 'action',
-        render: (text, record) => (
-            <span>
-                <Link to={`/editor?articleId=${record.id}`}>编辑</Link>
-            </span>
-      )
+        render: (text, record) => <Button disabled shape='circle' size='small' icon='delete' />
     }]
     render () {
         const {contents, count, isFetching} = this.props.articles;

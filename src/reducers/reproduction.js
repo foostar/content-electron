@@ -30,6 +30,11 @@ export const fetchStat = createCallApi(HUSSIF, {
     })
 });
 
+export const fetchStatWithUpstreams = createCallApi(HUSSIF, {
+    type: 'FETCH_STAT_WITH_UPSTREAM',
+    endpoint: '/reproduction/stat'
+});
+
 export const upsert = createCallApi(HUSSIF, {
     type: 'UPSERT_REPRODUCTION',
     endpoint: '/reproduction/:id',

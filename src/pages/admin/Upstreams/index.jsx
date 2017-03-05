@@ -64,10 +64,6 @@ class AdminUsers extends Component {
                                 width='25%'
                                 dataIndex='account'
                                 key='account'
-                                render={(text, record) => {
-                                    // return <Link to={`/admin/upstreams/${record.id}`}>{text}</Link>;
-                                    return <a>{text}</a>;
-                                }}
                             />
                             <Column
                                 title='平台'
