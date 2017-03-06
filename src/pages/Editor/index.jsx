@@ -63,9 +63,11 @@ export default class Editor extends Component {
                     params: articleId
                 });
                 if (type === 'EDITARTICLE_SUCCESS') {
-                    return resolve(true);
+                    resolve(true);
                 }
+                return;
             }
+            console.log(1111);
             const {type} = await this.props.addArticle({
                 body: data
             });

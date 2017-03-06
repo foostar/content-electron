@@ -39,9 +39,9 @@ export default class extends Component {
         this.fetchData();
     }
     getFormData (fromData, skip) {
-        skip = skip || this.props.articles.skip;
+        skip = skip || 0;
         const data = {
-            skip,
+            skip: skip * 10,
             limit: 10
         };
         Object.keys(fromData).forEach((v) => {
@@ -84,7 +84,7 @@ export default class extends Component {
         dataIndex: 'title',
         width: 300,
         key: 'title',
-        render: (title, record) => <Link to={`/admin/articles/editor?articleId=${record.id}`}>{title}</Link>
+        render: (title, record) => <Link to={`/editor?articleId=${record.id}`}>{title}</Link>
     }, {
         title: '作者',
         dataIndex: 'author',
