@@ -153,6 +153,7 @@ export default class Editor extends Component {
         tooltips: false,
         imagePasteProcess: false,
         imageRoundPercent: false,
+        toolbarSticky: false,
         quickInsertButtons: [ 'table', 'ul', 'ol', 'hr' ],
         toolbarButtonsSM: ['fullscreen', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'insertLink', 'insertTable', 'undo', 'redo'],
         toolbarButtons: ['print', 'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', 'fontFamily', 'fontSize', '|', 'specialCharacters', 'color', 'emoticons', 'inlineStyle', 'paragraphStyle', '|', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', '-', 'insertLink', 'insertVideo', 'insertFile', 'insertTable', 'undo', 'redo', 'clearFormatting', 'selectAll', 'html'],
