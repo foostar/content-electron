@@ -1,22 +1,29 @@
 import Platform from './platform';
+import WebviewHelper from 'utils/webview-helper';
 
 export default class OMQQPlatform extends Platform {
     loginUrl = 'https://om.qq.com/userAuth/index'
     publishUrl = 'https://om.qq.com/article/articlePublish'
-    _login () {
+    async _isLogin (webview) {
+        const helper = new WebviewHelper(webview);
+        const data = await helper.fetchJSON('https://om.qq.com/article/list?index=1&commentflag=0&source=0&relogin=1');
+        return data.response.code !== -10403;
+    }
+    _login (webview) {
+        const helper = new WebviewHelper(webview);
         return new Promise((resolve, reject) => {
-            const {webview, loginUrl, account, password} = this;
+            const {loginUrl, account, password} = this;
             webview.loadURL(loginUrl);
 
-            const timer = setTimeout(() => {
-                reject(new Error('timeout'));
-            }, 10000);
+            // const timer = setTimeout(() => {
+            //     reject(new Error('timeout'));
+            // }, 10000);
 
             const didDomReady = async () => {
                 const url = webview.getURL();
                 // 登录界面
                 if (url.startsWith(loginUrl)) {
-                    this.executeJavaScript(`
+                    helper.executeJavaScript(`
                         (function() {
                             var el = document.querySelector('#LEmail')
                             if (!el) return setTimeout(arguments.callee, 200);
@@ -30,17 +37,17 @@ export default class OMQQPlatform extends Platform {
                 // 登录成功, 获取 cookies
                 if (url === 'https://om.qq.com/') {
                     try {
-                        const cookies = await this.getCookies();
+                        const cookies = await helper.getCookies();
                         const session = cookies.map(item => {
                             item.url = 'https://om.qq.com/';
                             return item;
                         });
-                        const nickname = await this.executeJavaScript('document.querySelector(".header-login-inner .name").innerText;');
+                        const nickname = await helper.executeJavaScript('document.querySelector(".header-login-inner .name").innerText;');
                         resolve({session, nickname});
                     } catch (err) {
                         reject(err);
                     } finally {
-                        clearTimeout(timer);
+                        // clearTimeout(timer);
                         webview.removeEventListener('dom-ready', didDomReady);
                     }
                 }
@@ -48,60 +55,34 @@ export default class OMQQPlatform extends Platform {
             webview.addEventListener('dom-ready', didDomReady);
         });
     }
-    _isLogin () {
+    _publish (webview, title, data) {
+        const helper = new WebviewHelper(webview);
         return new Promise(async (resolve, reject) => {
-            const {webview} = this;
-            const checkUrl = 'https://om.qq.com/article/list?index=1&commentflag=0&source=0&relogin=1';
-            webview.loadURL(checkUrl);
-
-            const didDomReady = async () => {
-                const url = webview.getURL(checkUrl);
-                if (url.startsWith(checkUrl)) {
-                    console.log(url);
-                }
-            };
-
-            // try {
-            //     const res = await this.getRresponse('https://om.qq.com/article/publish?relogin=1');
-            //     const data = JSON.parse(res.body);
-            //     resolve(data);
-            // } catch (err) {
-            //     reject(err);
-            // } finally {
-            //     webview.removeEventListener('dom-ready', didDomReady);
-            // }
-
-            webview.addEventListener('dom-ready', didDomReady);
-        });
-    }
-    _publish (title, data) {
-        return new Promise(async (resolve, reject) => {
-            const {webview, publishUrl} = this;
+            const {publishUrl} = this;
             webview.loadURL(publishUrl);
 
             const didDomReady = async () => {
                 const url = webview.getURL();
                 if (url.startsWith(publishUrl)) {
-                    this.injectPublishScript();
+                    this.injectPublishScript(webview, title, data);
+                }
+                try {
+                    const res = await helper.getRresponse('https://om.qq.com/article/publish?relogin=1');
+                    const data = JSON.parse(res.body);
+                    resolve(data);
+                } catch (err) {
+                    reject(err);
+                } finally {
+                    webview.removeEventListener('dom-ready', didDomReady);
                 }
             };
-
-            try {
-                const res = await this.getRresponse('https://om.qq.com/article/publish?relogin=1');
-                const data = JSON.parse(res.body);
-                resolve(data);
-            } catch (err) {
-                reject(err);
-            } finally {
-                webview.removeEventListener('dom-ready', didDomReady);
-            }
-
             webview.addEventListener('dom-ready', didDomReady);
         });
     }
 
-    injectPublishScript (title, {content}) {
-        return this.executeJavaScript(`
+    injectPublishScript (webview, title, {content}) {
+        const helper = new WebviewHelper(webview);
+        return helper.executeJavaScript(`
             (function() {
                 const el = document.querySelector('#ueditor_0');
                 if (!el) return setTimeout(arguments.callee, 200);

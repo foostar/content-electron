@@ -283,13 +283,12 @@ class PublishContent extends Component {
     async componentDidMount () {
         const {account, password, session: cookies, platform: platformId} = this.props.data.upstream;
         const platform = new platformsById[platformId].Class(account, password, cookies);
-        this.refs.wrap.appendChild(platform.webview);
         try {
             const res = await this.props.editorActions.getArticle({
                 params: this.props.content.id
             });
             let {title, content} = res.payload.result.data;
-            const data = await platform.publish(title, {content});
+            const data = await platform.publish(title, {content}, this.refs.wrap);
             this.props.nextStep(data);
         } catch (err) {
             console.log(err);

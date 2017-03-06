@@ -18,11 +18,16 @@
 .platform-card
     margin-bottom 8px
     cursor pointer
+    line-height 40px
     .logo
-        height 60px
-        background-position center
+        height 40px
+        background-position left center
+        padding-left 50px
         background-size contain
         background-repeat no-repeat
+    :global
+        .ant-card-body
+            padding 2px
 
 .bind-tag
     position absolute
@@ -36,6 +41,9 @@
     left -1px
     margin 0
 
+.steps
+    max-width 680px
+    margin 0 auto
 .steps-content
     flex 1
     overflow auto

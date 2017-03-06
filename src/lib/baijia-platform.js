@@ -1,22 +1,29 @@
 import Platform from './platform';
+import WebviewHelper from 'utils/webview-helper';
 
 export default class BaijiaPlatform extends Platform {
     loginUrl = 'http://baijiahao.baidu.com/builder/app/login'
     publishUrl = 'http://baijiahao.baidu.com/builder/article/edit'
-    _login () {
+    async _isLogin (webview) {
+        const helper = new WebviewHelper(webview);
+        const data = await helper.fetchJSON('https://baijiahao.baidu.com/builderinner/api/content/marketing/income');
+        return data.error_code === 0;
+    }
+    _login (webview) {
+        const helper = new WebviewHelper(webview);
         return new Promise((resolve, reject) => {
-            const {webview, loginUrl, account, password} = this;
+            const {loginUrl, account, password} = this;
             webview.loadURL(loginUrl);
 
-            const timer = setTimeout(() => {
-                reject(new Error('timeout'));
-            }, 10000);
+            // const timer = setTimeout(() => {
+            //     reject(new Error('timeout'));
+            // }, 10000);
 
             const didDomReady = async () => {
                 const url = webview.getURL();
                 // 登录界面
                 if (url.startsWith(loginUrl)) {
-                    await this.executeJavaScript(`
+                    await helper.executeJavaScript(`
                         (function() {
                             const el = document.querySelector('#TANGRAM__PSP_4__userName');
                             if (!el) return setTimeout(arguments.callee, 200);
@@ -30,17 +37,17 @@ export default class BaijiaPlatform extends Platform {
                 // 登录成功, 获取 cookies
                 if (url === 'http://baijiahao.baidu.com/') {
                     try {
-                        const cookies = await this.getCookies();
+                        const cookies = await helper.getCookies();
                         const session = cookies.map(item => {
                             item.url = 'http://baijiahao.baidu.com/';
                             return item;
                         });
-                        const nickname = await this.executeJavaScript('document.querySelector(".mp-header-user .author .name").innerText;');
+                        const nickname = await helper.executeJavaScript('document.querySelector(".mp-header-user .author .name").innerText;');
                         resolve({session, nickname});
                     } catch (err) {
                         reject(err);
                     } finally {
-                        clearTimeout(timer);
+                        // clearTimeout(timer);
                         webview.removeEventListener('dom-ready', didDomReady);
                     }
                 }
@@ -48,16 +55,17 @@ export default class BaijiaPlatform extends Platform {
             webview.addEventListener('dom-ready', didDomReady);
         });
     }
-    _publish (title, data) {
+    _publish (webview, title, data) {
+        const helper = new WebviewHelper(webview);
         return new Promise(async (resolve, reject) => {
-            const {webview, publishUrl} = this;
+            const {publishUrl} = this;
             webview.loadURL(publishUrl);
             const didDomReady = async () => {
                 const url = webview.getURL();
                 if (url.startsWith(publishUrl)) {
-                    this.injectPublishScript(title, data);
+                    this.injectPublishScript(webview, title, data);
                     try {
-                        const res = await this.getRresponse('https://om.qq.com/article/publish?relogin=1');
+                        const res = await helper.getRresponse('https://om.qq.com/article/publish?relogin=1');
                         const data = JSON.parse(res.body);
                         resolve(data);
                     } catch (err) {
@@ -72,9 +80,9 @@ export default class BaijiaPlatform extends Platform {
         });
     }
 
-    async injectPublishScript (title, {content}) {
-        const {webview} = this;
-        await this.executeJavaScript(`
+    async injectPublishScript (webview, title, {content}) {
+        const helper = new WebviewHelper(webview);
+        await helper.executeJavaScript(`
             (function() {
                 const el = document.querySelector('#ueditor_0');
                 if (!el) return setTimeout(arguments.callee, 200);
