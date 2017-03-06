@@ -10,7 +10,8 @@ const INITAL = {
     category: '搞笑',
     modalVisible: false,
     isAlter: false,
-    originSrc: ''
+    originSrc: '',
+    id: ''
 };
 // 更新编辑器里的内容
 export const updateModel = createAction('UPDATE_MODEL');
@@ -66,7 +67,10 @@ export const addArticle = createCallApi(HUSSIF, {
     request: (state, payload) => update(state, {
         isFetching: {$set: true}
     }),
-    success: (state, payload) => INITAL,
+    success: (state, payload) => {
+        const {data} = payload.result;
+        return Object.assign({}, state, data);
+    },
     failure: (state, payload) => update(state, {
         isFetching: {$set: false}
     })

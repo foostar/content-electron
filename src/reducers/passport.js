@@ -21,7 +21,7 @@ if (!fs.existsSync(datDir)) {
 try {
     data = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
 } catch (err) {
-    console.log(err, 'no token file');
+    console.info(err, 'no token file');
 }
 
 const INITAL = {

@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Form, Input, Button, Layout} from 'antd';
 
 import style from './style.styl';
-import {platformsById} from 'utils/consts';
+import {platformsById} from 'lib/platforms';
 
 const FormItem = Form.Item;
 
@@ -10,9 +10,19 @@ const FormItem = Form.Item;
 class InputAccount extends Component {
     onSubmit = (e) => {
         e.preventDefault();
-        this.props.form.validateFields((err, values) => {
+        console.log(this.props.data.platform);
+        this.props.form.validateFields(async (err, values) => {
             if (err) return;
             this.props.nextStep(values);
+            // const {account, password} = values;
+            // const platform = new platformsById[this.props.data.platform].Class(account, password);
+            // try {
+            //     const data = await platform.login();
+            //     console.log(data);
+            //     this.props.nextStep(data);
+            // } catch (err) {
+            //     console.log(err);
+            // }
         });
     }
     render () {
@@ -30,6 +40,7 @@ class InputAccount extends Component {
                         <Layout.Content className={style.content}>
                             <FormItem>
                                 {getFieldDecorator('account', {
+                                    initialValue: '17600806970',
                                     // initialValue: 'mameiling@goyoo.com',
                                     rules: [{required: true, message: '请输入账号!'}]
                                 })(
@@ -38,7 +49,7 @@ class InputAccount extends Component {
                             </FormItem>
                             <FormItem>
                                 {getFieldDecorator('password', {
-                                    // initialValue: 'zxc123456',
+                                    initialValue: 'zxc123456',
                                     rules: [{required: true, message: '请输入密码!'}]
                                 })(
                                     <Input placeholder='密码' />

@@ -11,7 +11,7 @@ export default class FormSearch extends Component {
             wrapperCol: {span: 24}
         };
 
-        const {recentTag, getFieldDecorator, form, expand} = this.props;
+        const {recentTag, getFieldDecorator, form} = this.props;
         const options = recentTag.map((v, index) => {
             return <Option key={index} value={v}>{v}</Option>;
         });
@@ -96,10 +96,9 @@ export default class FormSearch extends Component {
             </div>
         ];
 
-        const shownCount = expand ? children.length : 3;
         return (
             <div>
-                {children.slice(0, shownCount)}
+                {children}
             </div>
         );
     }

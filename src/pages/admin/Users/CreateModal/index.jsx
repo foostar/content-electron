@@ -3,10 +3,11 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import * as usersActions from 'reducers/users';
 import * as upstreamsActions from 'reducers/upstreams';
+import {platformsById} from 'lib/platforms';
 
 import {
     Modal, Button, Form, Input,
-    Radio, Tag, Select, Alert
+    Radio, Select, Alert
 } from 'antd';
 
 const FormItem = Form.Item;
@@ -122,11 +123,7 @@ class CreateModal extends Component {
                         >
                             {this.props.upstreams.map(item =>
                                 <Option key={item.id}>
-                                    {item.platform === '企鹅号'
-                                        ? <Tag color='purple'>{item.platform}</Tag>
-                                        : <Tag color='blue'>{item.platform}</Tag>
-                                    }
-                                    {item.nickname}
+                                    [{platformsById[item.platform].name}] {item.nickname}
                                 </Option>
                             )}
 

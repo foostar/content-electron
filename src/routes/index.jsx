@@ -14,6 +14,10 @@ import AdminUsers from 'pages/admin/Users';
 import AdminArticles from 'pages/admin/Articles';
 import AdminEditor from 'pages/admin/Editor';
 import AdminUpstreams from 'pages/admin/Upstreams';
+import AdminStat from 'pages/admin/Stat';
+import AdminStatByPlatform from 'pages/admin/Stat/Platform';
+import AdminStatByRedactor from 'pages/admin/Stat/Redactor';
+import AdminStatByAuthor from 'pages/admin/Stat/Author';
 
 import store from 'store';
 
@@ -52,9 +56,16 @@ export default (
             <Route path='console2' component={Console} />
             <Route path='admin'>
                 <Route path='users' component={AdminUsers} />
-                <Route path='articles' component={AdminArticles} />
-                <Route path='editor' component={AdminEditor} />
+                <Route path='articles'>
+                    <IndexRoute component={AdminArticles} />
+                    <Route path='editor' component={AdminEditor} />
+                </Route>
                 <Route path='upstreams' component={AdminUpstreams} />
+                <Route path='stat' component={AdminStat}>
+                    <IndexRoute component={AdminStatByPlatform} />
+                    <Route path='redactor' component={AdminStatByRedactor} />
+                    <Route path='author' component={AdminStatByAuthor} />
+                </Route>
             </Route>
             <Route path='*' component={NotFound} />
         </Route>

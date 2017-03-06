@@ -2,15 +2,15 @@ import React, {Component} from 'react';
 import {Card} from 'antd';
 
 import style from './style.styl';
-import {platforms} from 'utils/consts';
+import platforms from 'lib/platforms';
 
 class ChoosePlatform extends Component {
     render () {
         return (
             <div className={style.platforms}>
-                {platforms.map(item =>
+                {platforms.map((item, idx) =>
                     <Card
-                        key={item.name}
+                        key={idx}
                         className={style['platform-card'] + (item.disabled ? ` ${style['platform-disabled']}` : '')}
                         onClick={() => item.disabled || this.props.nextStep({platform: item.id})}>
                         <div

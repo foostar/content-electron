@@ -3,11 +3,14 @@ import passport from './passport';
 import editor from './editor';
 import upstreams from './upstreams';
 import articles from './articles';
+import reproduction from './reproduction';
+
 import adminArticles from './admin/articles';
 import adminEditor from './admin/editor';
 import users from './users';
 
 export default combineReducers({
+    reproduction,
     passport,
     users,
     editor,

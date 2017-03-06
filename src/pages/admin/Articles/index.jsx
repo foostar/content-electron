@@ -6,9 +6,10 @@ import {Link} from 'react-router';
 import {bindActionCreators} from 'redux';
 import Page from 'components/Page';
 import FormSearch from './FormSearch';
-import PublishModal from './PublishModal';
+import PublishModal from 'components/PublishModal';
 import * as actions from 'reducers/admin/articles';
 import moment from 'moment';
+import {findDOMNode} from 'react-dom';
 
 const Option = Select.Option;
 const mapStateToProps = state => {
@@ -60,106 +61,56 @@ export default class extends Component {
         this.props.pageChange(page);
         this.fetchData(page);
     }
-    addTag = (tag) => {
-        this.props.addTag({
-            params: {
-                id: tag.id,
-                tag: tag.value[0]
-            }
-        });
-    }
     renderTag = (_, record) => {
-        const tags = record.tags.map((v, index) => {
-            return (
-                <Tag
-                    closable
-                    className={style['table-tag']}
-                    key={index}
-                    afterClose={() => this.removeTag({id: record.id, value: v})}>
-                    {v}
-                </Tag>
-            );
-        });
         const {recentTag} = this.props.articles;
-        const children = recentTag.map((v, index) => {
-            return <Option key={index} value={v}>{v}</Option>;
-        });
+        const {addTag, removeTag} = this.props;
         return (
-            <div>
-                {tags}
-                {!record.inputVisible &&
-                    <Button
-                        size='small'
-                        type='dashed'
-                        onClick={() => this.showNewTag(record.id)}
-                    >
-                        + 新标签
-                    </Button>
-                }
-                {record.inputVisible && (
-                    <Select
-                        tags
-                        ref={`select-${record.id}`}
-                        style={{width: '100%'}}
-                        searchPlaceholder='标签模式'
-                        onChange={(value) => this.addTag({id: record.id, value})}
-                        value={record.inputValue}
-                    >
-                        {children}
-                    </Select>
-                )}
-            </div>
+            <TagSelector
+                recentTag={recentTag}
+                record={record}
+                removeTag={removeTag}
+                addTag={addTag}
+            />
         );
     }
-    removeTag (data) {
-        this.props.removeTag({
-            params: {
-                id: data.id,
-                tag: data.value
-            }
-        });
-    }
+
     handleReset = () => {
         this.props.form.resetFields();
         this.props.changeForm({});
     }
-    showNewTag (id) {
-        this.props.showNewTag({isShow: true, id});
-    }
+
     columns = [{
         title: '文章标题',
         dataIndex: 'title',
-        key: 'title'
+        width: 300,
+        key: 'title',
+        render: (title, record) => <Link to={`/admin/articles/editor?articleId=${record.id}`}>{title}</Link>
     }, {
         title: '作者',
         dataIndex: 'author',
         key: 'author',
+        width: 100,
         render: author => author ? author.username : '作者已被删除'
     }, {
         title: '文章分类',
         dataIndex: 'category',
-        key: 'category'
+        key: 'category',
+        width: 80
     }, {
         title: '创建时间',
         dataIndex: 'createdAt',
+        width: 120,
         key: 'createdAt',
         render: (time) => moment(time).format('YY-M-D h:m')
     }, {
         title: '文章标签',
-        dataIndex: 'tag',
         key: 'tag',
-        width: 200,
         render: this.renderTag
     }, {
         title: '操作',
         key: 'action',
         width: 90,
-        render: (text, record) => (
-            <span>
-                <Link to={`/admin/editor?articleId=${record.id}`}>编辑</Link>
-                &emsp;<PublishModal content={record} />
-            </span>
-      )
+        render: (text, record) => <PublishModal content={record} ><a>发布</a></PublishModal>
     }]
     render () {
         const {getFieldDecorator} = this.props.form;
@@ -176,9 +127,6 @@ export default class extends Component {
                                     清空
                                 </Button>
                                 <Button type='primary' htmlType='submit'>搜索</Button>
-                                { /* <a style={{marginLeft: 8, fontSize: 12}} onClick={this.props.toggle}>
-                                    {expand ? '合上' : '展开'} <Icon type={expand ? 'up' : 'down'} />
-                                </a> */ }
                             </div>
                         </Form>
                     </Layout.Sider>
@@ -194,6 +142,83 @@ export default class extends Component {
                     </Layout.Content>
                 </Layout>
             </Page>
+        );
+    }
+}
+
+class TagSelector extends Component {
+    state = {
+        inputVisible: false,
+        inputValue: []
+    }
+
+    addTag = (v) => {
+        if (!v) return;
+        this.props.addTag({
+            params: {
+                id: this.props.record.id,
+                tag: v[0]
+            }
+        });
+        this.setState({inputValue: []});
+    }
+    removeTag = (tag) => {
+        console.log(tag);
+        this.props.removeTag({
+            params: {
+                id: this.props.record.id,
+                tag
+            }
+        });
+    }
+
+    toggleVisible = () => {
+        this.setState({
+            inputVisible: !this.state.inputVisible
+        }, () => {
+            this.refs.select && findDOMNode(this.refs.select).click();
+        });
+    }
+
+    render () {
+        const {record: {tags}, recentTag} = this.props;
+        return (
+            <div>
+                {tags.map((label, index) =>
+                    <Tag
+                        closable
+                        key={index}
+                        className={style['table-tag']}
+                        afterClose={() => this.removeTag(label)}>
+                        {label}
+                    </Tag>
+                )}
+                {this.state.inputVisible ? (
+                    <Select
+                        tags
+                        size='small'
+                        ref='select'
+                        style={{width: '100%'}}
+                        onBlur={this.toggleVisible}
+                        searchPlaceholder='标签模式'
+                        onChange={this.addTag}
+                        value={this.state.inputValue}
+                    >
+                        {recentTag.map((v, index) =>
+                            <Option key={index} value={v}>{v}</Option>
+                        )}
+                    </Select>
+                ) : (
+                    <Button
+                        size='small'
+                        type='dashed'
+                        onClick={this.toggleVisible}
+                    >
+                        <span>+ 新标签</span>
+                    </Button>
+                )
+                }
+            </div>
         );
     }
 }

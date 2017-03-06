@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import * as usersActions from 'reducers/users';
 import * as upstreamsActions from 'reducers/upstreams';
-import {platformsById} from 'utils/consts';
+import {platformsById} from 'lib/platforms';
 
 import {
     Modal, Button, Form, Input,

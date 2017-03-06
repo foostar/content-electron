@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {hashHistory} from 'react-router';
-import {Form, Button, Input, Select, notification, Upload, Icon, message, Layout, Spin} from 'antd';
+import {Form, Button, Input, Select, notification, Upload, Icon, message, Layout, Spin, Tag} from 'antd';
 import * as actions from 'reducers/editor';
 
 import Page from 'components/Page';
@@ -13,6 +13,7 @@ import 'froala-editor/js/froala_editor.pkgd.min.js';
 import 'froala-editor/css/froala_editor.pkgd.min.css';
 import 'font-awesome/css/font-awesome.css';
 import FroalaEditor from 'react-froala-wysiwyg';
+import PublishModal from 'components/PublishModal';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const OptGroup = Select.OptGroup;
@@ -38,9 +39,8 @@ export default class Editor extends Component {
         }
         this.props.clearArticle();
     }
-    handleSubmit = (e) => {
+    fetchData = () => new Promise(async (resolve, reject) => {
         const {articleId} = this.props.router.location.query;
-        e.preventDefault();
         this.props.form.validateFields(async (err, values) => {
             const {content, isFetching} = this.props.editor;
             if (err) return;
@@ -57,25 +57,32 @@ export default class Editor extends Component {
                 type: 'article',
                 content: _content
             });
-
             if (articleId) {
                 const {type} = await this.props.editArticle({
                     body: data,
                     params: articleId
                 });
                 if (type === 'EDITARTICLE_SUCCESS') {
-                    hashHistory.replace('/articles');
+                    return resolve(true);
                 }
-                return;
             }
-
             const {type} = await this.props.addArticle({
                 body: data
             });
             if (type === 'ADDARTICLE_SUCCESS') {
-                hashHistory.replace('/articles');
+                return resolve(true);
             }
         });
+    })
+    handleSubmit = async (e) => {
+        e.preventDefault();
+        const result = await this.fetchData();
+        if (result) {
+            this.addSuccess();
+        }
+    }
+    addSuccess = () => {
+        hashHistory.replace('/articles');
     }
     replaceImg (content) {
         const modelDom = this.refs.model;
@@ -175,6 +182,7 @@ export default class Editor extends Component {
             parent.css({position: 'relative'}).append('<i style="margin-left:3px" class="editor fa fa-pencil-square-o fa-2x" aria-hidden="true"></i>');
             $('.editor').unbind('click');
             $('.editor').on('click', () => {
+                $('.editor').unbind('click');
                 $('.editor').remove();
                 this.props.handleImg(Img.attr('src'));
             });
@@ -200,7 +208,15 @@ export default class Editor extends Component {
         .then(json => json);
     }
     handleEditorChange = (content) => {
-        this.props.updateModel(content);
+        const modelDom = $(this.refs.model);
+        modelDom.html(content);
+        const imgs = modelDom.find('img');
+        if (imgs.parent().attr('data-wrap')) {
+            return this.props.updateModel(content);
+        }
+        imgs.wrap('<div data-wrap="true"></div>');
+        const newContent = modelDom.html();
+        this.props.updateModel(newContent);
     }
     imageProcess = async (src, blob) => {
         this.props.fetching();
@@ -215,7 +231,7 @@ export default class Editor extends Component {
     }
     render () {
         const {content, title, category, isFetching, modalVisible, isAlter, originSrc} = this.props.editor;
-        const {getFieldDecorator} = this.props.form;
+        const {getFieldDecorator, getFieldValue} = this.props.form;
         const self = this;
         const props = {
             name: 'file',
@@ -262,6 +278,9 @@ export default class Editor extends Component {
                                     })(
                                         <Input placeholder='输入文章标题' />
                                     )}
+                                    <Tag className={style['text-num']} color='blue'>
+                                        已输入 {(getFieldValue('title') || {}).length || '0'} 个字
+                                    </Tag>
                                 </FormItem>
                                 <FormItem
                                 >
@@ -306,6 +325,7 @@ export default class Editor extends Component {
                                         </Select>
                                     )}
                                 </FormItem>
+                                <FormItem />
                                 <FormItem
                                     hasFeedback
                                 >
@@ -331,9 +351,17 @@ export default class Editor extends Component {
                                     imageProcess={this.imageProcess}
                                 /> }
                                 <div className={style.disappear} ref='model' />
+
                             </Layout.Content>
                             <Layout.Footer className={style.footer}>
                                 <Button type='primary' htmlType='submit'>提交</Button>
+                                {this.props.passport.data.level !== 1 && <PublishModal
+                                    beforeShowModal={this.fetchData}
+                                    content={this.props.editor}
+                                    afterClose={this.addSuccess}
+                                >
+                                    <Button type='primary'>发布</Button>
+                                </PublishModal>}
                             </Layout.Footer>
                             <Button className='editbutton' style={{display: 'none'}}>
                                 <Icon type='edit' /> 编辑

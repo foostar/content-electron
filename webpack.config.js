@@ -71,10 +71,6 @@ const config = {
                 test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
                 loader: 'file-loader?limit=10000&mimetype=image/svg+xml'
             }
-            // {
-            //     test: /trix.js$/,
-            //     loader: 'exports-loader?window.Trix!script'
-            // }
 
         ]
     },
@@ -84,10 +80,6 @@ const config = {
             path.resolve(__dirname, 'src')
         ],
         extensions: ['.js', '.jsx', '.json']
-        // alias: {
-        //     Trix: path.resolve(__dirname, 'src', 'lib/trix.js')
-        // }
-        // modulesDirectories: ['node_modules']
     },
     plugins: [
         new HtmlWebpackPlugin({
