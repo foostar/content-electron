@@ -288,8 +288,8 @@ class PublishContent extends Component {
                 params: this.props.content.id
             });
             let {title, content} = res.payload.result.data;
-            const data = await platform.publish(title, {content}, this.refs.wrap);
-            this.props.nextStep(data);
+            const link = await platform.publish(title, {content}, this.refs.wrap);
+            this.props.nextStep({link});
         } catch (err) {
             console.log(err);
         }

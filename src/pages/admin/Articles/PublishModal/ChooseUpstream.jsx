@@ -8,9 +8,11 @@ class ChooseUpstream extends Component {
     render () {
         const {visibleUpstreams, upstreams} = this.props;
 
-        const list = visibleUpstreams
-            ? upstreams.filter(u => visibleUpstreams.includes(u))
-            : upstreams;
+        console.log('============', upstreams);
+
+        const list = visibleUpstreams === 'all'
+            ? upstreams
+            : upstreams.filter(u => visibleUpstreams.includes(u.id));
 
         return (
             <div>

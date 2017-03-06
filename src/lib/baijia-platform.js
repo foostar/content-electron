@@ -58,6 +58,19 @@ export default class BaijiaPlatform extends Platform {
     }
     _publish (webview, title, data) {
         const helper = new WebviewHelper(webview);
+        function bodyCheck (res) {
+            try {
+                return JSON.parse(res.body).status === 'analyze';
+            } catch (err) {
+                console.info('isPublishReq', err);
+            }
+        }
+        function urlCheck (response) {
+            const {url} = response;
+            console.log(url);
+            console.log(url.match(/builderinner\/api\/content\/article\/(\d+)\/update/));
+            return url.match(/builderinner\/api\/content\/article\/(\d+)\/update/);
+        }
         return new Promise(async (resolve, reject) => {
             const {publishUrl} = this;
             webview.loadURL(publishUrl);
@@ -66,30 +79,18 @@ export default class BaijiaPlatform extends Platform {
                 if (url.startsWith(publishUrl)) {
                     this.injectPublishScript(webview, title, data);
                     try {
-                        const res = await helper.getRresponse(({res}) => {
-                            if (!res.url.match(/baijiahao\.baidu\.com\/builderinner\/api\/content\/article\/(\d+)\/update/)) {
-                                return false;
-                            }
-                            let isPublishReq;
-                            try {
-                                isPublishReq = JSON.parse(res.body).status === 'analyze';
-                            } catch (err) {
-                                console.info(err);
-                            }
-                            if (isPublishReq && isPublishReq.status === 'analyze') {
-                                return true;
-                            }
-                        });
+                        const res = await helper.getRresponse(urlCheck, bodyCheck);
                         const result = JSON.parse(res.body);
-                        resolve(result);
+                        const link = result.url.replace(/https?:\/\//, '');
+                        resolve(link);
                     } catch (err) {
+                        console.log('JSON??', err);
                         reject(err);
                     } finally {
                         webview.removeEventListener('dom-ready', didDomReady);
                     }
                 }
             };
-
             webview.addEventListener('dom-ready', didDomReady);
         });
     }
@@ -152,12 +153,6 @@ export default class BaijiaPlatform extends Platform {
                 }
 
                 const res = await helper.fetchJSON(`http://baijiahao.baidu.com/builderinner/api/content/analysis/getArticleList?app_id=${id}&start=${startTime}&end=${endTime}&page=${page}&page_size=100`);
-
-                // const res = await this.executeJavaScript(`
-                //     fetch('http://baijiahao.baidu.com/builderinner/api/content/analysis/getArticleList?app_id=${id}&start=${startTime}&end=${endTime}&page=${page}&page_size=100', {
-                //         credentials: 'include'
-                //     }).then(res => res.json())
-                // `);
 
                 const {list = []} = res.data;
 

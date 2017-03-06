@@ -44,6 +44,7 @@ class PublishModal extends Component {
         data: {}
     }
     showModal = async () => {
+        console.log(123);
         if (await this.props.beforeShowModal()) {
             this.props.upstreamsActions.fetchUpstreams();
             this.setState({visible: true});
@@ -62,20 +63,21 @@ class PublishModal extends Component {
                 body: {
                     link: data.link,
                     content: this.props.content.id,
-                    upstream: this.state.data.upstream
+                    upstream: this.state.data.upstream.id
                 }
             });
-            return this.onCancel();
         }
 
         const {current} = this.state;
 
-        // if (current === 2) {
-        this.setState({
-            current: current + 1,
-            data: merge({}, data, this.state.data)
-        });
-        // }
+        if (current !== 2) {
+            this.setState({
+                current: current + 1,
+                data: merge({}, data, this.state.data)
+            });
+        } else {
+            return this.onCancel();
+        }
     }
     clearData = () => {
         this.setState({
@@ -90,13 +92,11 @@ class PublishModal extends Component {
         const authorBindUpstreams = (content.author || {}).bindUpstreams || [];
         const {myBindUpstreams = []} = this.props;
 
-        let visibleUpstreams;
+        let visibleUpstreams = myBindUpstreams;
 
         if (this.props.myLevel === 0) {
-            visibleUpstreams = null;
-        } else if (authorBindUpstreams.length === 0) {
-            visibleUpstreams = myBindUpstreams;
-        } else {
+            visibleUpstreams = 'all';
+        } else if (authorBindUpstreams.length !== 0) {
             visibleUpstreams = visibleUpstreams.filter(u => myBindUpstreams.includes(u));
         }
 

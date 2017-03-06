@@ -120,11 +120,17 @@ export default class Platform extends Events {
         await this.releaseWebview(webview);
         return result;
     }
-    async stats (startTime, endTime) {
+    async statByContent () {
         const webview = await this.getWebview();
         await autoLoginWithCookies(webview, this.cookies);
-        const result = await this._stats(webview, startTime, endTime);
+        const result = await this._statByConent(webview);
         await this.releaseWebview(webview);
+        return result;
+    }
+    async statByUpstream (startTime, endTime) {
+        const webview = await this.getWebview();
+        await autoLoginWithCookies(webview, this.cookies);
+        const result = await this._statByUpstream(webview, startTime, endTime);
         return result;
     }
     _login () {
@@ -136,7 +142,10 @@ export default class Platform extends Events {
     _publish () {
         throw new Error('请重写_publish方法！');
     }
-    _stats () {
-        throw new Error('请重写_stats方法！');
+    _statByContent () {
+        throw new Error('请重写_statByConent方法！');
+    }
+    _statByUpstream () {
+        throw new Error('请重写statByUpstream方法！');
     }
 }

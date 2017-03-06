@@ -82,19 +82,19 @@ class StatByPlatform extends Component {
                 throw Error('didididi~~~');
         }
 
-        const data = (await wP.stats()).map(item => {
-            item.upstream = upstreamId;
-            return item;
-        });
+        console.log(await wP.statByUpstream());
 
-        await this.props.reproductionActions.updateMany({body: data});
-        await this.props.reproductionActions.fetchStat();
+        // const data = (await wP.stats()).map(item => {
+        //     item.upstream = upstreamId;
+        //     return item;
+        // });
 
-        message.success('更新成功');
-
-        this.setState({
-            loadingList: this.state.loadingList.filter(x => x !== upstreamId)
-        });
+        // await this.props.reproductionActions.updateMany({body: data});
+        // await this.props.reproductionActions.fetchStat();
+        // message.success('更新成功');
+        // this.setState({
+        //     loadingList: this.state.loadingList.filter(x => x !== upstreamId)
+        // });
     }
 
     render () {
