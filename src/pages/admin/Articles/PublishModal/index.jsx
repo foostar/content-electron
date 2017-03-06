@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import * as articlesActions from 'reducers/articles';
 import * as upstreamsActions from 'reducers/upstreams';
+import * as reproductionActions from 'reducers/reproduction';
 import {merge} from 'lodash';
 
 import style from './style.styl';
@@ -16,6 +17,7 @@ const {Step} = Steps;
 
 const mapStateToProps = (state, props) => {
     return {
+        passport: state.passport.data,
         upstreams: state.upstreams.data,
         myBindUpstreams: state.passport.data.bindUpstreams,
         myLevel: state.passport.data.level
@@ -23,6 +25,7 @@ const mapStateToProps = (state, props) => {
 };
 const mapDispatchToProps = dispatch => {
     return {
+        reproduction: bindActionCreators(reproductionActions, dispatch),
         articlesActions: bindActionCreators(articlesActions, dispatch),
         upstreamsActions: bindActionCreators(upstreamsActions, dispatch)
     };
@@ -49,17 +52,30 @@ class PublishModal extends Component {
     onCancel = () => {
         this.setState({visible: false});
     }
-    nextStep = (data) => {
-        if (data === 'success') {
+    nextStep = async (data) => {
+        if (data.link) {
+            // link: data.link,
+            // data: Date.now() | 20170301,
+            // publisher: passport.id
+            // content: content.id
+            await this.props.reproduction.upsert({
+                body: {
+                    link: data.link,
+                    content: this.props.content.id,
+                    upstream: this.state.data.upstream
+                }
+            });
             return this.onCancel();
         }
+
         const {current} = this.state;
-        if (current !== 2) {
-            this.setState({
-                current: current + 1,
-                data: merge({}, data, this.state.data)
-            });
-        }
+
+        // if (current === 2) {
+        this.setState({
+            current: current + 1,
+            data: merge({}, data, this.state.data)
+        });
+        // }
     }
     clearData = () => {
         this.setState({

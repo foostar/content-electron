@@ -59,9 +59,25 @@ export default class BaijiaPlatform extends Platform {
                 if (url.startsWith(publishUrl)) {
                     this.injectPublishScript(title, data);
                     try {
-                        const res = await this.getRresponse('https://om.qq.com/article/publish?relogin=1');
-                        const data = JSON.parse(res.body);
-                        resolve(data);
+                        // 百家号
+                        const res = await this.getRresponse(({res}) => {
+                            if (!res.url.match(/baijiahao\.baidu\.com\/builderinner\/api\/content\/article\/(\d+)\/update/)) {
+                                return false;
+                            }
+                            let isPublishReq;
+                            try {
+                                isPublishReq = JSON.parse(res.body).status === 'analyze';
+                            } catch (err) {
+                                console.info(err);
+                            }
+                            if (isPublishReq && isPublishReq.status === 'analyze') {
+                                return true;
+                            }
+                        });
+
+                        const result = JSON.parse(res.body);
+                        const link = encodeURIComponent(result.url.replace(/https?:\/\//, ''));
+                        resolve(link);
                     } catch (err) {
                         reject(err);
                     } finally {

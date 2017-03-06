@@ -64,7 +64,7 @@ export const fetchStat = createCallApi(HUSSIF, {
 
 export const upsert = createCallApi(HUSSIF, {
     type: 'UPSERT_REPRODUCTION',
-    endpoint: '/reproduction/:id',
+    endpoint: '/reproduction/',
     method: 'POST',
     request: (state) => update(state, {
         fetching: {$set: true}
@@ -81,7 +81,7 @@ export const upsert = createCallApi(HUSSIF, {
 
 export const updateMany = createCallApi(HUSSIF, {
     type: 'UPDATE_REPRODUCTION',
-    endpoint: '/reproduction/update',
+    endpoint: '/reproduction/batch',
     method: 'POST',
     request: (state) => update(state, {
         fetching: {$set: true}

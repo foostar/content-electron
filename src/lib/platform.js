@@ -57,14 +57,26 @@ export default class Platform extends Events {
     getRresponse (url) {
         return new Promise((resolve, reject) => {
             const {webview} = this;
-            const _debugger = this._debugger = webview.getWebContents().debugger;
-            // _debugger.attach('1.1');
-            _debugger.on('message', (event, method, {response, requestId, type}) => {
+            const webContents = webview.getWebContents();
+
+            if (webContents.isDevToolsOpened()) {
+                return reject('Dev tools has opended');
+            }
+            let _debugger;
+
+            if (this._debugger) {
+                _debugger = this._debugger;
+            } else {
+                this._debugger = _debugger = webContents.debugger;
+                this._debugger.attach('1.1');
+            }
+            _debugger.on('message', (event, method, params) => {
+                const {response, requestId, type} = params;
                 if (method === 'Network.responseReceived' && type === 'XHR') {
                     if (typeof url === 'string' ? response.url !== url : !url(response)) return;
                     _debugger.sendCommand('Network.getResponseBody', {requestId}, (err, res) => {
                         if (err) {
-                            return reject(err);
+                            console.info('Network.getResponseBody', err);
                         }
                         resolve(res);
                     });

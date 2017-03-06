@@ -62,16 +62,6 @@ export default class OMQQPlatform extends Platform {
                 }
             };
 
-            // try {
-            //     const res = await this.getRresponse('https://om.qq.com/article/publish?relogin=1');
-            //     const data = JSON.parse(res.body);
-            //     resolve(data);
-            // } catch (err) {
-            //     reject(err);
-            // } finally {
-            //     webview.removeEventListener('dom-ready', didDomReady);
-            // }
-
             webview.addEventListener('dom-ready', didDomReady);
         });
     }
@@ -85,9 +75,13 @@ export default class OMQQPlatform extends Platform {
                 if (url.startsWith(publishUrl)) {
                     this.injectPublishScript(title, data);
                     try {
-                        const res = await this.getRresponse('https://om.qq.com/article/publish?relogin=1');
-                        const data = JSON.parse(res.body);
-                        resolve(data);
+                        // 企鹅号
+                        // const res = await this.getRresponse('https://om.qq.com/article/publish?relogin=1');
+                        const res = await this.getRresponse('https://om.qq.com/article/getWhiteListOfWordsInTitle?relogin=1');
+                        const result = JSON.parse(res.body);
+                        console.log(result);
+                        // const link = encodeURIComponent(result.data.article.Furl.replace(/https?:\/\//, ''));
+                        // resolve(link);
                     } catch (err) {
                         reject(err);
                     } finally {
@@ -100,7 +94,7 @@ export default class OMQQPlatform extends Platform {
         });
     }
 
-    injectPublishScript (title, {content}) {
+    async injectPublishScript (title, {content}) {
         return this.executeJavaScript(`
             (function() {
                 const el = document.querySelector('#ueditor_0');
