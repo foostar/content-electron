@@ -169,22 +169,20 @@ export default class Editor extends Component {
         }
     }
     bindImgEditor () {
-        $('.fr-element').on('mouseover', (e) => {
-            if (e.target.nodeName == 'IMG') {
-                const Img = $(e.target);
-                const parent = Img.parent();
-                parent.css({position: 'relative'}).append('<i style="margin-left:3px" class="editor fa fa-pencil-square-o fa-2x" aria-hidden="true"></i>');
-                Img.unbind('mouseout');
-                Img.on('mouseout', () => {
-                    setTimeout(() => {
-                        $('.editor').remove();
-                    }, 500);
-                });
-                $('.editor').on('click', () => {
-                    $('.editor').remove();
-                    this.props.handleImg(Img.attr('src'));
-                });
-            };
+        $('.fr-element').on('mouseover', 'img', (e) => {
+            const Img = $(e.target);
+            const parent = Img.parent();
+            parent.css({position: 'relative'}).append('<i style="margin-left:3px" class="editor fa fa-pencil-square-o fa-2x" aria-hidden="true"></i>');
+            $('.editor').unbind('click');
+            $('.editor').on('click', () => {
+                $('.editor').remove();
+                this.props.handleImg(Img.attr('src'));
+            });
+        });
+        $('.fr-element').on('mouseout', 'img', (e) => {
+            setTimeout(() => {
+                $('.editor').remove();
+            }, 500);
         });
     }
     async dropUpload (imgs) {
