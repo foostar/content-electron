@@ -131,6 +131,7 @@ export default class Platform extends Events {
         const webview = await this.getWebview();
         await autoLoginWithCookies(webview, this.cookies);
         const result = await this._statByUpstream(webview, startTime, endTime);
+        await this.releaseWebview(webview);
         return result;
     }
     _login () {

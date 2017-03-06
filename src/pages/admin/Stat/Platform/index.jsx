@@ -2,9 +2,10 @@ import React, {Component} from 'react';
 import style from './style.styl';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {uniqBy} from 'lodash';
-import {Link} from 'react-router';
+// import {uniqBy} from 'lodash';
+// import {Link} from 'react-router';
 import moment from 'moment';
+import LineGraph from 'components/LineGraph';
 import * as upstreamsActions from 'reducers/upstreams';
 import * as reproductionActions from 'reducers/reproduction';
 
@@ -12,10 +13,12 @@ import OMQQPlatform from 'lib/omqq-platform';
 import BaiJiaPlatform from 'lib/baijia-platform';
 import {platformsById} from 'lib/platforms';
 
-import {Table, DatePicker, Button, message} from 'antd';
+import {Table, DatePicker, Button, TreeSelect, Spin} from 'antd';
 
 const {RangePicker} = DatePicker;
 const {Column} = Table;
+// const Option = Select.Option;
+// const OptGroup = Select.OptGroup;
 
 const mapStateToProps = state => {
     return {
@@ -33,15 +36,17 @@ const mapDispatchToProps = dispatch => {
 @connect(mapStateToProps, mapDispatchToProps)
 class StatByPlatform extends Component {
     state = {
-        loadingList: [],
-        publishStart: moment().subtract(30, 'days').valueOf(),
-        publishEnd: Date.now()
+        loading: false,
+        selectUps: [],
+        statData: [],
+        upsData: [],
+        startTime: moment().subtract(30, 'days').valueOf(),
+        endTime: Date.now() - 1000 * 60 * 60 * 24
     }
     componentDidMount () {
-        if (!Object.keys(this.props.statByUpstream).length) {
-            this.queryStat();
-        }
-
+        // if (!Object.keys(this.props.statByUpstream).length) {
+        //     this.queryStat();
+        // }
         if (!this.props.upstreams.length) {
             this.props.upstreamsActions.fetchUpstreams();
         }
@@ -49,28 +54,44 @@ class StatByPlatform extends Component {
 
     changeDateRange = ([start, end]) => {
         this.setState({
-            publishStart: start.valueOf(),
-            publishEnd: end.valueOf()
+            startTime: start.valueOf(),
+            endTime: end.valueOf()
         });
     }
 
-    queryStat = async () => {
-        const {publishStart, publishEnd} = this.state;
-        await this.props.reproductionActions.fetchStatGroupByUpstream({
-            query: {publishStart, publishEnd}
+    changeUps = (selectUps) => {
+        this.setState({
+            selectUps
         });
-        message.success('查询成功');
     }
 
-    asyncStats = async (ups) => {
-        const {id: upstreamId, platform, account, password, session} = ups;
+    fetchUpstreamsStat = async () => {
+        this.setState({
+            loading: true,
+            statData: [],
+            upsData: []
+        });
+        const actions = this.props.upstreams
+            .filter(x => this.state.selectUps.includes(x.id))
+            .map(item => this.fetchSingleUpstreamStat(item));
+
+        const upsData = await Promise.all(actions);
+        const statData = [];
+
+        upsData.forEach(stat => {
+            statData.push(...stat.data);
+        });
 
         this.setState({
-            loadingList: this.state.loadingList.concat(upstreamId)
+            statData,
+            upsData,
+            loading: false
         });
+    }
 
+    fetchSingleUpstreamStat = async (ups) => {
+        const {id: upstreamId, platform, account, password, session, nickname} = ups;
         let wP;
-
         switch (platform) {
             case 'omqq':
                 wP = new OMQQPlatform(account, password, session);
@@ -81,103 +102,120 @@ class StatByPlatform extends Component {
             default:
                 throw Error('didididi~~~');
         }
-
-        console.log(await wP.statByUpstream());
-
-        // const data = (await wP.stats()).map(item => {
-        //     item.upstream = upstreamId;
-        //     return item;
-        // });
-
-        // await this.props.reproductionActions.updateMany({body: data});
-        // await this.props.reproductionActions.fetchStat();
-        // message.success('更新成功');
-        // this.setState({
-        //     loadingList: this.state.loadingList.filter(x => x !== upstreamId)
-        // });
+        const {startTime, endTime} = this.state;
+        const data = await wP.statByUpstream(startTime, endTime);
+        const name = `[${platformsById[platform].name}] ${nickname}`;
+        data.forEach(item => {
+            item['平台账号'] = name;
+        });
+        return {
+            upstreamId,
+            name,
+            data
+        };
     }
 
     render () {
-        const platTypes = uniqBy(this.props.upstreams, 'platform').map(item => {
-            const {platform} = item;
-            return {
-                text: platformsById[platform].name,
-                value: platform
-            };
-        });
+        const treeData = [
+            {
+                label: '百家号',
+                value: 'baijia',
+                children: this.props.upstreams.filter(x => x.platform === 'baijia').map(item => {
+                    return {
+                        label: item.nickname,
+                        value: item.id
+                    };
+                })
+            },
+            {
+                label: '企鹅号',
+                value: 'omqq',
+                children: this.props.upstreams.filter(x => x.platform === 'omqq').map(item => {
+                    return {
+                        label: item.nickname,
+                        value: item.id
+                    };
+                })
+
+            }
+        ];
         return (
-            <div>
-                <div>
+            <Spin spinning={this.state.loading}>
+                <div style={{textAlign: 'center'}}>
                     <RangePicker
                         size='large'
                         onChange={this.changeDateRange}
-                        value={[moment(this.state.publishStart), moment(this.state.publishEnd)]}
-                        disabledDate={current => current && current.valueOf() > Date.now()}
+                        value={[moment(this.state.startTime), moment(this.state.endTime)]}
+                        disabledDate={current => current && current.valueOf() > (Date.now() - 1000 * 60 * 60 * 24)}
                     />
+                    {' '}
+                    <TreeSelect
+                        size='large'
+                        style={{minWidth: 300}}
+                        multiple
+                        treeDefaultExpandAll
+                        treeCheckable
+                        searchPlaceholder='请选择平台需要查看的平台账号'
+                        value={this.state.selectUps}
+                        onChange={this.changeUps}
+                        treeData={treeData}
+                    />
+                    {/*
+                    <Select
+                        multiple
+                        size='large'
+                        placeholder='请选择平台需要查看的平台账号'
+                        style={{width: 400}}
+                        onChange={this.changeUps}
+                    >
+                        <OptGroup label='百家号' key='baijia' onClick={console.log}>
+                            {this.props.upstreams.filter(x => x.platform === 'baijia').map((item, idx) =>
+                                <Option key={idx} value={item.id}>{item.nickname}</Option>
+                            )}
+                        </OptGroup>
+                        <OptGroup label='企鹅号' key='omqq'>
+                            {this.props.upstreams.filter(x => x.platform === 'omqq').map((item, idx) =>
+                                <Option key={idx} value={item.id}>{item.nickname}</Option>
+                            )}
+                        </OptGroup>
+                    </Select>
+                    */}
                     <Button
                         size='large'
                         icon='search'
                         className={style['search-btn']}
-                        onClick={this.queryStat}
+                        onClick={this.fetchUpstreamsStat}
                     >
                         搜索
                     </Button>
                 </div>
                 <br />
+                <LineGraph width={900} data={this.state.statData} />
+                <br />
                 <Table
                     bordered
-                    rowKey='id'
+                    style={{margin: '0 50px'}}
+                    rowKey='upstreamId'
                     pagination={false}
-                    dataSource={this.props.upstreams}
+                    dataSource={this.state.upsData}
                 >
                     <Column
                         title='[平台] 账号昵称'
-                        dataIndex='platform'
-                        width={200}
-                        filters={platTypes}
-                        filterMultiple={false}
-                        onFilter={(value, record) => value === record.platform}
-                        render={(p, recod) => (
-                            <Link to={`/admin/stat/${recod.id}`}>
-                                [{platformsById[p].name}] {recod.nickname}
-                            </Link>
-                        )}
+                        dataIndex='name'
+                        width={'50%'}
+                        // render={(name, recod) => <Link to={`/admin/stat/${recod.upstreamId}`}>{name}</Link>}
                     />
                     <Column
-                        title='平台PV'
-                        key='pv'
-                        sorter={(a, b) => {
-                            const aStat = this.props.statByUpstream[a.id] || {total: 0};
-                            const bStat = this.props.statByUpstream[b.id] || {total: 0};
-                            return aStat.total - bStat.total;
-                        }}
-                        dataIndex='id'
-                        render={id => {
-                            const stat = this.props.statByUpstream[id] || {};
-                            return (
-                                <span>{stat.total || '无数据'}</span>
-                            );
-                        }}
-                    />
-                    <Column
-                        title='同步'
-                        key='async'
-                        render={(_, p) => {
-                            const loading = this.state.loadingList.includes(p.id);
-                            return (
-                                <Button
-                                    disabled={loading}
-                                    loading={loading}
-                                    onClick={() => this.asyncStats(p)}
-                                    size='small'
-                                    shape='circle'
-                                    icon='reload'
-                                />
-                            );
-                        }}
+                        width={'50%'}
+                        title='该时段该 PV 总数'
+                        key='view'
+                        dataIndex='data'
+                        sorter={(a, b) => a - b}
+                        render={(data) => data.reduce((view, b) => view + Number(b.view), 0)}
                     />
                 </Table>
-            </div>
+
+            </Spin>
         );
     }
 }

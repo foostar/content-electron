@@ -10,7 +10,6 @@ const FormItem = Form.Item;
 class InputAccount extends Component {
     onSubmit = (e) => {
         e.preventDefault();
-        console.log(this.props.data.platform);
         this.props.form.validateFields(async (err, values) => {
             if (err) return;
             this.props.nextStep(values);

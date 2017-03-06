@@ -44,7 +44,6 @@ class PublishModal extends Component {
         data: {}
     }
     showModal = async () => {
-        console.log(123);
         if (await this.props.beforeShowModal()) {
             this.props.upstreamsActions.fetchUpstreams();
             this.setState({visible: true});

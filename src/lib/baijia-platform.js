@@ -67,8 +67,6 @@ export default class BaijiaPlatform extends Platform {
         }
         function urlCheck (response) {
             const {url} = response;
-            console.log(url);
-            console.log(url.match(/builderinner\/api\/content\/article\/(\d+)\/update/));
             return url.match(/builderinner\/api\/content\/article\/(\d+)\/update/);
         }
         return new Promise(async (resolve, reject) => {
@@ -84,7 +82,6 @@ export default class BaijiaPlatform extends Platform {
                         const link = result.url.replace(/https?:\/\//, '');
                         resolve(link);
                     } catch (err) {
-                        console.log('JSON??', err);
                         reject(err);
                     } finally {
                         webview.removeEventListener('dom-ready', didDomReady);
@@ -121,64 +118,49 @@ export default class BaijiaPlatform extends Platform {
         webview.paste();
     }
 
-    _stats (webview, startTime, endTime) {
+    _statByContent (webview) {
+        // const helper = new WebviewHelper(webview);
+        throw Error('TODO');
+    }
+    async _statByUpstream (webview, startTime, endTime) {
+        if (!startTime || !endTime) {
+            throw Error('no startTime or endTime');
+        }
+        startTime = moment(startTime).format('YYYYMMDD');
+        endTime = moment(endTime).format('YYYYMMDD');
+
         const helper = new WebviewHelper(webview);
+        // helper.dev();
+        webview.loadURL('http://baijiahao.baidu.com/');
+        const appId = await helper.executeJavaScript(`
+            (function () {
+                const el = document.querySelector(".aside-action")
+                if (!el) return setTimeout(arguments.callee, 200);
+                return el.href.match(/app_id=(\\d+)/)[1];
+            })()
+        `);
+        const start = moment(startTime).format('YYYYMMDD');
+        const end = moment(endTime).format('YYYYMMDD');
 
-        return new Promise(async (resolve, reject) => {
-            if (startTime) {
-                if (!moment(startTime, 'YYYYMMDD').isValid()) return reject('startTime 格式不正确');
-            } else {
-                startTime = moment().subtract(30, 'days').format('YYYYMMDD');
+        const fetchListScript = `
+            function fetchList (page = 1, result = []) {
+                return fetch(\`http://baijiahao.baidu.com/builderinner/api/content/analysis/getChartInfo?app_id=${appId}&start=${start}&end=${end}&page=\${page}&size=100\`, {credentials: 'include'})
+                    .then(res => res.json())
+                    .then(json => {
+                        if (json.data.page.cur_page < json.data.page.total_page) {
+                            return fetchList(page + 1, result.concat(json.data.list));
+                        }
+                        return result.concat(json.data.list);
+                    });
             }
-
-            if (endTime) {
-                if (!moment(endTime, 'YYYYMMDD').isValid()) return reject('endTime 格式不正确');
-            } else {
-                endTime = moment().format('YYYYMMDD');
-            }
-
-            let page = 1;
-            let result = [];
-            let id;
-
-            const injectGetStatsScript = async () => {
-                if (!id) {
-                    id = await helper.executeJavaScript(`
-                        (function() {
-                            el = document.querySelector("a.aside-action");
-                            if (!el) return setTimeout(arguments.callee, 200);
-                            return el.getAttribute("href").match(/app_id=(\\d+)/)[1];
-                        })();
-                    `);
-                }
-
-                const res = await helper.fetchJSON(`http://baijiahao.baidu.com/builderinner/api/content/analysis/getArticleList?app_id=${id}&start=${startTime}&end=${endTime}&page=${page}&page_size=100`);
-
-                const {list = []} = res.data;
-
-                result.push(...list);
-
-                const {total_page, cur_page} = res.data;
-
-                if (cur_page < total_page) { // eslint-disable-line
-                    page += 1;
-                    return await injectGetStatsScript();
-                }
-
-                webview.removeEventListener('dom-ready', injectGetStatsScript);
-
-                result = result.map(item => {
-                    return {
-                        link: `baijiahao.baidu.com/builder/preview/s?id=${item.article_id}`,
-                        view: item.view_times,
-                        title: item.title,
-                        custom: item
-                    };
-                });
-                resolve(result);
+            fetchList();
+        `;
+        const list = await helper.executeJavaScript(fetchListScript);
+        return list.map(item => {
+            return {
+                view: Number(item.view_reader_num),
+                day: moment(item.day, 'YYYYMMDD').format('YYYY-MM-DD')
             };
-            webview.loadURL('http://baijiahao.baidu.com/');
-            webview.addEventListener('dom-ready', injectGetStatsScript);
         });
     }
 }

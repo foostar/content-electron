@@ -291,7 +291,7 @@ class PublishContent extends Component {
             const link = await platform.publish(title, {content}, this.refs.wrap);
             this.props.nextStep({link});
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     }
     render () {

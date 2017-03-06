@@ -122,7 +122,7 @@ class SigninPlatform extends Component {
             const data = await platform.login(this.refs.wrap);
             this.props.nextStep(data);
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     }
     render () {

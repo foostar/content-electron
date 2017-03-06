@@ -69,7 +69,6 @@ export default class OMQQPlatform extends Platform {
                     const res = await helper.getRresponse('https://om.qq.com/article/publish?relogin=1');
                     // const res = await helper.getRresponse('https://om.qq.com/article/getWhiteListOfWordsInTitle?relogin=1');
                     const result = JSON.parse(res.body);
-                    console.log(result);
                     const link = result.data.article.Furl.replace(/https?:\/\//, '');
                     resolve(link);
                 } catch (err) {
@@ -147,9 +146,11 @@ export default class OMQQPlatform extends Platform {
         //     };
     }
 
-    async _statByUpstream (webview, startTime = Date.now() - 1000 * 60 * 60 * 24 * 15, endTime = Date.now()) {
+    async _statByUpstream (webview, startTime, endTime) {
+        if (!startTime || !endTime) {
+            throw Error('no startTime or endTime');
+        }
         const helper = new WebviewHelper(webview);
-
         const cookies = await helper.getCookies();
         const userid = cookies.find(x => x.name === 'userid').value;
 
@@ -157,6 +158,11 @@ export default class OMQQPlatform extends Platform {
         const btime = ~~(startTime / 1000);
         const etime = ~~(endTime / 1000);
         const res = await helper.fetchJSON(`https://om.qq.com/Statistic/MediaDaily?media=${userid}&channel=0&fields=statistic_date,read,exposure_article,exposure,relay,collect,postil,read_uv&btime=${btime}&etime=${etime}&page=1&num=${days}&merge=0&type=articleDaily&relogin=1`);
-        console.log(res);
+        return res.data.statistic.map(item => {
+            return {
+                view: Number(item.read),
+                day: moment(item.statistic_date, 'YYYY-MM-DD').format('YYYY-MM-DD')
+            };
+        });
     }
 }

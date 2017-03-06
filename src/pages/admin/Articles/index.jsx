@@ -163,7 +163,6 @@ class TagSelector extends Component {
         this.setState({inputValue: []});
     }
     removeTag = (tag) => {
-        console.log(tag);
         this.props.removeTag({
             params: {
                 id: this.props.record.id,
