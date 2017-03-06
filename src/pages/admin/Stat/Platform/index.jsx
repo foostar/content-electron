@@ -87,7 +87,7 @@ class StatByPlatform extends Component {
             return item;
         });
 
-        await this.props.reproductionActions.updateMany({body: {data}});
+        await this.props.reproductionActions.updateMany({body: data});
         await this.props.reproductionActions.fetchStat();
 
         message.success('更新成功');

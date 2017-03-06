@@ -118,9 +118,8 @@ class SigninPlatform extends Component {
     async componentDidMount () {
         const {account, password, platform: platformId} = this.props.data;
         const platform = new platformsById[platformId].Class(account, password);
-        this.refs.wrap.appendChild(platform.webview);
         try {
-            const data = await platform.login();
+            const data = await platform.login(this.refs.wrap);
             this.props.nextStep(data);
         } catch (err) {
             console.log(err);

@@ -1,12 +1,19 @@
 import Platform from './platform';
+import WebviewHelper from 'utils/webview-helper';
 
 export default class OMQQPlatform extends Platform {
     loginUrl = 'https://om.qq.com/userAuth/index'
     publishUrl = 'https://om.qq.com/article/articlePublish'
     statsUrl = 'https://om.qq.com/statistic/ArticleReal?media=5394191&channel=0&page=2&num=8&btime=1&relogin=1'
-    _login () {
+    async _isLogin (webview) {
+        const helper = new WebviewHelper(webview);
+        const data = await helper.fetchJSON('https://om.qq.com/article/list?index=1&commentflag=0&source=0&relogin=1');
+        return data.response.code !== -10403;
+    }
+    _login (webview) {
+        const helper = new WebviewHelper(webview);
         return new Promise((resolve, reject) => {
-            const {webview, loginUrl, account, password} = this;
+            const {loginUrl, account, password} = this;
             webview.loadURL(loginUrl);
 
             // const timer = setTimeout(() => {
@@ -17,7 +24,7 @@ export default class OMQQPlatform extends Platform {
                 const url = webview.getURL();
                 // 登录界面
                 if (url.startsWith(loginUrl)) {
-                    this.executeJavaScript(`
+                    helper.executeJavaScript(`
                         (function() {
                             var el = document.querySelector('#LEmail')
                             if (!el) return setTimeout(arguments.callee, 200);
@@ -31,12 +38,12 @@ export default class OMQQPlatform extends Platform {
                 // 登录成功, 获取 cookies
                 if (url === 'https://om.qq.com/') {
                     try {
-                        const cookies = await this.getCookies();
+                        const cookies = await helper.getCookies();
                         const session = cookies.map(item => {
                             item.url = 'https://om.qq.com/';
                             return item;
                         });
-                        const nickname = await this.executeJavaScript('document.querySelector(".header-login-inner .name").innerText;');
+                        const nickname = await helper.executeJavaScript('document.querySelector(".header-login-inner .name").innerText;');
                         resolve({session, nickname});
                     } catch (err) {
                         reject(err);
@@ -49,53 +56,38 @@ export default class OMQQPlatform extends Platform {
             webview.addEventListener('dom-ready', didDomReady);
         });
     }
-    _isLogin () {
+    _publish (webview, title, data) {
+        const helper = new WebviewHelper(webview);
         return new Promise(async (resolve, reject) => {
-            const {webview} = this;
-            const checkUrl = 'https://om.qq.com/article/list?index=1&commentflag=0&source=0&relogin=1';
-            webview.loadURL(checkUrl);
-
-            const didDomReady = async () => {
-                const url = webview.getURL(checkUrl);
-                if (url.startsWith(checkUrl)) {
-                    console.log(url);
-                }
-            };
-
-            webview.addEventListener('dom-ready', didDomReady);
-        });
-    }
-    _publish (title, data) {
-        return new Promise(async (resolve, reject) => {
-            const {webview, publishUrl} = this;
+            const {publishUrl} = this;
             webview.loadURL(publishUrl);
 
             const didDomReady = async () => {
                 const url = webview.getURL();
                 if (url.startsWith(publishUrl)) {
-                    this.injectPublishScript(title, data);
-                    try {
-                        // 企鹅号
-                        // const res = await this.getRresponse('https://om.qq.com/article/publish?relogin=1');
-                        const res = await this.getRresponse('https://om.qq.com/article/getWhiteListOfWordsInTitle?relogin=1');
-                        const result = JSON.parse(res.body);
-                        console.log(result);
-                        // const link = encodeURIComponent(result.data.article.Furl.replace(/https?:\/\//, ''));
-                        // resolve(link);
-                    } catch (err) {
-                        reject(err);
-                    } finally {
-                        webview.removeEventListener('dom-ready', didDomReady);
-                    }
+                    this.injectPublishScript(webview, title, data);
+                }
+                try {
+                    // 企鹅号
+                    // const res = await this.getRresponse('https://om.qq.com/article/publish?relogin=1');
+                    const res = await helper.getRresponse('https://om.qq.com/article/getWhiteListOfWordsInTitle?relogin=1');
+                    const result = JSON.parse(res.body);
+                    console.log(result);
+                    const link = encodeURIComponent(result.data.article.Furl.replace(/https?:\/\//, ''));
+                    resolve(link);
+                } catch (err) {
+                    reject(err);
+                } finally {
+                    webview.removeEventListener('dom-ready', didDomReady);
                 }
             };
-
             webview.addEventListener('dom-ready', didDomReady);
         });
     }
 
-    async injectPublishScript (title, {content}) {
-        return this.executeJavaScript(`
+    injectPublishScript (webview, title, {content}) {
+        const helper = new WebviewHelper(webview);
+        return helper.executeJavaScript(`
             (function() {
                 const el = document.querySelector('#ueditor_0');
                 if (!el) return setTimeout(arguments.callee, 200);
@@ -120,17 +112,20 @@ export default class OMQQPlatform extends Platform {
         `);
     }
 
-    _stats () {
+    _stats (webview, startTime, endTime) {
+        const helper = new WebviewHelper(webview);
+
         return new Promise((resolve, reject) => {
-            const {webview} = this;
             let page = 1;
             let result = [];
             const injectGetStatsScript = async () => {
-                const res = await this.executeJavaScript(`
-                    fetch('https://om.qq.com/statistic/ArticleReal?channel=0&page=${page}&num=100&btime=1&relogin=1', {
-                        credentials: 'include'
-                    }).then(res => res.json())
-                `);
+                // const res = await this.executeJavaScript(`
+                //     fetch('https://om.qq.com/statistic/ArticleReal?channel=0&page=${page}&num=100&btime=1&relogin=1', {
+                //         credentials: 'include'
+                //     }).then(res => res.json())
+                // `);
+
+                const res = await helper.fetchJSON(`https://om.qq.com/statistic/ArticleReal?channel=0&page=${page}&num=100&btime=1&relogin=1`);
 
                 const {statistic = []} = res.data;
 
@@ -141,11 +136,11 @@ export default class OMQQPlatform extends Platform {
                     return await injectGetStatsScript();
                 }
 
-                this.webview.removeEventListener('dom-ready', injectGetStatsScript);
+                webview.removeEventListener('dom-ready', injectGetStatsScript);
 
                 result = result.map(item => {
                     return {
-                        id: encodeURIComponent(`kuaibao.qq.com/s/${item.articleId}`),
+                        link: `kuaibao.qq.com/s/${item.articleId}`,
                         view: item.read,
                         title: item.title,
                         custom: item

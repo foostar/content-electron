@@ -8,10 +8,10 @@ import {merge} from 'lodash';
 
 import style from './style.styl';
 import {Modal, Steps, Alert, Button} from 'antd';
-import {platformsById} from 'lib/platforms';
 
 import ChooseUpstream from './ChooseUpstream';
 import PublishContent from './PublishContent';
+import {platformsById} from 'lib/platforms';
 
 const {Step} = Steps;
 
@@ -101,14 +101,14 @@ class PublishModal extends Component {
         }
 
         const steps = [
-            '选择平台',
+            '选择账号',
             '发布文章',
             '确认完成'
         ];
 
         let title = steps[current];
         try {
-            title = `[${platformsById[data.upstream.platform].name}] ${data.upstream.nickname}`;
+            title = `[${platformsById[data.upstream.platform].name}] ${data.upstream.nickname || ''}`;
         } catch (err) {}
 
         return (
@@ -125,7 +125,7 @@ class PublishModal extends Component {
                     onCancel={this.onCancel}
                     afterClose={this.clearData}
                 >
-                    <Steps current={current}>
+                    <Steps className={style.steps} current={current}>
                         {steps.map(title => <Step key={title} title={title} />)}
                     </Steps>
                     <div className={style['steps-content']}>

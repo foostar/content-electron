@@ -1,8 +1,4 @@
 import React, {Component} from 'react';
-
-// import qieLogo from 'pages/admin/Upstreams/CreateModal/qi-e-logo.png';
-// import baiJiaLogo from 'pages/admin/Upstreams/CreateModal/bai-jia-logo.png';
-
 import {platformsById} from 'lib/platforms';
 
 import style from './style.styl';
