@@ -30,9 +30,11 @@ export default class WebviewHelper {
         this.webview.openDevTools();
     }
     fetchJSON (url) {
+        url = url.trim();
         return new Promise(resolve => {
             const {webview} = this;
             const didDomReady = async () => {
+                webview.openDevTools();
                 const currentUrl = webview.getURL(url);
                 if (currentUrl.startsWith(url)) {
                     const body = await this.executeJavaScript(`document.body.innerText`);

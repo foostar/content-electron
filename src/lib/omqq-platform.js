@@ -147,7 +147,7 @@ export default class OMQQPlatform extends Platform {
         //     };
     }
 
-    async _statByUpstream (webview, startTime, endTime) {
+    async _statByUpstream (webview, startTime = Date.now() - 1000 * 60 * 60 * 24 * 15, endTime = Date.now()) {
         const helper = new WebviewHelper(webview);
 
         const cookies = await helper.getCookies();
@@ -156,8 +156,7 @@ export default class OMQQPlatform extends Platform {
         const days = Math.ceil((endTime - startTime) / (60 * 60 * 24 * 1000));
         const btime = ~~(startTime / 1000);
         const etime = ~~(endTime / 1000);
-        const res = await helper.fetchJSON(`
-            https://om.qq.com/Statistic/MediaDaily?media=${userid}&channel=0&fields=statistic_date,read,exposure_article,exposure,relay,collect,postil,read_uv&btime=${btime}&etime=${etime}&page=1&num=${days}&merge=0&type=articleDaily&relogin=1
-        `);
+        const res = await helper.fetchJSON(`https://om.qq.com/Statistic/MediaDaily?media=${userid}&channel=0&fields=statistic_date,read,exposure_article,exposure,relay,collect,postil,read_uv&btime=${btime}&etime=${etime}&page=1&num=${days}&merge=0&type=articleDaily&relogin=1`);
+        console.log(res);
     }
 }
