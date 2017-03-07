@@ -4,6 +4,8 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 // import {uniqBy} from 'lodash';
 // import {Link} from 'react-router';
+import mapLimit from 'async/mapLimit';
+
 import moment from 'moment';
 import LineGraph from 'components/LineGraph';
 import * as upstreamsActions from 'reducers/upstreams';
@@ -71,21 +73,30 @@ class StatByPlatform extends Component {
             statData: [],
             upsData: []
         });
-        const actions = this.props.upstreams
-            .filter(x => this.state.selectUps.includes(x.id))
-            .map(item => this.fetchSingleUpstreamStat(item));
+        const upps = this.props.upstreams.filter(x => this.state.selectUps.includes(x.id));
 
-        const upsData = await Promise.all(actions);
-        const statData = [];
+        mapLimit(upps, 2, (x, done) => {
+            console.log(x);
+            this.fetchSingleUpstreamStat(x).then((result) => {
+                console.log(result);
+                done(null, result);
+            }, done);
+        }, (err, upsData) => {
+            if (err) {
+                this.setState({
+                    loading: false
+                });
+            }
+            const statData = [];
+            upsData.forEach(stat => {
+                statData.push(...stat.data);
+            });
 
-        upsData.forEach(stat => {
-            statData.push(...stat.data);
-        });
-
-        this.setState({
-            statData,
-            upsData,
-            loading: false
+            this.setState({
+                statData,
+                upsData,
+                loading: false
+            });
         });
     }
 
