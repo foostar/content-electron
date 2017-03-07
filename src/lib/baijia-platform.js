@@ -1,14 +1,21 @@
 import Platform from './platform';
 import moment from 'moment';
+import WebviewHelper from 'utils/webview-helper';
 
 export default class BaijiaPlatform extends Platform {
+    platformId = 'baijia'
     loginUrl = 'http://baijiahao.baidu.com/builder/app/login'
     publishUrl = 'http://baijiahao.baidu.com/builder/article/edit'
-    _login () {
+    async _isLogin (webview) {
+        const helper = new WebviewHelper(webview);
+        const data = await helper.fetchJSON('https://baijiahao.baidu.com/builderinner/api/content/marketing/income');
+        return data.error_code === 0;
+    }
+    _login (webview) {
+        const helper = new WebviewHelper(webview);
         return new Promise((resolve, reject) => {
-            const {webview, loginUrl, account, password} = this;
+            const {loginUrl, account, password} = this;
             webview.loadURL(loginUrl);
-
             // 登录会有输入验证码的情况, 不能做超时
             // const timer = setTimeout(() => {
             //     reject(new Error('timeout'));
@@ -18,7 +25,7 @@ export default class BaijiaPlatform extends Platform {
                 const url = webview.getURL();
                 // 登录界面
                 if (url.startsWith(loginUrl)) {
-                    await this.executeJavaScript(`
+                    await helper.executeJavaScript(`
                         (function() {
                             const el = document.querySelector('#TANGRAM__PSP_4__userName');
                             if (!el) return setTimeout(arguments.callee, 200);
@@ -32,12 +39,12 @@ export default class BaijiaPlatform extends Platform {
                 // 登录成功, 获取 cookies
                 if (url === 'http://baijiahao.baidu.com/') {
                     try {
-                        const cookies = await this.getCookies();
+                        const cookies = await helper.getCookies();
                         const session = cookies.map(item => {
                             item.url = 'http://baijiahao.baidu.com/';
                             return item;
                         });
-                        const nickname = await this.executeJavaScript('document.querySelector(".mp-header-user .author .name").innerText;');
+                        const nickname = await helper.executeJavaScript('document.querySelector(".mp-header-user .author .name").innerText;');
                         resolve({session, nickname});
                     } catch (err) {
                         reject(err);
@@ -50,18 +57,31 @@ export default class BaijiaPlatform extends Platform {
             webview.addEventListener('dom-ready', didDomReady);
         });
     }
-    _publish (title, data) {
+    _publish (webview, title, data) {
+        const helper = new WebviewHelper(webview);
+        function bodyCheck (res) {
+            try {
+                return JSON.parse(res.body).status === 'analyze';
+            } catch (err) {
+                console.info('isPublishReq', err);
+            }
+        }
+        function urlCheck (response) {
+            const {url} = response;
+            return url.match(/builderinner\/api\/content\/article\/(\d+)\/update/);
+        }
         return new Promise(async (resolve, reject) => {
-            const {webview, publishUrl} = this;
+            const {publishUrl} = this;
             webview.loadURL(publishUrl);
             const didDomReady = async () => {
                 const url = webview.getURL();
                 if (url.startsWith(publishUrl)) {
-                    this.injectPublishScript(title, data);
+                    this.injectPublishScript(webview, title, data);
                     try {
-                        const res = await this.getRresponse('https://om.qq.com/article/publish?relogin=1');
-                        const data = JSON.parse(res.body);
-                        resolve(data);
+                        const res = await helper.getRresponse(urlCheck, bodyCheck);
+                        const result = JSON.parse(res.body);
+                        const link = result.url.replace(/https?:\/\//, '');
+                        resolve(link);
                     } catch (err) {
                         reject(err);
                     } finally {
@@ -69,14 +89,13 @@ export default class BaijiaPlatform extends Platform {
                     }
                 }
             };
-
             webview.addEventListener('dom-ready', didDomReady);
         });
     }
 
-    async injectPublishScript (title, {content}) {
-        const {webview} = this;
-        await this.executeJavaScript(`
+    async injectPublishScript (webview, title, {content}) {
+        const helper = new WebviewHelper(webview);
+        await helper.executeJavaScript(`
             (function() {
                 const el = document.querySelector('#ueditor_0');
                 if (!el) return setTimeout(arguments.callee, 200);
@@ -100,68 +119,49 @@ export default class BaijiaPlatform extends Platform {
         webview.paste();
     }
 
-    _stats (startTime, endTime) {
-        return new Promise(async (resolve, reject) => {
-            if (startTime) {
-                if (!moment(startTime, 'YYYYMMDD').isValid()) return reject('startTime 格式不正确');
-            } else {
-                startTime = moment().subtract(30, 'days').format('YYYYMMDD');
+    _statByContent (webview) {
+        // const helper = new WebviewHelper(webview);
+        throw Error('TODO');
+    }
+    async _statByUpstream (webview, startTime, endTime) {
+        if (!startTime || !endTime) {
+            throw Error('no startTime or endTime');
+        }
+        startTime = moment(startTime).format('YYYYMMDD');
+        endTime = moment(endTime).format('YYYYMMDD');
+
+        const helper = new WebviewHelper(webview);
+        // helper.dev();
+        webview.loadURL('http://baijiahao.baidu.com/');
+        const appId = await helper.executeJavaScript(`
+            (function () {
+                const el = document.querySelector(".aside-action")
+                if (!el) return setTimeout(arguments.callee, 200);
+                return el.href.match(/app_id=(\\d+)/)[1];
+            })()
+        `);
+        const start = moment(startTime).format('YYYYMMDD');
+        const end = moment(endTime).format('YYYYMMDD');
+
+        const fetchListScript = `
+            function fetchList (page = 1, result = []) {
+                return fetch(\`http://baijiahao.baidu.com/builderinner/api/content/analysis/getChartInfo?app_id=${appId}&start=${start}&end=${end}&page=\${page}&size=100\`, {credentials: 'include'})
+                    .then(res => res.json())
+                    .then(json => {
+                        if (json.data.page.cur_page < json.data.page.total_page) {
+                            return fetchList(page + 1, result.concat(json.data.list));
+                        }
+                        return result.concat(json.data.list);
+                    });
             }
-
-            if (endTime) {
-                if (!moment(endTime, 'YYYYMMDD').isValid()) return reject('endTime 格式不正确');
-            } else {
-                endTime = moment().format('YYYYMMDD');
-            }
-
-            const {webview} = this;
-
-            let page = 1;
-            let result = [];
-            let id;
-
-            const injectGetStatsScript = async () => {
-                if (!id) {
-                    id = await this.executeJavaScript(`
-                        (function() {
-                            el = document.querySelector("a.aside-action");
-                            if (!el) return setTimeout(arguments.callee, 200);
-                            return el.getAttribute("href").match(/app_id=(\\d+)/)[1];
-                        })();
-                    `);
-                }
-
-                const res = await this.executeJavaScript(`
-                    fetch('http://baijiahao.baidu.com/builderinner/api/content/analysis/getArticleList?app_id=${id}&start=${startTime}&end=${endTime}&page=${page}&page_size=100', {
-                        credentials: 'include'
-                    }).then(res => res.json())
-                `);
-
-                const {list = []} = res.data;
-
-                result.push(...list);
-
-                const {total_page, cur_page} = res.data;
-
-                if (cur_page < total_page) { // eslint-disable-line
-                    page += 1;
-                    return await injectGetStatsScript();
-                }
-
-                this.webview.removeEventListener('dom-ready', injectGetStatsScript);
-
-                result = result.map(item => {
-                    return {
-                        id: encodeURIComponent(`baijiahao.baidu.com/builder/preview/s?id=${item.article_id}`),
-                        view: item.view_times,
-                        title: item.title,
-                        custom: item
-                    };
-                });
-                resolve(result);
+            fetchList();
+        `;
+        const list = await helper.executeJavaScript(fetchListScript);
+        return list.map(item => {
+            return {
+                view: Number(item.view_reader_num),
+                day: moment(item.day, 'YYYYMMDD').format('YYYY-MM-DD')
             };
-            webview.loadURL('http://baijiahao.baidu.com/');
-            webview.addEventListener('dom-ready', injectGetStatsScript);
         });
     }
 }

@@ -84,7 +84,7 @@ export default class extends Component {
         dataIndex: 'title',
         width: 300,
         key: 'title',
-        render: (title, record) => <Link to={`/editor?articleId=${record.id}`}>{title}</Link>
+        render: (title, record) => <Link style={{color: '#333', fontWeight: 500}} to={`/admin/articles/editor?articleId=${record.id}`}>{title}</Link>
     }, {
         title: '作者',
         dataIndex: 'author',
@@ -163,7 +163,6 @@ class TagSelector extends Component {
         this.setState({inputValue: []});
     }
     removeTag = (tag) => {
-        console.log(tag);
         this.props.removeTag({
             params: {
                 id: this.props.record.id,

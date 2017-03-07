@@ -3,19 +3,21 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import * as articlesActions from 'reducers/articles';
 import * as upstreamsActions from 'reducers/upstreams';
+import * as reproductionActions from 'reducers/reproduction';
 import {merge} from 'lodash';
 
 import style from './style.styl';
 import {Modal, Steps, Alert, Button} from 'antd';
-import {platformsById} from 'lib/platforms';
 
 import ChooseUpstream from './ChooseUpstream';
 import PublishContent from './PublishContent';
+import {platformsById} from 'lib/platforms';
 
 const {Step} = Steps;
 
 const mapStateToProps = (state, props) => {
     return {
+        passport: state.passport.data,
         upstreams: state.upstreams.data,
         myBindUpstreams: state.passport.data.bindUpstreams,
         myLevel: state.passport.data.level
@@ -23,6 +25,7 @@ const mapStateToProps = (state, props) => {
 };
 const mapDispatchToProps = dispatch => {
     return {
+        reproduction: bindActionCreators(reproductionActions, dispatch),
         articlesActions: bindActionCreators(articlesActions, dispatch),
         upstreamsActions: bindActionCreators(upstreamsActions, dispatch)
     };
@@ -51,16 +54,30 @@ class PublishModal extends Component {
     onCancel = () => {
         this.setState({visible: false});
     }
-    nextStep = (data) => {
-        if (data === 'success') {
-            return this.onCancel();
+    nextStep = async (data) => {
+        if (data.link) {
+            // link: data.link,
+            // data: Date.now() | 20170301,
+            // publisher: passport.id
+            // content: content.id
+            await this.props.reproduction.upsert({
+                body: {
+                    link: data.link,
+                    content: this.props.content.id,
+                    upstream: this.state.data.upstream.id
+                }
+            });
         }
+
         const {current} = this.state;
+
         if (current !== 2) {
             this.setState({
                 current: current + 1,
                 data: merge({}, data, this.state.data)
             });
+        } else {
+            return this.onCancel();
         }
     }
     clearData = () => {
@@ -77,25 +94,23 @@ class PublishModal extends Component {
         const authorBindUpstreams = (content.author || {}).bindUpstreams || [];
         const {myBindUpstreams = []} = this.props;
 
-        let visibleUpstreams;
+        let visibleUpstreams = myBindUpstreams;
 
         if (this.props.myLevel === 0) {
-            visibleUpstreams = null;
-        } else if (authorBindUpstreams.length === 0) {
-            visibleUpstreams = myBindUpstreams;
-        } else {
+            visibleUpstreams = 'all';
+        } else if (authorBindUpstreams.length !== 0) {
             visibleUpstreams = visibleUpstreams.filter(u => myBindUpstreams.includes(u));
         }
 
         const steps = [
-            '选择平台',
+            '选择账号',
             '发布文章',
             '确认完成'
         ];
 
         let title = steps[current];
         try {
-            title = `[${platformsById[data.upstream.platform].name}] ${data.upstream.nickname}`;
+            title = `[${platformsById[data.upstream.platform].name}] ${data.upstream.nickname || ''}`;
         } catch (err) {}
 
         return (
@@ -112,7 +127,7 @@ class PublishModal extends Component {
                     onCancel={this.onCancel}
                     afterClose={this.clearData}
                 >
-                    <Steps current={current}>
+                    <Steps className={style.steps} current={current}>
                         {steps.map(title => <Step key={title} title={title} />)}
                     </Steps>
                     <div className={style['steps-content']}>

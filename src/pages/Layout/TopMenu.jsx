@@ -21,11 +21,11 @@ export default class TopMenu extends Component {
             router: '/articles'
         }, {
             name: '平台账号',
-            level: l => l === 0 || l > 1,
+            level: l => l === 0,
             router: '/admin/upstreams'
         }, {
             name: '用户',
-            level: l => l === 0 || l > 1,
+            level: l => l === 0,
             router: '/admin/users'
         }, {
             name: '内容库',
@@ -33,8 +33,9 @@ export default class TopMenu extends Component {
             router: '/admin/articles'
         }, {
             name: '统计',
+            level: l => l === 0 || l > 1,
             router: '/admin/stat'
-        }];
+        }].filter(x => !x.level || x.level(this.props.passport.level));
         return (
             <div className={style.menu}>
                 {menu.map(x => (

@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import Page from 'components/Page';
 import style from './style.styl';
-import {IndexLink, Link} from 'react-router';
-import {Layout, Button} from 'antd';
+// import {IndexLink, Link} from 'react-router';
+import {Layout} from 'antd';
 // import {connect} from 'react-redux';
 // import moment from 'moment';
 // import {bindActionCreators} from 'redux';
@@ -15,7 +15,7 @@ import {Layout, Button} from 'antd';
 // import OMQQPlatform from 'lib/omqq-platform';
 // import BaiJiaPlatform from 'lib/baijia-platform';
 
-const {Header, Content} = Layout;
+const {Content} = Layout;
 
 // const mapStateToProps = state => {
 //     return {
@@ -36,17 +36,19 @@ class Stat extends Component {
         return (
             <Page>
                 <Layout className={style.layout}>
+                    {/*
                     <Header className={style.header}>
                         <IndexLink to='/admin/stat' activeClassName={style.active}>
                             <Button>按平台统计</Button>
                         </IndexLink>
                         <Link to='/admin/stat/redactor' activeClassName={style.active}>
-                            <Button>按小编统计</Button>
+                            <Button>按编辑统计</Button>
                         </Link>
                         <Link to='/admin/stat/author' activeClassName={style.active}>
-                            <Button>按内容提供者统计</Button>
+                            <Button>按作者统计</Button>
                         </Link>
                     </Header>
+                    */}
                     <Content style={{padding: 20}}>
                         {this.props.children}
                     </Content>

@@ -116,14 +116,13 @@ class QiE extends Component {
 // }
 class SigninPlatform extends Component {
     async componentDidMount () {
-        const {account, password, platform: platformId} = this.props.data;
-        const platform = new platformsById[platformId].Class(account, password);
-        this.refs.wrap.appendChild(platform.webview);
+        const {platform: platformId} = this.props.data;
+        const platform = new platformsById[platformId].Class(this.props.data);
         try {
-            const data = await platform.login();
+            const data = await platform.login(this.refs.wrap);
             this.props.nextStep(data);
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     }
     render () {

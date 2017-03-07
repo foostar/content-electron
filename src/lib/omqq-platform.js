@@ -1,23 +1,28 @@
 import Platform from './platform';
+import WebviewHelper from 'utils/webview-helper';
+import moment from 'moment';
 
 export default class OMQQPlatform extends Platform {
+    platformId = 'omqq'
     loginUrl = 'https://om.qq.com/userAuth/index'
     publishUrl = 'https://om.qq.com/article/articlePublish'
     statsUrl = 'https://om.qq.com/statistic/ArticleReal?media=5394191&channel=0&page=2&num=8&btime=1&relogin=1'
-    _login () {
+    async _isLogin (webview) {
+        const helper = new WebviewHelper(webview);
+        const data = await helper.fetchJSON('https://om.qq.com/article/list?index=1&commentflag=0&source=0&relogin=1');
+        return data.response.code !== -10403;
+    }
+    _login (webview) {
+        const helper = new WebviewHelper(webview);
         return new Promise((resolve, reject) => {
-            const {webview, loginUrl, account, password} = this;
+            const {loginUrl, account, password} = this;
             webview.loadURL(loginUrl);
-
-            // const timer = setTimeout(() => {
-            //     reject(new Error('timeout'));
-            // }, 10000);
 
             const didDomReady = async () => {
                 const url = webview.getURL();
                 // 登录界面
                 if (url.startsWith(loginUrl)) {
-                    this.executeJavaScript(`
+                    helper.executeJavaScript(`
                         (function() {
                             var el = document.querySelector('#LEmail')
                             if (!el) return setTimeout(arguments.callee, 200);
@@ -31,12 +36,12 @@ export default class OMQQPlatform extends Platform {
                 // 登录成功, 获取 cookies
                 if (url === 'https://om.qq.com/') {
                     try {
-                        const cookies = await this.getCookies();
+                        const cookies = await helper.getCookies();
                         const session = cookies.map(item => {
                             item.url = 'https://om.qq.com/';
                             return item;
                         });
-                        const nickname = await this.executeJavaScript('document.querySelector(".header-login-inner .name").innerText;');
+                        const nickname = await helper.executeJavaScript('document.querySelector(".header-login-inner .name").innerText;');
                         resolve({session, nickname});
                     } catch (err) {
                         reject(err);
@@ -49,59 +54,37 @@ export default class OMQQPlatform extends Platform {
             webview.addEventListener('dom-ready', didDomReady);
         });
     }
-    _isLogin () {
+    _publish (webview, title, data) {
+        const helper = new WebviewHelper(webview);
         return new Promise(async (resolve, reject) => {
-            const {webview} = this;
-            const checkUrl = 'https://om.qq.com/article/list?index=1&commentflag=0&source=0&relogin=1';
-            webview.loadURL(checkUrl);
-
-            const didDomReady = async () => {
-                const url = webview.getURL(checkUrl);
-                if (url.startsWith(checkUrl)) {
-                    console.log(url);
-                }
-            };
-
-            // try {
-            //     const res = await this.getRresponse('https://om.qq.com/article/publish?relogin=1');
-            //     const data = JSON.parse(res.body);
-            //     resolve(data);
-            // } catch (err) {
-            //     reject(err);
-            // } finally {
-            //     webview.removeEventListener('dom-ready', didDomReady);
-            // }
-
-            webview.addEventListener('dom-ready', didDomReady);
-        });
-    }
-    _publish (title, data) {
-        return new Promise(async (resolve, reject) => {
-            const {webview, publishUrl} = this;
+            const {publishUrl} = this;
             webview.loadURL(publishUrl);
 
             const didDomReady = async () => {
                 const url = webview.getURL();
                 if (url.startsWith(publishUrl)) {
-                    this.injectPublishScript(title, data);
-                    try {
-                        const res = await this.getRresponse('https://om.qq.com/article/publish?relogin=1');
-                        const data = JSON.parse(res.body);
-                        resolve(data);
-                    } catch (err) {
-                        reject(err);
-                    } finally {
-                        webview.removeEventListener('dom-ready', didDomReady);
-                    }
+                    this.injectPublishScript(webview, title, data);
+                }
+                try {
+                    // 企鹅号
+                    const res = await helper.getRresponse('https://om.qq.com/article/publish?relogin=1');
+                    // const res = await helper.getRresponse('https://om.qq.com/article/getWhiteListOfWordsInTitle?relogin=1');
+                    const result = JSON.parse(res.body);
+                    const link = result.data.article.Furl.replace(/https?:\/\//, '');
+                    resolve(link);
+                } catch (err) {
+                    reject(err);
+                } finally {
+                    webview.removeEventListener('dom-ready', didDomReady);
                 }
             };
-
             webview.addEventListener('dom-ready', didDomReady);
         });
     }
 
-    injectPublishScript (title, {content}) {
-        return this.executeJavaScript(`
+    injectPublishScript (webview, title, {content}) {
+        const helper = new WebviewHelper(webview);
+        return helper.executeJavaScript(`
             (function() {
                 const el = document.querySelector('#ueditor_0');
                 if (!el) return setTimeout(arguments.callee, 200);
@@ -126,43 +109,61 @@ export default class OMQQPlatform extends Platform {
         `);
     }
 
-    _stats () {
-        return new Promise((resolve, reject) => {
-            const {webview} = this;
-            let page = 1;
-            let result = [];
-            const injectGetStatsScript = async () => {
-                const res = await this.executeJavaScript(`
-                    fetch('https://om.qq.com/statistic/ArticleReal?channel=0&page=${page}&num=100&btime=1&relogin=1', {
-                        credentials: 'include'
-                    }).then(res => res.json())
-                `);
+    async _statByConent (webview) {
+        const helper = new WebviewHelper(webview);
 
-                const {statistic = []} = res.data;
+        function avaliblePubTime (data) {
+            return moment(data.pubTime).isAfter(
+                moment().subtract(15, 'd')
+            );
+        }
 
-                result.push(...statistic);
+        async function getList (page = 1, result = []) {
+            const res = await helper.fetchJSON(`https://om.qq.com/statistic/ArticleReal?channel=0&page=${page}&num=100&btime=1&relogin=1`);
+            const {statistic = []} = res.data;
+            if (statistic.length === 0) return result;
 
-                if (statistic.length === 100) {
-                    page += 1;
-                    return await injectGetStatsScript();
-                }
+            const _result = result.concat(statistic);
 
-                this.webview.removeEventListener('dom-ready', injectGetStatsScript);
+            const lastItem = statistic[statistic.lenght - 1];
 
-                result = result.map(item => {
-                    return {
-                        id: encodeURIComponent(`kuaibao.qq.com/s/${item.articleId}`),
-                        view: item.read,
-                        title: item.title,
-                        custom: item
-                    };
-                });
+            if (avaliblePubTime(lastItem)) {
+                return getList(page + 1, _result);
+            }
 
-                resolve(result);
-            };
-            webview.loadURL('https://om.qq.com/');
-            webview.addEventListener('dom-ready', injectGetStatsScript);
-        });
+            return result.filter(avaliblePubTime);
+        }
+
+        const list = await getList();
+        console.log(list);
+        // TODO
+        throw Error('还需要根据列表, 抓取单片文章状态');
+
+        //     return {
+        //         link: `kuaibao.qq.com/s/${item.articleId}`,
+        //         view: item.read,
+        //         title: item.title,
+        //         custom: item
+        //     };
     }
 
+    async _statByUpstream (webview, startTime, endTime) {
+        if (!startTime || !endTime) {
+            throw Error('no startTime or endTime');
+        }
+        const helper = new WebviewHelper(webview);
+        const cookies = await helper.getCookies();
+        const userid = cookies.find(x => x.name === 'userid').value;
+
+        const days = Math.ceil((endTime - startTime) / (60 * 60 * 24 * 1000));
+        const btime = ~~(startTime / 1000);
+        const etime = ~~(endTime / 1000);
+        const res = await helper.fetchJSON(`https://om.qq.com/Statistic/MediaDaily?media=${userid}&channel=0&fields=statistic_date,read,exposure_article,exposure,relay,collect,postil,read_uv&btime=${btime}&etime=${etime}&page=1&num=${days}&merge=0&type=articleDaily&relogin=1`);
+        return res.data.statistic.map(item => {
+            return {
+                view: Number(item.read),
+                day: moment(item.statistic_date, 'YYYY-MM-DD').format('YYYY-MM-DD')
+            };
+        });
+    }
 }
