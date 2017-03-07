@@ -6,7 +6,7 @@ import {Link} from 'react-router';
 import {bindActionCreators} from 'redux';
 import Page from 'components/Page';
 import FormSearch from './FormSearch';
-import PublishModal from './PublishModal';
+import PublishModal from 'components/PublishModal';
 import * as actions from 'reducers/admin/articles';
 import moment from 'moment';
 import {findDOMNode} from 'react-dom';
@@ -39,9 +39,9 @@ export default class extends Component {
         this.fetchData();
     }
     getFormData (fromData, skip) {
-        skip = skip || this.props.articles.skip;
+        skip = skip || 0;
         const data = {
-            skip,
+            skip: skip * 10,
             limit: 10
         };
         Object.keys(fromData).forEach((v) => {

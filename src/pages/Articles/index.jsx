@@ -27,7 +27,7 @@ export default class extends Component {
         if (isFetching) return;
         this.props.getArticles({query: {
             limit: 10,
-            skip: page
+            skip: page * 10
         }});
     }
     pageChange = (page) => {

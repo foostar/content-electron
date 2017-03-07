@@ -3,17 +3,17 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {hashHistory} from 'react-router';
-import {Form, Button, Input, Select, notification, Tag, Upload, Icon, message, Layout} from 'antd';
+import {Form, Button, Input, Select, notification, Upload, Icon, message, Layout, Spin, Tag} from 'antd';
 import * as actions from 'reducers/editor';
 
 import Page from 'components/Page';
 import style from './style.styl';
-
+import ImgEditor from 'components/ImgEditor';
 import 'froala-editor/js/froala_editor.pkgd.min.js';
 import 'froala-editor/css/froala_editor.pkgd.min.css';
 import 'font-awesome/css/font-awesome.css';
-
 import FroalaEditor from 'react-froala-wysiwyg';
+import PublishModal from 'components/PublishModal';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const OptGroup = Select.OptGroup;
@@ -27,23 +27,20 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return bindActionCreators(actions, dispatch);
 };
-
 @Form.create()
 @connect(mapStateToProps, mapDispatchToProps)
 export default class Editor extends Component {
     componentDidMount () {
         const {articleId} = this.props.router.location.query;
-        const foolbar = document.querySelector('.fr-dropdown-menu');
+        const foolbar = document.querySelector('.fr-toolbar');
         foolbar.appendChild(this.refs.upload);
-        this.refs.upload.parentNode.style.width = '85px';
         if (articleId) {
             return this.props.getArticle({params: articleId});
         }
         this.props.clearArticle();
     }
-    handleSubmit = (e) => {
-        // const {articleId} = this.props.router.location.query;
-        e.preventDefault();
+    fetchData = () => new Promise(async (resolve, reject) => {
+        const {articleId} = this.props.router.location.query;
         this.props.form.validateFields(async (err, values) => {
             const {content, isFetching} = this.props.editor;
             if (err) return;
@@ -60,14 +57,34 @@ export default class Editor extends Component {
                 type: 'article',
                 content: _content
             });
-
+            if (articleId) {
+                const {type} = await this.props.editArticle({
+                    body: data,
+                    params: articleId
+                });
+                if (type === 'EDITARTICLE_SUCCESS') {
+                    resolve(true);
+                }
+                return;
+            }
+            console.log(1111);
             const {type} = await this.props.addArticle({
                 body: data
             });
             if (type === 'ADDARTICLE_SUCCESS') {
-                hashHistory.replace('/articles');
+                return resolve(true);
             }
         });
+    })
+    handleSubmit = async (e) => {
+        e.preventDefault();
+        const result = await this.fetchData();
+        if (result) {
+            this.addSuccess();
+        }
+    }
+    addSuccess = () => {
+        hashHistory.replace('/articles');
     }
     replaceImg (content) {
         const modelDom = this.refs.model;
@@ -106,8 +123,16 @@ export default class Editor extends Component {
         if (/ofsyr49wg/.test(item.url)) {
             return item;
         }
-        const {token, key} = await this.getToken();
         const blob = await this.getImg(item.url);
+        const url = await this.uploadImg(blob);
+        return {
+            index: item.index,
+            url
+        };
+    }
+    async uploadImg (file) {
+        const {token, key} = await this.getToken();
+        const blob = file;
         const formData = new FormData();
         formData.append('key', key);
         formData.append('token', token);
@@ -117,13 +142,7 @@ export default class Editor extends Component {
             body: formData
         })
         .then(response => response.json())
-        .then(json => {
-            const {key} = json;
-            return {
-                index: item.index,
-                url: `http://ofsyr49wg.bkt.clouddn.com/${key}`
-            };
-        });
+        .then(json => `http://ofsyr49wg.bkt.clouddn.com/${json.key}`);
     }
     getImg (url) {
         return fetch(url)
@@ -132,22 +151,58 @@ export default class Editor extends Component {
     }
     editorConfig = {
         placeholderText: '写点什么吧!',
-        toolbarButtons: ['fullscreen', 'print', 'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', 'fontFamily', 'fontSize', '|', 'specialCharacters', 'color', 'emoticons', 'inlineStyle', 'paragraphStyle', '|', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', '-', 'insertLink', 'insertVideo', 'insertFile', 'insertTable', 'undo', 'redo', 'clearFormatting', 'selectAll', 'html'],
-        toolbarButtonsMD: ['fullscreen', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'paragraphStyle', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', 'insertLink', 'insertVideo', 'insertFile', 'insertTable', 'undo', 'redo', 'clearFormatting'],
+        dragInline: false,
+        tooltips: false,
+        imagePasteProcess: false,
+        imageRoundPercent: false,
+        toolbarSticky: false,
+        quickInsertButtons: [ 'table', 'ul', 'ol', 'hr' ],
+        toolbarButtonsSM: ['fullscreen', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'insertLink', 'insertTable', 'undo', 'redo'],
+        toolbarButtons: ['print', 'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', 'fontFamily', 'fontSize', '|', 'specialCharacters', 'color', 'emoticons', 'inlineStyle', 'paragraphStyle', '|', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', '-', 'insertLink', 'insertVideo', 'insertFile', 'insertTable', 'undo', 'redo', 'clearFormatting', 'selectAll', 'html'],
+        toolbarButtonsMD: ['bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'paragraphStyle', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', 'insertLink', 'insertVideo', 'insertFile', 'insertTable', 'undo', 'redo', 'clearFormatting'],
         events: {
             'froalaEditor.initialized': (e, editor) => {
+                editor.tooltip.hide();
                 if (!this.$editor) {
                     this.$editor = editor;
                 }
+                this.bindImgEditor();
             },
-            'froalaEditor.image.beforePasteUpload': (e, editor) => {
+            'froalaEditor.image.beforePasteUpload': (e, editor, img) => {
                 return false;
             },
-            'froalaEditor.image.beforeUpload': (e, editor) => {
-                editor.tooltip.hide();
+            'froalaEditor.image.beforeUpload': (e, editor, img) => {
+                this.props.fetching();
+                this.dropUpload(img);
                 return false;
             }
         }
+    }
+    bindImgEditor () {
+        $('.fr-element').on('mouseover', 'img', (e) => {
+            const Img = $(e.target);
+            const parent = Img.parent();
+            parent.css({position: 'relative'}).append('<i style="margin-left:3px" class="editor fa fa-pencil-square-o fa-2x" aria-hidden="true"></i>');
+            $('.editor').unbind('click');
+            $('.editor').on('click', () => {
+                $('.editor').unbind('click');
+                $('.editor').remove();
+                this.props.handleImg(Img.attr('src'));
+            });
+        });
+        $('.fr-element').on('mouseout', 'img', (e) => {
+            setTimeout(() => {
+                $('.editor').remove();
+            }, 500);
+        });
+    }
+    async dropUpload (imgs) {
+        this.$editor.popups.hideAll();
+        this.$editor.html.cleanEmptyTags();
+        document.querySelector('.fr-drag-helper').remove();
+        const blob = imgs[0];
+        const url = await this.uploadImg(blob);
+        this.$editor.html.insert(`<img src='${url}'/>`, true);
     }
     getToken () {
         const url = `http://baijia.rss.apps.xiaoyun.com/api/qiniu/uptoken`;
@@ -156,10 +211,29 @@ export default class Editor extends Component {
         .then(json => json);
     }
     handleEditorChange = (content) => {
-        this.props.updateModel(content);
+        const modelDom = $(this.refs.model);
+        modelDom.html(content);
+        const imgs = modelDom.find('img');
+        if (imgs.parent().attr('data-wrap')) {
+            return this.props.updateModel(content);
+        }
+        imgs.wrap('<div data-wrap="true"></div>');
+        const newContent = modelDom.html();
+        this.props.updateModel(newContent);
+    }
+    imageProcess = async (src, blob) => {
+        this.props.fetching();
+        const url = await this.uploadImg(blob);
+        const html = this.$editor.html.get().replace(src, url);
+        this.handleEditorChange(html);
+        this.props.modalCancel();
+        this.props.fetching(false);
+    }
+    handleImg = () => {
+        this.props.handleImg();
     }
     render () {
-        const {content, title, category} = this.props.editor;
+        const {content, title, category, isFetching, modalVisible, isAlter, originSrc} = this.props.editor;
         const {getFieldDecorator, getFieldValue} = this.props.form;
         const self = this;
         const props = {
@@ -190,12 +264,15 @@ export default class Editor extends Component {
             }
         };
         return (
-            <Page>
-                <Form onSubmit={this.handleSubmit} className={style.form} >
+            <Page className={style.container}>
+                <Spin spinning={isFetching}>
                     <Layout className={style.layout}>
-                        <Layout.Content className={style.content}>
-                            <div className={style.editor}>
-                                <FormItem>
+                        <Form onSubmit={this.handleSubmit} className={style.editor}>
+                            <Layout.Content className={style.content}>
+                                <FormItem
+                                    // {...formItemLayout}
+                                    hasFeedback
+                                >
                                     {getFieldDecorator('title', {
                                         rules: [{
                                             required: true, message: '请输入标题'
@@ -209,7 +286,6 @@ export default class Editor extends Component {
                                     </Tag>
                                 </FormItem>
                                 <FormItem
-                                    // {...formItemLayout}
                                 >
                                     {getFieldDecorator('category', {
                                         initialValue: category || '搞笑'
@@ -252,8 +328,8 @@ export default class Editor extends Component {
                                         </Select>
                                     )}
                                 </FormItem>
+                                <FormItem />
                                 <FormItem
-                                    // {...formItemLayout}
                                     hasFeedback
                                 >
                                     <FroalaEditor
@@ -270,14 +346,32 @@ export default class Editor extends Component {
                                         </Button>
                                     </Upload>
                                 </div>
+                                { isAlter && <ImgEditor
+                                    src={originSrc}
+                                    isFetching={isFetching}
+                                    modalCancel={this.props.modalCancel}
+                                    modalVisible={modalVisible}
+                                    imageProcess={this.imageProcess}
+                                /> }
                                 <div className={style.disappear} ref='model' />
-                            </div>
-                        </Layout.Content>
-                        <Layout.Footer className={style.footer}>
-                            <Button type='primary' htmlType='submit'>保存</Button>
-                        </Layout.Footer>
+
+                            </Layout.Content>
+                            <Layout.Footer className={style.footer}>
+                                <Button type='primary' htmlType='submit'>提交</Button>
+                                {this.props.passport.data.level !== 1 && <PublishModal
+                                    beforeShowModal={this.fetchData}
+                                    content={this.props.editor}
+                                    afterClose={this.addSuccess}
+                                >
+                                    <Button type='primary'>发布</Button>
+                                </PublishModal>}
+                            </Layout.Footer>
+                            <Button className='editbutton' style={{display: 'none'}}>
+                                <Icon type='edit' /> 编辑
+                            </Button>
+                        </Form>
                     </Layout>
-                </Form>
+                </Spin>
             </Page>
         );
     }

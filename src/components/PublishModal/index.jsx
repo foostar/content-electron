@@ -34,9 +34,8 @@ const mapDispatchToProps = dispatch => {
 @connect(mapStateToProps, mapDispatchToProps)
 class PublishModal extends Component {
     static defaultProps = {
-        beforeShowModal () {
-            return true;
-        }
+        beforeShowModal () {},
+        afterClose () {}
     }
     state = {
         visible: false,
@@ -44,9 +43,12 @@ class PublishModal extends Component {
         data: {}
     }
     showModal = async () => {
-        if (await this.props.beforeShowModal()) {
+        try {
+            await this.props.beforeShowModal();
             this.props.upstreamsActions.fetchUpstreams();
             this.setState({visible: true});
+        } catch (err) {
+            console.info('beforeShowModal', err);
         }
     }
     onCancel = () => {
@@ -79,6 +81,8 @@ class PublishModal extends Component {
         }
     }
     clearData = () => {
+        this.props.afterClose();
+
         this.setState({
             current: 0,
             data: {}
@@ -87,7 +91,6 @@ class PublishModal extends Component {
     render () {
         const {content, upstreams} = this.props;
         const {current, visible, data} = this.state;
-
         const authorBindUpstreams = (content.author || {}).bindUpstreams || [];
         const {myBindUpstreams = []} = this.props;
 
