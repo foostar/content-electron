@@ -3,11 +3,14 @@ import _ from 'lodash';
 import WebviewHelper from 'utils/webview-helper';
 import store from 'store';
 import {updateUpstream} from 'reducers/upstreams';
+import DataCache from './datacache';
 
 const container = document.createElement('div');
 container.style.width = container.style.height = 0;
 container.style.overflow = 'hidden';
 document.body.appendChild(container);
+
+const dataCaches = {};
 
 const addWebviewToContainer = (webview, container) => {
     return new Promise(resolve => {
@@ -40,6 +43,7 @@ export default class Platform extends Events {
         this.password = password;
         this.cookies = cookies;
         this._webviews = [];
+        this.dataCache = dataCaches[id] = dataCaches[id] || new DataCache();
         this.options = Object.assign({}, {
             container
         }, options);
@@ -114,10 +118,16 @@ export default class Platform extends Events {
         return result;
     }
     async isLogin (container) {
+        if (Date.now() - this._lastCheck < 1000 * 60 * 5) {
+            return true;
+        }
         const webview = await this.getWebview();
         await autoLoginWithCookies(webview, this.cookies);
         const result = await this._isLogin(webview);
         await this.releaseWebview(webview);
+        if (result) {
+            this._lastCheck = Date.now();
+        }
         return result;
     }
     async publish (title, data, container) {
@@ -147,7 +157,22 @@ export default class Platform extends Events {
         await this.releaseWebview(webview);
         return result;
     }
-    async statByUpstream (startTime, endTime) {
+    statByUpstream (startTime, endTime) {
+        const key = JSON.stringify({
+            startTime,
+            endTime,
+            id: this.id
+        });
+        return this.dataCache.get(key, {
+            sync: 2,
+            expires: 1000 * 60 * 60 * 6,
+            force: true
+        }, (k) => {
+            const data = JSON.parse(k);
+            return this.__statByUpstream(data.startTime, data.endTime);
+        });
+    }
+    async __statByUpstream (startTime, endTime) {
         const webview = await this.getWebview();
         await autoLoginWithCookies(webview, this.cookies);
         const isLogin = await this.isLogin();
