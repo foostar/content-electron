@@ -1,4 +1,53 @@
 import _ from 'lodash';
+import path from 'path';
+import fs from 'fs';
+
+import {remote} from 'electron';
+
+const app = remote.app;
+
+class DiskStore {
+    constructor () {
+        const fileDir = path.join(app.getPath('appData'), 'xiaoyun');
+        this.filePath = path.join(app.getPath('appData'), 'xiaoyun', 'cache.json');
+        if (!fs.existsSync(fileDir)) {
+            fs.mkdirSync(fileDir);
+        }
+    }
+    _getStore () {
+        return new Promise((resolve, reject) => {
+            if (!fs.existsSync(this.filePath)) {
+                return resolve({});
+            }
+            fs.readFile(this.filePath, 'utf-8', (err, data) => {
+                if (err) return reject(err);
+                return resolve(JSON.parse(data));
+            });
+        });
+    }
+    _setStore (store) {
+        return new Promise((resolve, reject) => {
+            fs.writeFile(this.filePath, JSON.stringify(store), (err) => {
+                if (err) return reject(err);
+                return resolve();
+            });
+        });
+    }
+    async get (id) {
+        const store = await this._getStore();
+        return store[id];
+    }
+    async set (id, data) {
+        const store = await this._getStore();
+        store[id] = data;
+        return this._setStore(store);
+    }
+    async del (id) {
+        const store = await this._getStore();
+        delete store[id];
+        return this._setStore(store);
+    }
+}
 
 class MemoryStore {
     constructor () {
@@ -159,5 +208,5 @@ class DataCache {
     }
 }
 
-export {MemoryStore, RadisStore};
+export {MemoryStore, RadisStore, DiskStore};
 export default DataCache;

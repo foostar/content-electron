@@ -3,7 +3,7 @@ import _ from 'lodash';
 import WebviewHelper from 'utils/webview-helper';
 import store from 'store';
 import {updateUpstream} from 'reducers/upstreams';
-import DataCache from './datacache';
+import DataCache, {DiskStore} from './datacache';
 
 const container = document.createElement('div');
 container.style.width = container.style.height = 0;
@@ -43,7 +43,9 @@ export default class Platform extends Events {
         this.password = password;
         this.cookies = cookies;
         this._webviews = [];
-        this.dataCache = dataCaches[id] = dataCaches[id] || new DataCache();
+        this.dataCache = dataCaches[id] = dataCaches[id] || new DataCache({
+            store: new DiskStore()
+        });
         this.options = Object.assign({}, {
             container
         }, options);
