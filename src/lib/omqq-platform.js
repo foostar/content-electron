@@ -2,6 +2,7 @@ import Platform from './platform';
 import WebviewHelper from 'utils/webview-helper';
 
 export default class OMQQPlatform extends Platform {
+    platformId = 'omqq'
     loginUrl = 'https://om.qq.com/userAuth/index'
     publishUrl = 'https://om.qq.com/article/articlePublish'
     statsUrl = 'https://om.qq.com/statistic/ArticleReal?media=5394191&channel=0&page=2&num=8&btime=1&relogin=1'

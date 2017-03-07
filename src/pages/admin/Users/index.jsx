@@ -150,9 +150,9 @@ class AdminUsers extends Component {
 
 function getLevelLabel (level) {
     switch (level) {
-        case 0: return '超级管理员';
-        case 1: return '内容提供';
-        case 2: return '小云编辑';
+        case 0: return '管理员';
+        case 1: return '作者';
+        case 2: return '编辑';
     }
 }
 

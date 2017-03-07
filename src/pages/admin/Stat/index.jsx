@@ -41,10 +41,10 @@ class Stat extends Component {
                             <Button>按平台统计</Button>
                         </IndexLink>
                         <Link to='/admin/stat/redactor' activeClassName={style.active}>
-                            <Button>按小编统计</Button>
+                            <Button>按编辑统计</Button>
                         </Link>
                         <Link to='/admin/stat/author' activeClassName={style.active}>
-                            <Button>按内容提供者统计</Button>
+                            <Button>按作者统计</Button>
                         </Link>
                     </Header>
                     <Content style={{padding: 20}}>

@@ -3,6 +3,7 @@ import moment from 'moment';
 import WebviewHelper from 'utils/webview-helper';
 
 export default class BaijiaPlatform extends Platform {
+    platformId = 'baijia'
     loginUrl = 'http://baijiahao.baidu.com/builder/app/login'
     publishUrl = 'http://baijiahao.baidu.com/builder/article/edit'
     async _isLogin (webview) {

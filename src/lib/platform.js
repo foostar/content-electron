@@ -1,6 +1,8 @@
 import Events from 'events';
 import _ from 'lodash';
 import WebviewHelper from 'utils/webview-helper';
+import store from 'store';
+import {updateUpstream} from 'reducers/upstreams';
 
 const container = document.createElement('div');
 container.style.width = container.style.height = 0;
@@ -28,10 +30,12 @@ const autoLoginWithCookies = async (webview, cookies) => {
 };
 
 export default class Platform extends Events {
-    constructor (account, password, cookies, options = {}) {
+    constructor ({account, password, session: cookies, id}, options = {}) {
         super();
         if (!account || !password) throw new Error('缺少用户名或密码');
-        this.partition = `persist:${Date.now()}`;
+        this.partition = `persist:${id}`;
+        // this.partition = `persist:${Date.now()}`;
+        this.id = id;
         this.account = account;
         this.password = password;
         this.cookies = cookies;
@@ -70,19 +74,29 @@ export default class Platform extends Events {
         return instance;
     }
 
+    updateCookies (cookies) {
+        this.cookies = cookies;
+        store.dispatch(updateUpstream({
+            params: {id: this.id},
+            body: {session: cookies}
+        }));
+    }
+
     releaseWebview (instance) {
         return new Promise((resolve, reject) => {
             const webviews = this._webviews.filter(x => x.instance === instance);
             if (webviews.length !== 1) return reject(new Error('webviews 管理错误!'));
             const webview = webviews[0];
-            const didDomReady = () => {
-                instance.removeEventListener('dom-ready', didDomReady);
+            const complete = () => {
                 webview.state = 0;
                 resolve();
             };
+            const didDomReady = () => {
+                instance.removeEventListener('dom-ready', didDomReady);
+                complete();
+            };
             if (instance.parentElement === container) {
-                webview.state = 0;
-                return resolve();
+                return complete();
             }
             addWebviewToContainer(instance, container).then(() => {
                 instance.addEventListener('dom-ready', didDomReady);
@@ -111,7 +125,8 @@ export default class Platform extends Events {
         await autoLoginWithCookies(webview, this.cookies);
         const isLogin = await this.isLogin();
         if (!isLogin) {
-            await this.login();
+            const {session} = await this.login();
+            this.updateCookies(session);
         }
         if (container) {
             await addWebviewToContainer(webview, container);
@@ -123,6 +138,11 @@ export default class Platform extends Events {
     async stats (startTime, endTime) {
         const webview = await this.getWebview();
         await autoLoginWithCookies(webview, this.cookies);
+        const isLogin = await this.isLogin();
+        if (!isLogin) {
+            const {session} = await this.login();
+            this.updateCookies(session);
+        }
         const result = await this._stats(webview, startTime, endTime);
         await this.releaseWebview(webview);
         return result;
