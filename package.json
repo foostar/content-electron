@@ -18,6 +18,7 @@
   "devDependencies": {
     "add": "^2.0.6",
     "antd": "^2.7.1",
+    "async": "^2.1.5",
     "axios": "^0.15.3",
     "babel-core": "^6.22.1",
     "babel-eslint": "^7.1.1",
@@ -33,7 +34,6 @@
     "babel-preset-stage-0": "^6.22.0",
     "concurrently": "^3.3.0",
     "css-loader": "^0.26.1",
-    "draft-js": "^0.10.0",
     "electron": "^1.6.1",
     "electron-packager": "^8.5.2",
     "eslint": "^3.15.0",

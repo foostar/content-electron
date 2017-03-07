@@ -80,7 +80,6 @@ const config = {
             path.resolve(__dirname, 'src')
         ],
         extensions: ['.js', '.jsx', '.json']
-        // modulesDirectories: ['node_modules']
     },
     plugins: [
         new HtmlWebpackPlugin({
