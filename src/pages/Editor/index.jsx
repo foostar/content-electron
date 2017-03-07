@@ -120,7 +120,7 @@ export default class Editor extends Component {
         });
     }
     async fetchImg (item) {
-        if (/ofsyr49wg/.test(item.url)) {
+        if (/distribution/.test(item.url)) {
             return item;
         }
         const blob = await this.getImg(item.url);
@@ -142,7 +142,7 @@ export default class Editor extends Component {
             body: formData
         })
         .then(response => response.json())
-        .then(json => `http://ofsyr49wg.bkt.clouddn.com/${json.key}`);
+        .then(json => `http://distribution-file.apps.xiaoyun.com/${json.key}`);
     }
     getImg (url) {
         return fetch(url)
@@ -233,7 +233,7 @@ export default class Editor extends Component {
         this.props.handleImg();
     }
     render () {
-        const {content, title, category, isFetching, modalVisible, isAlter, originSrc} = this.props.editor;
+        const {content, title, category, isFetching, isAlter, originSrc} = this.props.editor;
         const {getFieldDecorator, getFieldValue} = this.props.form;
         const self = this;
         const props = {
@@ -257,7 +257,7 @@ export default class Editor extends Component {
                 }
                 if (info.file.status === 'done') {
                     self.props.fetching(false);
-                    self.$editor.html.insert(`<img src='http://ofsyr49wg.bkt.clouddn.com/${info.file.response.key}'/>`, true);
+                    self.$editor.html.insert(`<img src='http://distribution-file.apps.xiaoyun.com/${info.file.response.key}'/>`, true);
                 } else if (info.file.status === 'error') {
                     message.error('图片上传失败，请重试！');
                 }
@@ -350,7 +350,7 @@ export default class Editor extends Component {
                                     src={originSrc}
                                     isFetching={isFetching}
                                     modalCancel={this.props.modalCancel}
-                                    modalVisible={modalVisible}
+                                    modalVisible={this.props.editor.modalVisible}
                                     imageProcess={this.imageProcess}
                                 /> }
                                 <div className={style.disappear} ref='model' />
