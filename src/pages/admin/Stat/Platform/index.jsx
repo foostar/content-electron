@@ -24,6 +24,7 @@ const {Column} = Table;
 
 const mapStateToProps = state => {
     return {
+        passport: state.passport.data,
         upstreams: state.upstreams.data,
         statByUpstream: state.reproduction.upstream
     };
@@ -35,6 +36,8 @@ const mapDispatchToProps = dispatch => {
     };
 };
 
+const DAY = 1000 * 60 * 60 * 24;
+
 @connect(mapStateToProps, mapDispatchToProps)
 class StatByPlatform extends Component {
     state = {
@@ -42,8 +45,8 @@ class StatByPlatform extends Component {
         selectUps: [],
         statData: [],
         upsData: [],
-        startTime: moment().subtract(30, 'days').valueOf(),
-        endTime: Date.now() - 1000 * 60 * 60 * 24
+        startTime: Math.floor((Date.now() - 30 * DAY) / DAY) * DAY,
+        endTime: Math.floor((Date.now() - DAY) / DAY) * DAY
     }
     componentDidMount () {
         // if (!Object.keys(this.props.statByUpstream).length) {
@@ -73,6 +76,7 @@ class StatByPlatform extends Component {
             statData: [],
             upsData: []
         });
+
         const upps = this.props.upstreams.filter(x => this.state.selectUps.includes(x.id));
 
         mapLimit(upps, 2, (x, done) => {
@@ -130,7 +134,14 @@ class StatByPlatform extends Component {
             {
                 label: '百家号',
                 value: 'baijia',
-                children: this.props.upstreams.filter(x => x.platform === 'baijia').map(item => {
+                children: this.props.upstreams.filter(x => {
+                    const f1 = x.platform === 'baijia';
+                    let f2 = true;
+                    if (this.props.passport.level === 2) {
+                        f2 = this.props.passport.bindUpstreams.includes(x.id);
+                    }
+                    return f1 && f2;
+                }).map(item => {
                     return {
                         label: item.nickname,
                         value: item.id
@@ -140,7 +151,14 @@ class StatByPlatform extends Component {
             {
                 label: '企鹅号',
                 value: 'omqq',
-                children: this.props.upstreams.filter(x => x.platform === 'omqq').map(item => {
+                children: this.props.upstreams.filter(x => {
+                    const f1 = x.platform === 'omqq';
+                    let f2 = true;
+                    if (this.props.passport.level === 2) {
+                        f2 = this.props.passport.bindUpstreams.includes(x.id);
+                    }
+                    return f1 && f2;
+                }).map(item => {
                     return {
                         label: item.nickname,
                         value: item.id
@@ -148,7 +166,7 @@ class StatByPlatform extends Component {
                 })
 
             }
-        ];
+        ].filter(x => x.children.length);
         return (
             <Spin spinning={this.state.loading}>
                 <div style={{textAlign: 'center'}}>

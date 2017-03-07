@@ -67,7 +67,6 @@ export default class Editor extends Component {
                 }
                 return;
             }
-            console.log(1111);
             const {type} = await this.props.addArticle({
                 body: data
             });
