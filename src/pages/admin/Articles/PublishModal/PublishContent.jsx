@@ -281,8 +281,8 @@ class BaiJia extends Component {
 @connect(null, mapDispatchToProps)
 class PublishContent extends Component {
     async componentDidMount () {
-        const {account, password, session: cookies, platform: platformId} = this.props.data.upstream;
-        const platform = new platformsById[platformId].Class(account, password, cookies);
+        const {platform: platformId} = this.props.data.upstream;
+        const platform = new platformsById[platformId].Class(this.props.data.upstream);
         try {
             const res = await this.props.editorActions.getArticle({
                 params: this.props.content.id

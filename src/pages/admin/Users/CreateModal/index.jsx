@@ -89,8 +89,8 @@ class CreateModal extends Component {
                         rules: [{required: true, message: '请选择账户类型!'}]
                     })(
                         <RadioGroup>
-                            <RadioButton value={1}>内容提供</RadioButton>
-                            <RadioButton value={2}>小云小编</RadioButton>
+                            <RadioButton value={1}>作者</RadioButton>
+                            <RadioButton value={2}>编辑</RadioButton>
                         </RadioGroup>
                         )}
                 </FormItem>

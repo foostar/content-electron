@@ -38,7 +38,7 @@ export default class extends Component {
         title: '标题',
         dataIndex: 'title',
         key: 'title',
-        render: (title, record) => <Link to={`/editor?articleId=${record.id}`}>{title}</Link>
+        render: (title, record) => <Link style={{color: '#333', fontWeight: 500}} to={`/editor?articleId=${record.id}`}>{title}</Link>
     }, {
         title: '分类',
         dataIndex: 'category',

@@ -92,8 +92,8 @@ class ModifyModal extends Component {
             <Form onSubmit={this.handleSubmit}>
                 <FormItem label='用户类型' labelCol={{span: 5}} wrapperCol={{span: 17}}>
                     <RadioGroup value={level} disabled>
-                        <RadioButton value={1}>内容提供</RadioButton>
-                        <RadioButton value={2}>小云小编</RadioButton>
+                        <RadioButton value={1}>作者</RadioButton>
+                        <RadioButton value={2}>编辑</RadioButton>
                     </RadioGroup>
                 </FormItem>
 

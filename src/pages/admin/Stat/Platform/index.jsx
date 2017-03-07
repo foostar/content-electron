@@ -90,14 +90,14 @@ class StatByPlatform extends Component {
     }
 
     fetchSingleUpstreamStat = async (ups) => {
-        const {id: upstreamId, platform, account, password, session, nickname} = ups;
+        const {id: upstreamId, platform, nickname} = ups;
         let wP;
         switch (platform) {
             case 'omqq':
-                wP = new OMQQPlatform(account, password, session);
+                wP = new OMQQPlatform(ups);
                 break;
             case 'baijia':
-                wP = new BaiJiaPlatform(account, password, session);
+                wP = new BaiJiaPlatform(ups);
                 break;
             default:
                 throw Error('didididi~~~');
