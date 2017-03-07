@@ -76,7 +76,6 @@ class StatByPlatform extends Component {
         const upps = this.props.upstreams.filter(x => this.state.selectUps.includes(x.id));
 
         mapLimit(upps, 2, (x, done) => {
-            console.log(x);
             this.fetchSingleUpstreamStat(x).then((result) => {
                 console.log(result);
                 done(null, result);
@@ -153,24 +152,36 @@ class StatByPlatform extends Component {
         return (
             <Spin spinning={this.state.loading}>
                 <div style={{textAlign: 'center'}}>
-                    <RangePicker
-                        size='large'
-                        onChange={this.changeDateRange}
-                        value={[moment(this.state.startTime), moment(this.state.endTime)]}
-                        disabledDate={current => current && current.valueOf() > (Date.now() - 1000 * 60 * 60 * 24)}
-                    />
-                    {' '}
-                    <TreeSelect
-                        size='large'
-                        style={{minWidth: 300}}
-                        multiple
-                        treeDefaultExpandAll
-                        treeCheckable
-                        searchPlaceholder='请选择平台需要查看的平台账号'
-                        value={this.state.selectUps}
-                        onChange={this.changeUps}
-                        treeData={treeData}
-                    />
+                    <div>
+                        <TreeSelect
+                            size='large'
+                            style={{width: 800}}
+                            multiple
+                            treeDefaultExpandAll
+                            treeCheckable
+                            searchPlaceholder='请选择平台需要查看的平台账号'
+                            value={this.state.selectUps}
+                            onChange={this.changeUps}
+                            treeData={treeData}
+                        />
+                    </div>
+                    <br />
+                    <div>
+                        <RangePicker
+                            size='large'
+                            onChange={this.changeDateRange}
+                            value={[moment(this.state.startTime), moment(this.state.endTime)]}
+                            disabledDate={current => current && current.valueOf() > (Date.now() - 1000 * 60 * 60 * 24)}
+                        />
+                        <Button
+                            size='large'
+                            icon='search'
+                            className={style['search-btn']}
+                            onClick={this.fetchUpstreamsStat}
+                        >
+                            搜索
+                        </Button>
+                    </div>
                     {/*
                     <Select
                         multiple
@@ -191,14 +202,7 @@ class StatByPlatform extends Component {
                         </OptGroup>
                     </Select>
                     */}
-                    <Button
-                        size='large'
-                        icon='search'
-                        className={style['search-btn']}
-                        onClick={this.fetchUpstreamsStat}
-                    >
-                        搜索
-                    </Button>
+
                 </div>
                 <br />
                 <LineGraph width={900} data={this.state.statData} />
