@@ -79,20 +79,24 @@ class StatByPlatform extends Component {
 
         const upps = this.props.upstreams.filter(x => this.state.selectUps.includes(x.id));
 
-        mapLimit(upps, 2, (x, done) => {
-            this.fetchSingleUpstreamStat(x).then((result) => {
+        mapLimit(upps, 2, (item, done) => {
+            this.fetchSingleUpstreamStat(item).then((result) => {
                 console.log(result);
                 done(null, result);
             }, done);
-        }, (err, upsData) => {
+        }, (err, dataArr) => {
             if (err) {
                 this.setState({
                     loading: false
                 });
             }
             const statData = [];
-            upsData.forEach(stat => {
+            const upsData = dataArr.map(stat => {
                 statData.push(...stat.data);
+                return {
+                    name: stat.name,
+                    total: stat.data.reduce((view, b) => view + Number(b.view), 0)
+                };
             });
 
             this.setState({
@@ -241,10 +245,8 @@ class StatByPlatform extends Component {
                     <Column
                         width={'50%'}
                         title='该时段该 PV 总数'
-                        key='view'
-                        dataIndex='data'
-                        sorter={(a, b) => a - b}
-                        render={(data) => data.reduce((view, b) => view + Number(b.view), 0)}
+                        key='total'
+                        dataIndex='total'
                     />
                 </Table>
 

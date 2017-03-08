@@ -133,10 +133,9 @@ export default class BaijiaPlatform extends Platform {
         endTime = moment(endTime).format('YYYYMMDD');
 
         const helper = new WebviewHelper(webview);
-        // helper.dev();
         webview.loadURL('http://baijiahao.baidu.com/');
         const appId = await helper.executeJavaScript(`
-            new Promise(resolve, => {
+            new Promise(resolve => {
                 (function () {
                     const el = document.querySelector(".aside-action")
                     if (!el) return setTimeout(arguments.callee, 200);
