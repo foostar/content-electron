@@ -98,7 +98,7 @@ export default class BaijiaPlatform extends Platform {
         const helper = new WebviewHelper(webview);
         await helper.executeJavaScript(`
             new Promise(resolve => {
-                (() => {
+                (function () {
                     const el = document.querySelector('#ueditor_0');
                     if (!el) return setTimeout(arguments.callee, 200);
                     document.querySelector('#header-wrapper').remove();
