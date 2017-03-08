@@ -136,11 +136,13 @@ export default class BaijiaPlatform extends Platform {
         // helper.dev();
         webview.loadURL('http://baijiahao.baidu.com/');
         const appId = await helper.executeJavaScript(`
-            (function () {
-                const el = document.querySelector(".aside-action")
-                if (!el) return setTimeout(arguments.callee, 200);
-                return el.href.match(/app_id=(\\d+)/)[1];
-            })()
+            new Promise(resolve, => {
+                (function () {
+                    const el = document.querySelector(".aside-action")
+                    if (!el) return setTimeout(arguments.callee, 200);
+                    resolve(el.href.match(/app_id=(\\d+)/)[1]);
+                })()
+            })
         `);
         const start = moment(startTime).format('YYYYMMDD');
         const end = moment(endTime).format('YYYYMMDD');
