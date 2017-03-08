@@ -1,5 +1,6 @@
 import Platform from './platform';
 import moment from 'moment';
+import {clipboard} from 'electron';
 import WebviewHelper from 'utils/webview-helper';
 
 export default class BaijiaPlatform extends Platform {
@@ -96,26 +97,27 @@ export default class BaijiaPlatform extends Platform {
     async injectPublishScript (webview, title, {content}) {
         const helper = new WebviewHelper(webview);
         await helper.executeJavaScript(`
-            (function() {
-                const el = document.querySelector('#ueditor_0');
-                if (!el) return setTimeout(arguments.callee, 200);
-                document.querySelector('#header-wrapper').remove();
-                document.querySelector('.aside').remove();
-                document.querySelector('.post-article-tips-wrap').remove();
-                document.querySelector('.mp-footer').remove();
-                document.querySelector('body').style.minWidth = 'initial';
-                document.querySelector('#pageWrapper').style.minWidth = 'initial';
-                document.querySelector('.editor-footer').style.padding = '10px';
-                document.querySelector('.editor-footer').style.minWidth = 'initial';
-                document.querySelector('.main').style.padding = 0;
-                document.querySelector('.main').style.margin = 0;
-                document.querySelector('#article-title').value = \`${title}\`;
-                window.frames['ueditor_0'].contentWindow.document.body.innerHTML = \`${content}\`;
-                editor.getEditor().focus();
-            })();
+            new Promise(resolve => {
+                (function () {
+                    const el = document.querySelector('#ueditor_0');
+                    if (!el) return setTimeout(arguments.callee, 200);
+                    document.querySelector('#header-wrapper').remove();
+                    document.querySelector('.aside').remove();
+                    document.querySelector('.post-article-tips-wrap').remove();
+                    document.querySelector('.mp-footer').remove();
+                    document.querySelector('body').style.minWidth = 'initial';
+                    document.querySelector('#pageWrapper').style.minWidth = 'initial';
+                    document.querySelector('.editor-footer').style.padding = '10px';
+                    document.querySelector('.editor-footer').style.minWidth = 'initial';
+                    document.querySelector('.main').style.padding = 0;
+                    document.querySelector('.main').style.margin = 0;
+                    document.querySelector('#article-title').value = \`${title}\`;
+                    editor.getEditor().focus();
+                    resolve()
+                })()
+            });
         `);
-        webview.selectAll();
-        webview.cut();
+        clipboard.writeHTML(content);
         webview.paste();
     }
 
