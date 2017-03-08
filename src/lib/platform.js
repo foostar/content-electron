@@ -11,6 +11,7 @@ container.style.overflow = 'hidden';
 document.body.appendChild(container);
 
 const dataCaches = {};
+const webviews = [];
 
 const addWebviewToContainer = (webview, container) => {
     return new Promise(resolve => {
@@ -36,13 +37,12 @@ export default class Platform extends Events {
     constructor ({account, password, session: cookies, id}, options = {}) {
         super();
         if (!account || !password) throw new Error('缺少用户名或密码');
-        this.partition = `persist:${id}`;
+        // this.partition = `persist:${id}`;
         // this.partition = `persist:${Date.now()}`;
         this.id = id;
         this.account = account;
         this.password = password;
         this.cookies = cookies;
-        this._webviews = [];
         this.dataCache = dataCaches[id] = dataCaches[id] || new DataCache({
             store: new DiskStore()
         });
@@ -54,7 +54,6 @@ export default class Platform extends Events {
         const webview = document.createElement('webview');
         webview.style.height = '100%';
         // document.body.innerHTML = '';
-        webview.setAttribute('partition', this.partition);
         webview.setAttribute('src', 'about:blank');
         const container = typeof this.options.container === 'function'
             ? this.options.container()
@@ -69,14 +68,20 @@ export default class Platform extends Events {
     async getWebview () {
         // 0 未使用
         // 1 使用中
-        const idle = _.remove(this._webviews, x => x.state === 0);
+        const idle = _.remove(webviews, x => x.state === 0);
         const webview = idle.pop();
-        this._webviews = this._webviews.concat(idle);
+        idle.forEach(x => {
+            webviews.push(x);
+        });
         const instance = webview ? webview.instance : await this.createWebview();
-        this._webviews.push({
+        webviews.push({
             state: 1,
             instance
         });
+        // 如果webview池，partition无法重新设置
+        // instance.setAttribute('partition', this.partition);
+        const helper = new WebviewHelper(instance);
+        await helper.clearCache();
         return instance;
     }
 
@@ -90,9 +95,9 @@ export default class Platform extends Events {
 
     releaseWebview (instance) {
         return new Promise((resolve, reject) => {
-            const webviews = this._webviews.filter(x => x.instance === instance);
-            if (webviews.length !== 1) return reject(new Error('webviews 管理错误!'));
-            const webview = webviews[0];
+            const wvs = webviews.filter(x => x.instance === instance);
+            if (wvs.length !== 1) return reject(new Error('webviews 管理错误!'));
+            const webview = wvs[0];
             const complete = () => {
                 webview.state = 0;
                 resolve();
