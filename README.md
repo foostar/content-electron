@@ -1,6 +1,6 @@
 # dev
 
-`$ ELECTRON_MIRROR=http://npm.taobao.org/mirrors/electron/`
+`$ export ELECTRON_MIRROR=http://npm.taobao.org/mirrors/electron/`
 
 `$ npm install`
 
