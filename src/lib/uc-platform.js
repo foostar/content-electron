@@ -19,11 +19,6 @@ export default class BaijiaPlatform extends Platform {
             const {loginUrl, account, password} = this;
             let session;
             webview.loadURL(loginUrl);
-            // 登录会有输入验证码的情况, 不能做超时
-            // const timer = setTimeout(() => {
-            //     reject(new Error('timeout'));
-            // }, 10000);
-
             const didDomReady = async () => {
                 const url = webview.getURL();
                 // 登录界面
