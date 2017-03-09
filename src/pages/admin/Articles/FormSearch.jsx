@@ -5,21 +5,21 @@ import style from './style.styl';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
-let timeout;
-let currentValue;
 export default class FormSearch extends Component {
     state = {
         data: []
     }
+    timeout = null
+    currentValue = null
     handleChange = (value) => {
-        if (timeout) {
-            clearTimeout(timeout);
-            timeout = null;
+        if (this.timeout) {
+            clearTimeout(this.timeout);
+            this.timeout = null;
         }
-        currentValue = value;
-        timeout = setTimeout(async () => {
+        this.currentValue = value;
+        this.timeout = setTimeout(async () => {
             const result = await this.props.searchUser({query: {username: value}});
-            if (currentValue == value) {
+            if (this.currentValue == value) {
                 const data = result.payload.result.data.map((v) => {
                     return {
                         value: v.id,
@@ -37,7 +37,7 @@ export default class FormSearch extends Component {
         });
         const children = [
             <div key='1'>
-                <div className={style['form-item-label']}>作者名</div>
+                <div className={style['form-item-label']}>作者</div>
                 <FormItem>
                     {getFieldDecorator('author', {
                         initialValue: form.author || ''
