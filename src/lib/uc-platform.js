@@ -14,7 +14,6 @@ export default class BaijiaPlatform extends Platform {
     }
     _login (webview) {
         const helper = new WebviewHelper(webview);
-        webview.openDevTools();
         return new Promise((resolve, reject) => {
             const {loginUrl, account, password} = this;
             let session;
@@ -30,14 +29,11 @@ export default class BaijiaPlatform extends Platform {
                 if (url.startsWith(loginUrl)) {
                     await helper.executeJavaScript(`
                         (function() {
-                            const el = document.querySelector('.login_body').getElementsByTagName('input');
+                            const el = document.querySelector('.login_body');
                             if (!el) return setTimeout(arguments.callee, 200);
-                            el[0].focus();
-                            el[0].value = '${account}';
-                            el[0].blur();
-                            el[1].focus();
-                            el[1].value = '${password}';
-                            el[1].blur();
+                            const inputs = el.getElementsByTagName('input')
+                            inputs[0].value = '${account}';
+                            inputs[1].value = '${password}';
                         })();
                     `);
                 }
@@ -79,7 +75,7 @@ export default class BaijiaPlatform extends Platform {
         });
     }
     _publish (webview, title, data) {
-        // const helper = new WebviewHelper(webview);
+        const helper = new WebviewHelper(webview);
         return new Promise(async (resolve, reject) => {
             const {publishUrl} = this;
             webview.loadURL(publishUrl);
@@ -89,18 +85,17 @@ export default class BaijiaPlatform extends Platform {
                 if (url.startsWith(publishUrl)) {
                     this.injectPublishScript(webview, title, data);
                 }
-                // try {
-                //     // 企鹅号
-                //     const res = await helper.getRresponse('https://om.qq.com/article/publish?relogin=1');
-                //     // const res = await helper.getRresponse('https://om.qq.com/article/getWhiteListOfWordsInTitle?relogin=1');
-                //     const result = JSON.parse(res.body);
-                //     const link = result.data.article.Furl.replace(/https?:\/\//, '');
-                //     resolve(link);
-                // } catch (err) {
-                //     reject(err);
-                // } finally {
-                //     webview.removeEventListener('dom-ready', didDomReady);
-                // }
+                try {
+                    // 企鹅号
+                    const res = await helper.getRresponse('http://mp.uc.cn/dashboard/save-draft');
+                    const result = JSON.parse(res.body);
+                    const link = result.data.previewUrl.replace(/http?:\/\//, '');
+                    resolve(link);
+                } catch (err) {
+                    reject(err);
+                } finally {
+                    webview.removeEventListener('dom-ready', didDomReady);
+                }
             };
             webview.addEventListener('dom-ready', didDomReady);
         });
@@ -113,7 +108,7 @@ export default class BaijiaPlatform extends Platform {
                 if (!el) return setTimeout(arguments.callee, 200);
                 document.querySelector('.article-write_box-title').value = \`${title}\`;
                 window.frames['ueditor_0'].contentWindow.document.body.innerHTML = \`${content}\`;
-                editor.getEditor().focus();
+                document.querySelector('.article-write_box-title').focus();
             })();
         `);
         webview.selectAll();

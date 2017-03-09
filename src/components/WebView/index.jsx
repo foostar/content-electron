@@ -63,7 +63,7 @@ export default class extends React.Component {
                     />
                 }
                 <Spin spinning={this.state.loading}>
-                    <webview ref='webview' style={{width: '100%', height: '100%'}} disablewebsecurity='on' />
+                    <webview ref='webview' style={{width: '100%', height: '100%'}} />
                 </Spin>
             </div>
         );
