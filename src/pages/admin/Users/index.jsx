@@ -18,6 +18,8 @@ const {Column} = Table;
 const mapStateToProps = state => {
     return {
         users: state.users.data,
+        count: state.users.count,
+        skip: state.users.skip,
         upstreams: state.upstreams.data
     };
 };
@@ -34,9 +36,22 @@ class AdminUsers extends Component {
         users: [],
         upstreams: []
     }
+    state = {
+        limit: 20
+    }
     componentDidMount () {
-        this.props.userActions.fetchUsers();
         this.props.upstreamsActions.fetchUpstreams();
+        if (this.props.users.length === 0) {
+            this.fetchUsers(1);
+        }
+    }
+    fetchUsers = (page = 1) => {
+        this.props.userActions.fetchUsers({
+            query: {
+                skip: (page - 1) * this.state.limit,
+                limit: this.state.limit
+            }
+        });
     }
     renderUpstreamsByIds = (ids) => {
         if (ids.length === 0) return <Tag>无</Tag>;
@@ -75,6 +90,17 @@ class AdminUsers extends Component {
                 text: '无',
                 value: 'null'
             });
+
+        const pagination = {
+            current: ~~(this.props.skip / this.state.limit) + 1,
+            total: this.props.count,
+            onChange: this.fetchUsers,
+            pageSize: this.state.limit,
+            showSizeChanger: true,
+            onShowSizeChange: (current, limit) => {
+                this.setState({limit}, this.fetchUsers);
+            }
+        };
         return (
             <Page className={style.container}>
                 <Layout className={style.layout}>
@@ -83,9 +109,9 @@ class AdminUsers extends Component {
                     </Layout.Header>
                     <Layout.Content className={style.content}>
                         <Table
-                            pagination={false}
-                            rowKey='id'
                             bordered
+                            rowKey='id'
+                            pagination={pagination}
                             dataSource={this.props.users}
                         >
                             <Column

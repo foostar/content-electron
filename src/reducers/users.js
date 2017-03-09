@@ -5,7 +5,9 @@ import update from 'react/lib/update';
 const HUSSIF = {};
 const INITAL = {
     fetching: false,
-    data: []
+    data: [],
+    count: 0,
+    skip: 0
 };
 
 // 获取用户列表
@@ -18,7 +20,9 @@ export const fetchUsers = createCallApi(HUSSIF, {
     }),
     success: (state, payload) => update(state, {
         fetching: {$set: false},
-        data: {$set: payload.result.data}
+        data: {$set: payload.result.data.users},
+        count: {$set: payload.result.data.count},
+        skip: {$set: payload.result.data.skip}
     }),
     failure: (state, payload) => update(state, {
         fetching: {$set: false}

@@ -7,7 +7,7 @@ const INITAL = {
     isFetching: false,
     content: '',
     title: '',
-    category: '搞笑',
+    category: '',
     modalVisible: false,
     isAlter: false,
     originSrc: '',
