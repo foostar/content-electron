@@ -25,6 +25,11 @@ const platforms = [{
     logo: qieLogo,
     Class: OMQQPlatform
 }, {
+    id: 'uc',
+    name: 'UC云观',
+    logo: ucLogo,
+    Class: UCPlatform
+}, {
     id: 'toutiao',
     name: '头条号',
     logo: toutiaoLogo,
@@ -39,11 +44,6 @@ const platforms = [{
     name: '微信公众号',
     logo: wechatLogo,
     disabled: true
-}, {
-    id: 'uc',
-    name: 'UC云观',
-    logo: ucLogo,
-    Class: UCPlatform
 }, {
     id: 'qq',
     name: 'QQ公众平台',
