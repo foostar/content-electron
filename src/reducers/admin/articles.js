@@ -18,6 +18,7 @@ const INITAL = {
         includeTags: [],
         excludeTags: []
     },
+    userNames: [],
     expand: false
 };
 // 改变页数
@@ -155,6 +156,15 @@ export const removeTag = createCallApi(HUSSIF, {
     failure: (state, payload) => update(state, {
         isFetching: {$set: true}
     })
+});
+// 搜索username
+export const searchUser = createCallApi(HUSSIF, {
+    type: 'ADMIN_SEARCHUSER',
+    endpoint: '/users',
+    method: 'GET',
+    request: (state) => state,
+    success: (state) => state,
+    failure: (state) => state
 });
 
 export default createReducer(HUSSIF, INITAL);

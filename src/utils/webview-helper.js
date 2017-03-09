@@ -70,7 +70,6 @@ export default class WebviewHelper {
             const fn = (event, method, {response, requestId, type}) => {
                 if (method === 'Network.responseReceived' && type === 'XHR') {
                     if (typeof url === 'string' ? response.url !== url : !url(response)) return;
-
                     _debugger.sendCommand('Network.getResponseBody', {requestId}, (err, res) => {
                         if (this._callbacks.indexOf(fn) !== -1) {
                             this._callbacks.splice(this._callbacks.indexOf(fn), 1);

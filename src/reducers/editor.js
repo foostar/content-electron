@@ -113,4 +113,20 @@ export const editArticle = createCallApi(HUSSIF, {
     })
 });
 
+// 替换路径
+export const replaceImg = createCallApi(HUSSIF, {
+    type: 'REPLACEIMG',
+    endpoint: '/qiniu/replace-src',
+    method: 'POST',
+    request: (state, payload) => update(state, {
+        isFetching: {$set: true}
+    }),
+    success: (state, payload) => update(state, {
+        isFetching: {$set: false}
+    }),
+    failure: (state, payload) => update(state, {
+        isFetching: {$set: false}
+    })
+});
+
 export default createReducer(HUSSIF, INITAL);
