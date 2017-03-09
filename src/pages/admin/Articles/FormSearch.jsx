@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {Form, Input, Select} from 'antd';
+import CategorySelect from 'components/CategorySelect';
 import style from './style.styl';
 
 const FormItem = Form.Item;
@@ -53,13 +54,8 @@ export default class FormSearch extends Component {
                 >
                     {getFieldDecorator('category', {
                         rules: [],
-                        initialValue: form.category || ''
-                    })(
-                        <Select className={style.select}>
-                            <Option value=''>全部</Option>
-                            <Option value='other'>其他</Option>
-                        </Select>
-                    )}
+                        initialValue: form.category || []
+                    })(<CategorySelect />)}
                 </FormItem>
             </div>,
             <div key='4'>
