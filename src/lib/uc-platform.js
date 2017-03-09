@@ -6,6 +6,7 @@ export default class BaijiaPlatform extends Platform {
     platformId = 'uc'
     loginUrl = 'http://mp.uc.cn/index.html'
     publishUrl = 'http://mp.uc.cn/dashboard/article/write'
+    submitUrl = 'http://mp.uc.cn/dashboard/contents/submit'
     async _isLogin (webview) {
         const helper = new WebviewHelper(webview);
         const data = await helper.fetchJSON(`http://mp.uc.cn/api/ws/stat/wemedia/summary?date=${moment(new Date()).format('YYYYMMDD')}&_=${Date.now()}`);
@@ -87,7 +88,7 @@ export default class BaijiaPlatform extends Platform {
                     this.injectPublishScript(webview, title, data);
                 }
                 try {
-                    // 企鹅号
+                    // uc云观
                     const res = await helper.getRresponse('http://mp.uc.cn/dashboard/save-draft');
                     const result = JSON.parse(res.body);
                     const link = result.data.previewUrl.replace(/http?:\/\//, '');
@@ -100,6 +101,49 @@ export default class BaijiaPlatform extends Platform {
             };
             webview.addEventListener('dom-ready', didDomReady);
         });
+    }
+    _submit (webview) {
+        const helper = new WebviewHelper(webview);
+        return new Promise(async (resolve, reject) => {
+            const {publishUrl} = this;
+            webview.loadURL(publishUrl);
+            const didDomReady = async () => {
+                const url = webview.getURL();
+                if (url.startsWith(publishUrl)) {
+                    this.injectSubmitScript(webview);
+                }
+                try {
+                    // uc云观
+                    const res = await helper.getRresponse('http://mp.uc.cn/dashboard/submit-article');
+                    const result = JSON.parse(res.body);
+                    if (result.data) {
+                        resolve();
+                    }
+                } catch (err) {
+                    reject(err);
+                } finally {
+                    webview.removeEventListener('dom-ready', didDomReady);
+                }
+            };
+            webview.addEventListener('dom-ready', didDomReady);
+        });
+    }
+    async injectSubmitScript (webview) {
+        const helper = new WebviewHelper(webview);
+        await helper.executeJavaScript(`
+            (function () {
+                const el = document.querySelector('.w-list');
+                if (!el) return setTimeout(arguments.callee, 200);
+                const checkbox = el.getElementsByClassName("w-checkbox");
+                const len = checkbox.length;
+                for(var i = 0; i < len; i++) {
+                    checkbox[i].click()
+                }
+                document.querySelector('.contents-submit_article-btn').click();
+                document.querySelector('.w-btn_primary').click();
+                document.querySelector('.w-confirm_footer').querySelector('.w-btn_primary').click();
+            })()
+        `);
     }
     async injectPublishScript (webview, title, {content}) {
         const helper = new WebviewHelper(webview);
