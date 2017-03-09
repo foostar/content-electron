@@ -16,6 +16,16 @@ export default class WebviewHelper {
             });
         });
     }
+    clearCache () {
+        return new Promise((resolve, reject) => {
+            const session = this.webview.getWebContents().session;
+            session.clearCache(() => {
+                session.clearStorageData([], function () {
+                    resolve();
+                });
+            });
+        });
+    }
     async setCookies (cookies) {
         const actions = cookies.map((cookie) => new Promise((resolve, reject) => {
             this.webview.getWebContents().session.cookies.set(cookie, (err) => {
