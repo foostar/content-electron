@@ -55,15 +55,13 @@ export default class extends Component {
     }]
     render () {
         const {contents, count, isFetching} = this.props.articles;
+        const pagination = {total: count, onChange: this.pageChange, pageSize: 10};
         return (
             <Page className={style.container}>
                 <Layout className={style.layout}>
                     <Layout.Header className={style.header}>
                         <Link to='/editor'>
-                            <Button
-                                icon='plus'
-                                onClick={() => this.setState({visible: true})}
-                            >
+                            <Button icon='plus' onClick={() => this.setState({visible: true})}>
                                 发表新文章
                             </Button>
                         </Link>
@@ -74,7 +72,7 @@ export default class extends Component {
                             rowSelection={this.rowSelection}
                             columns={this.columns}
                             dataSource={contents}
-                            pagination={{total: count, onChange: this.pageChange, pageSize: 10}}
+                            pagination={pagination}
                             loading={isFetching}
                         />
                     </Layout.Content>

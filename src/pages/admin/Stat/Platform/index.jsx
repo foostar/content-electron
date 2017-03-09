@@ -79,22 +79,22 @@ class StatByPlatform extends Component {
 
         const upps = this.props.upstreams.filter(x => this.state.selectUps.includes(x.id));
 
-        mapLimit(upps, 2, (x, done) => {
-            this.fetchSingleUpstreamStat(x).then((result) => {
-                console.log(result);
-                done(null, result);
-            }, done);
-        }, (err, upsData) => {
+        mapLimit(upps, 2, (item, done) => {
+            this.fetchSingleUpstreamStat(item).then((result) => done(null, result)).catch(done);
+        }, (err, dataArr) => {
             if (err) {
                 this.setState({
                     loading: false
                 });
             }
             const statData = [];
-            upsData.forEach(stat => {
+            const upsData = dataArr.map(stat => {
                 statData.push(...stat.data);
+                return {
+                    name: stat.name,
+                    total: stat.data.reduce((view, b) => view + Number(b.view), 0)
+                };
             });
-
             this.setState({
                 statData,
                 upsData,
@@ -122,11 +122,7 @@ class StatByPlatform extends Component {
         data.forEach(item => {
             item['平台账号'] = name;
         });
-        return {
-            upstreamId,
-            name,
-            data
-        };
+        return {upstreamId, name, data};
     }
 
     render () {
@@ -220,7 +216,6 @@ class StatByPlatform extends Component {
                         </OptGroup>
                     </Select>
                     */}
-
                 </div>
                 <br />
                 <LineGraph width={900} data={this.state.statData} />
@@ -228,7 +223,7 @@ class StatByPlatform extends Component {
                 <Table
                     bordered
                     style={{margin: '0 50px'}}
-                    rowKey='upstreamId'
+                    rowKey='name'
                     pagination={false}
                     dataSource={this.state.upsData}
                 >
@@ -241,10 +236,8 @@ class StatByPlatform extends Component {
                     <Column
                         width={'50%'}
                         title='该时段该 PV 总数'
-                        key='view'
-                        dataIndex='data'
-                        sorter={(a, b) => a - b}
-                        render={(data) => data.reduce((view, b) => view + Number(b.view), 0)}
+                        key='total'
+                        dataIndex='total'
                     />
                 </Table>
 

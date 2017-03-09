@@ -100,7 +100,7 @@ class CreateModal extends Component {
                         rules: [{required: true, message: '请输入账号!'}]
                     })(
                         <Input placeholder='账号' />
-                        )}
+                    )}
                 </FormItem>
 
                 <FormItem label='密码' labelCol={{span: 5}} wrapperCol={{span: 17}}>

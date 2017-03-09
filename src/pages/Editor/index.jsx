@@ -3,10 +3,12 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {hashHistory} from 'react-router';
-import {Form, Button, Input, Select, notification, Upload, Icon, message, Layout, Spin, Tag} from 'antd';
+import {Form, Button, Input, notification, Upload, Icon, message, Layout, Tag} from 'antd';
 import * as actions from 'reducers/editor';
 
 import Page from 'components/Page';
+import CategorySelect from 'components/CategorySelect';
+
 import style from './style.styl';
 import ImgEditor from 'components/ImgEditor';
 import 'froala-editor/js/froala_editor.pkgd.min.js';
@@ -15,8 +17,6 @@ import 'font-awesome/css/font-awesome.css';
 import FroalaEditor from 'react-froala-wysiwyg';
 import PublishModal from 'components/PublishModal';
 const FormItem = Form.Item;
-const Option = Select.Option;
-const OptGroup = Select.OptGroup;
 
 const mapStateToProps = state => {
     return {
@@ -264,73 +264,28 @@ export default class Editor extends Component {
         };
         return (
             <Page className={style.container}>
-                <Spin spinning={isFetching}>
+                <Form onSubmit={this.handleSubmit} style={{height: '100%'}}>
                     <Layout className={style.layout}>
-                        <Form onSubmit={this.handleSubmit} className={style.editor}>
-                            <Layout.Content className={style.content}>
-                                <FormItem
-                                    // {...formItemLayout}
-                                    hasFeedback
-                                >
+                        <Layout.Content className={style.content}>
+                            <div className={style.inner}>
+                                <FormItem>
                                     {getFieldDecorator('title', {
-                                        rules: [{
-                                            required: true, message: '请输入标题'
-                                        }],
+                                        rules: [{required: true, message: '请输入标题'}],
                                         initialValue: title || ''
-                                    })(
-                                        <Input placeholder='输入文章标题' />
-                                    )}
+                                    })(<Input placeholder='输入文章标题' autoFocus />)}
+
                                     <Tag className={style['text-num']} color='blue'>
                                         已输入 {(getFieldValue('title') || {}).length || '0'} 个字
                                     </Tag>
                                 </FormItem>
-                                <FormItem
-                                >
+                                <FormItem>
                                     {getFieldDecorator('category', {
-                                        initialValue: category || '搞笑'
-                                    })(
-                                        <Select>
-                                            <OptGroup label='搞笑'>
-                                                <Option value='搞笑'>搞笑</Option>
-                                                <Option value='美图'>美图</Option>
-                                                <Option value='科学'>科学</Option>
-                                                <Option value='历史'>历史</Option>
-                                            </OptGroup>
-                                            <OptGroup label='科技互联网'>
-                                                <Option value='互联网'>互联网</Option>
-                                                <Option value='科技'>科技</Option>
-                                            </OptGroup>
-                                            <OptGroup label='两性健康'>
-                                                <Option value='两性'>两性</Option>
-                                                <Option value='情感'>情感</Option>
-                                                <Option value='女人'>女人</Option>
-                                                <Option value='健康'>健康</Option>
-                                            </OptGroup>
-                                            <OptGroup label='国际社会'>
-                                                <Option value='社会'>社会</Option>
-                                                <Option value='三农'>三农</Option>
-                                                <Option value='军事'>军事</Option>
-                                                <Option value='游戏'>游戏</Option>
-                                                <Option value='娱乐'>娱乐</Option>
-                                                <Option value='体育'>体育</Option>
-                                            </OptGroup>
-                                            <OptGroup label='生活服务'>
-                                                <Option value='宠物'>宠物</Option>
-                                                <Option value='家居'>家居</Option>
-                                                <Option value='时尚'>时尚</Option>
-                                                <Option value='育儿'>育儿</Option>
-                                                <Option value='美食'>美食</Option>
-                                                <Option value='旅游'>旅游</Option>
-                                                <Option value='汽车'>汽车</Option>
-                                                <Option value='生活'>生活</Option>
-                                            </OptGroup>
-                                        </Select>
-                                    )}
+                                        rules: [{required: true, message: '请输入选择分类'}],
+                                        initialValue: category || []
+                                    })(<CategorySelect />)}
                                 </FormItem>
                                 <FormItem />
-                                <FormItem
-                                    hasFeedback
-                                >
+                                <FormItem hasFeedback>
                                     <FroalaEditor
                                         tag='textarea'
                                         model={content}
@@ -340,37 +295,39 @@ export default class Editor extends Component {
                                 </FormItem>
                                 <div ref='upload' className={style.upload}>
                                     <Upload {...props}>
-                                        <Button>
-                                            <Icon type='picture' />上传
-                                        </Button>
+                                        <Button><Icon type='picture' />上传</Button>
                                     </Upload>
                                 </div>
-                                { isAlter && <ImgEditor
-                                    src={originSrc}
-                                    isFetching={isFetching}
-                                    modalCancel={this.props.modalCancel}
-                                    modalVisible={this.props.editor.modalVisible}
-                                    imageProcess={this.imageProcess}
-                                /> }
+                                {isAlter &&
+                                    <ImgEditor
+                                        src={originSrc}
+                                        isFetching={isFetching}
+                                        modalCancel={this.props.modalCancel}
+                                        modalVisible={this.props.editor.modalVisible}
+                                        imageProcess={this.imageProcess}
+                                    />
+                                }
                                 <div className={style.disappear} ref='model' />
-
-                            </Layout.Content>
-                            <Layout.Footer className={style.footer}>
-                                <Button type='primary' htmlType='submit'>提交</Button>
-                                {this.props.passport.data.level !== 1 && <PublishModal
+                            </div>
+                        </Layout.Content>
+                        <Layout.Footer className={style.footer}>
+                            <Button type='primary' htmlType='submit'>提交</Button>
+                            {this.props.passport.data.level !== 1 &&
+                                <PublishModal
                                     beforeShowModal={this.fetchData}
                                     content={this.props.editor}
                                     afterClose={this.addSuccess}
                                 >
                                     <Button type='primary'>发布</Button>
-                                </PublishModal>}
-                            </Layout.Footer>
-                            <Button className='editbutton' style={{display: 'none'}}>
-                                <Icon type='edit' /> 编辑
-                            </Button>
-                        </Form>
+                                </PublishModal>
+                            }
+                        </Layout.Footer>
+                        <Button className='editbutton' style={{display: 'none'}}>
+                            <Icon type='edit' /> 编辑
+                        </Button>
                     </Layout>
-                </Spin>
+                </Form>
+
             </Page>
         );
     }
