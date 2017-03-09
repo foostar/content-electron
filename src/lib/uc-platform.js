@@ -165,38 +165,39 @@ export default class BaijiaPlatform extends Platform {
         throw Error('TODO');
     }
     async _statByUpstream (webview, startTime, endTime) {
-        if (!startTime || !endTime) {
-            throw Error('no startTime or endTime');
-        }
-        startTime = moment(startTime).format('YYYYMMDD');
-        endTime = moment(endTime).format('YYYYMMDD');
+        return [];
+        // if (!startTime || !endTime) {
+        //     throw Error('no startTime or endTime');
+        // }
+        // startTime = moment(startTime).format('YYYYMMDD');
+        // endTime = moment(endTime).format('YYYYMMDD');
 
-        const helper = new WebviewHelper(webview);
-        const start = moment(startTime).format('YYYYMMDD');
-        const end = moment(endTime).format('YYYYMMDD');
+        // const helper = new WebviewHelper(webview);
+        // const start = moment(startTime).format('YYYYMMDD');
+        // const end = moment(endTime).format('YYYYMMDD');
 
-        const fetchListScript = `
-            function fetchList (page = 1, result = []) {
-                return fetch(\`http://mp.uc.cn/v2/api/ws/stat/article?size=10&begin_date=${start}&end_date=${end}&page=\${page}&merge_by_date=0&create_limit=1&article_ctg=0&export_excel=0&_=${Date.now()}\`)
-                    .then(res => res.json())
-                    .then(json => {
-                        const { metadata, data } = json;
-                        const { page, size, total } = metadata;
-                        if ((page * size) < total) {
-                            return fetchList(page + 1, result.concat(data));
-                        }
-                        return result.concat(json.data);
-                    });
-            }
-            fetchList();
-        `;
-        const list = await helper.executeJavaScript(fetchListScript);
-        return list.map(item => {
-            return {
-                view: Number(item.view_reader_num),
-                day: moment(item.day, 'YYYYMMDD').format('YYYY-MM-DD')
-            };
-        });
+        // const fetchListScript = `
+        //     function fetchList (page = 1, result = []) {
+        //         return fetch(\`http://mp.uc.cn/v2/api/ws/stat/article?size=10&begin_date=${start}&end_date=${end}&page=\${page}&merge_by_date=0&create_limit=1&article_ctg=0&export_excel=0&_=${Date.now()}\`)
+        //             .then(res => res.json())
+        //             .then(json => {
+        //                 const { metadata, data } = json;
+        //                 const { page, size, total } = metadata;
+        //                 if ((page * size) < total) {
+        //                     return fetchList(page + 1, result.concat(data));
+        //                 }
+        //                 return result.concat(json.data);
+        //             });
+        //     }
+        //     fetchList();
+        // `;
+        // const list = await helper.executeJavaScript(fetchListScript);
+        // return list.map(item => {
+        //     return {
+        //         view: Number(item.view_reader_num),
+        //         day: moment(item.day, 'YYYYMMDD').format('YYYY-MM-DD')
+        //     };
+        // });
     }
 }
 
