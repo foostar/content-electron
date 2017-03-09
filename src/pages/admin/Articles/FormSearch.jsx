@@ -10,25 +10,21 @@ export default class FormSearch extends Component {
         data: []
     }
     timeout = null
-    currentValue = null
     handleChange = (value) => {
         if (this.timeout) {
             clearTimeout(this.timeout);
             this.timeout = null;
         }
-        this.currentValue = value;
         this.timeout = setTimeout(async () => {
-            const result = await this.props.searchUser({query: {username: value}});
-            if (this.currentValue == value) {
-                const data = result.payload.result.data.map((v) => {
-                    return {
-                        value: v.id,
-                        text: v.username
-                    };
-                });
-                this.setState({data});
-            }
-        }, 300);
+            const result = await this.props.searchUser({query: {username: value, limit: 20}});
+            const data = result.payload.result.data.users.map((v) => {
+                return {
+                    value: v.id,
+                    text: v.username
+                };
+            });
+            this.setState({data});
+        }, 1000);
     }
     render () {
         const {recentTag, getFieldDecorator, form} = this.props;

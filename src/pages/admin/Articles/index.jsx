@@ -101,7 +101,7 @@ export default class extends Component {
         dataIndex: 'createdAt',
         width: 120,
         key: 'createdAt',
-        render: (time) => moment(time).format('YY-M-D h:m')
+        render: (time) => moment(time).format('YYYY-MM-DD hh:mm')
     }, {
         title: '文章标签',
         key: 'tag',

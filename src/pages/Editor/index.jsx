@@ -148,7 +148,7 @@ export default class Editor extends Component {
     }
     async getImg (path) {
         const {type, payload} = await this.props.replaceImg({body: {path}});
-        if (type == 'REPLACEIMG_SUCCESS') {
+        if (type === 'REPLACEIMG_SUCCESS') {
             return `http://distribution-file.apps.xiaoyun.com/${payload.result.data.key}`;
         }
     }

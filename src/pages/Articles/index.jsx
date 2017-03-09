@@ -47,7 +47,7 @@ export default class extends Component {
         title: '创建时间',
         dataIndex: 'createdAt',
         key: 'createdAt',
-        render: (time) => moment(time).format('YY-M-D h:m')
+        render: (time) => moment(time).format('YYYY-MM-DD hh:mm')
     }, {
         title: '操作',
         key: 'action',

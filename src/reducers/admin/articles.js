@@ -1,7 +1,7 @@
 import {createCallApi} from 'middlewares/api';
 import {createAction, createReducer} from 'redux-act';
 import update from 'react/lib/update';
-import {format} from 'utils/util';
+import moment from 'moment';
 
 const HUSSIF = {};
 const INITAL = {
@@ -48,7 +48,7 @@ HUSSIF[ toggle ] = (state, skip) => {
 HUSSIF[ showNewTag ] = (state, data) => {
     const contents = state.contents;
     contents.forEach((v) => {
-        if (v.id == data.id) {
+        if (v.id === data.id) {
             v.inputVisible = data.isShow;
         }
     });
@@ -68,7 +68,7 @@ export const getArticles = createCallApi(HUSSIF, {
         const {data} = payload.result;
         data.contents.forEach((v) => {
             v.key = v.id;
-            v.createdAt = format(v.createdAt);
+            v.createdAt = moment(v.createdAt).format('YYYY-MM-DD');
             v.inputVisible = false;
             v.inputValue = [];
         });
@@ -112,7 +112,7 @@ export const addTag = createCallApi(HUSSIF, {
         const {id, tags} = data;
         const {recentTag, contents} = state;
         contents.forEach((v) => {
-            if (v.id == id) {
+            if (v.id === id) {
                 v.tags = tags;
                 v.inputVisible = false;
             }
@@ -144,7 +144,7 @@ export const removeTag = createCallApi(HUSSIF, {
         const {id, tags} = data;
         const contents = state.contents;
         contents.forEach((v) => {
-            if (v.id == id) {
+            if (v.id === id) {
                 v.tags = tags;
             }
         });
