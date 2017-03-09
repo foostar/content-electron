@@ -1,14 +1,12 @@
 {
     "presets": [
         "react"
-        // "modern-browsers",
-        // "stage-0"
     ],
     "plugins": [
-        // [
-        //     "import",
-        //     {"libraryName": "antd"}
-        // ],
+        [
+            "import",
+            {"libraryName": "antd"}
+        ],
         "transform-decorators-legacy",
         "transform-object-rest-spread",
         "transform-class-properties"

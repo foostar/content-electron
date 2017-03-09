@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-
+const BabiliPlugin = require('babili-webpack-plugin');
 const pkg = require('./package.json');
 
 let theme = {};
@@ -57,19 +57,19 @@ const config = {
             },
             {
                 test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
-                loader: 'file-loader?limit=10000&mimetype=application/font-woff'
+                use: 'file-loader?limit=10000&mimetype=application/font-woff'
             }, {
                 test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
-                loader: 'file-loader?limit=10000&mimetype=application/font-woff'
+                use: 'file-loader?limit=10000&mimetype=application/font-woff'
             }, {
                 test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
-                loader: 'file-loader?limit=10000&mimetype=application/octet-stream'
+                use: 'file-loader?limit=10000&mimetype=application/octet-stream'
             }, {
                 test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-                loader: 'file-loader'
+                use: 'file-loader'
             }, {
                 test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-                loader: 'file-loader?limit=10000&mimetype=image/svg+xml'
+                use: 'file-loader?limit=10000&mimetype=image/svg+xml'
             }
 
         ]
@@ -97,18 +97,15 @@ const config = {
 };
 
 if (process.env.NODE_ENV === 'production') {
+    if (!process.env.API_PREFIX) {
+        throw Error('no API_PREFIX!');
+    }
     config.plugins.push(
         new webpack.DefinePlugin({
-            'process.env': JSON.stringify(process.env)
+            'process.env.NODE_EVN': JSON.stringify(process.env.NODE_ENV),
+            'process.env.API_PREFIX': JSON.stringify(process.env.API_PREFIX)
         }),
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                warnings: false
-            },
-            output: {
-                comments: false
-            }
-        })
+        new BabiliPlugin()
     );
 }
 
