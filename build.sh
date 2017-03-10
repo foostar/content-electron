@@ -1,4 +1,9 @@
-echo "API_PREFIX: \c"
+
+echo "- http://content-distribution.apps.xiaoyun.com/api"
+echo "- http://content-distribution-test-1.apps.xiaoyun.com/api"
+echo "- http://content-distribution-test-2.apps.xiaoyun.com/api"
+
+echo "API_PREFIX=\c"
 
 read API_PREFIX
 

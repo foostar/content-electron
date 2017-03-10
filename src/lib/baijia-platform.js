@@ -112,9 +112,11 @@ export default class BaijiaPlatform extends Platform {
                     document.querySelector('.main').style.padding = 0;
                     document.querySelector('.main').style.margin = 0;
                     document.querySelector('#article-title').value = \`${title}\`;
-                    editor.getEditor().focus();
-                    resolve()
-                })()
+                    setTimeout(() => {
+                        editor.getEditor().focus();
+                        resolve();
+                    }, 1000)
+                })();
             });
         `);
         clipboard.writeHTML(content);
@@ -147,17 +149,19 @@ export default class BaijiaPlatform extends Platform {
         const end = moment(endTime).format('YYYYMMDD');
 
         const fetchListScript = `
-            function fetchList (page = 1, result = []) {
-                return fetch(\`http://baijiahao.baidu.com/builderinner/api/content/analysis/getChartInfo?app_id=${appId}&start=${start}&end=${end}&page=\${page}&size=100\`, {credentials: 'include'})
-                    .then(res => res.json())
-                    .then(json => {
-                        if (json.data.page.cur_page < json.data.page.total_page) {
-                            return fetchList(page + 1, result.concat(json.data.list));
-                        }
-                        return result.concat(json.data.list);
-                    });
-            }
-            fetchList();
+            (function () {
+                function fetchList (page = 1, result = []) {
+                    return fetch(\`http://baijiahao.baidu.com/builderinner/api/content/analysis/getChartInfo?app_id=${appId}&start=${start}&end=${end}&page=\${page}&size=100\`, {credentials: 'include'})
+                        .then(res => res.json())
+                        .then(json => {
+                            if (json.data.page.cur_page < json.data.page.total_page) {
+                                return fetchList(page + 1, result.concat(json.data.list));
+                            }
+                            return result.concat(json.data.list);
+                        });
+                }
+                return fetchList();
+            })();
         `;
         const list = await helper.executeJavaScript(fetchListScript);
         return list.map(item => {
