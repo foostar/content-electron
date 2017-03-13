@@ -153,7 +153,7 @@ export default class OMQQPlatform extends Platform {
             throw Error('no startTime or endTime');
         }
         const helper = new WebviewHelper(webview);
-        const cookies = await helper.getCookies();
+        const cookies = await this.cookies;
         const userid = cookies.find(x => x.name === 'userid').value;
 
         const days = Math.ceil((endTime - startTime) / (60 * 60 * 24 * 1000));

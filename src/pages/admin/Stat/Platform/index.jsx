@@ -212,7 +212,7 @@ class StatByPlatform extends Component {
                 <br />
                 <Table
                     bordered
-                    style={{margin: '0 50px'}}
+                    style={{margin: '0 50px', userSelect: 'initial'}}
                     rowKey='name'
                     pagination={false}
                     dataSource={this.state.upsData}
