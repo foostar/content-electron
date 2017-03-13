@@ -1,17 +1,32 @@
 .container
     width 240px
-    max-height 200px
+    height 380px
     background #FFF
     box-shadow 0 0 3px #CCC
-    border-radius 3px
+    border-radius 4px
     position absolute
-    bottom 20px
+    bottom -10px
+    padding-bottom 10px
+    padding-top 30px
     right 20px
     z-index 99
+    overflow auto
+.upstreams-closed
+    bottom -350px
+.upstreams-title
+    position absolute
+    height 30px
+    top 0
+    width 100%
+    line-height 30px
+    padding 0 5px
+    font-weight bold
+    background #F6F7F8
+    cursor pointer
 .upstream
     padding 5px
     height 60px
-    box-shadow 0 0 1px #CCC
+    border-bottom 1px solid #F6F7F8
 .upstream-header
     height 20px
     line-height 20px
@@ -21,6 +36,9 @@
     width 20px
     height 100%
     float left
+    box-shadow 0 0 1px #CCC
+    border-radius 2px
+    overflow hidden
     img
         width 100%
         height 100%
@@ -28,7 +46,7 @@
 .upstream-name
     float left
     margin-left 5px
-    width 80px
+    width 180px
     height 100%
 .checkbox-group
     margin-bottom 15px
@@ -73,6 +91,7 @@
             height 30px
             background #F6F7F8
     .browser-content
+        position relative
         background #FFF
         flex 1
         display flex

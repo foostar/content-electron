@@ -40,6 +40,7 @@ export default class PlatformManager extends React.Component {
         this.state = {
             browserVisible: false,
             tasks: {},
+            closed: false,
             tree: _.chain(upstreams)
                 .map(x => Object.assign({}, x))
                 .groupBy('platform')
@@ -129,9 +130,14 @@ export default class PlatformManager extends React.Component {
     onSelectAccountCancel = () => {
         this.props.managerActions.selectAccount();
     }
+    toggle = () => {
+        this.setState({
+            closed: !this.state.closed
+        });
+    }
     render () {
         const {upstreams, manager} = this.props;
-        const {tree, tasks, selectedTask, browserVisible} = this.state;
+        const {tree, tasks, selectedTask, browserVisible, closed} = this.state;
         const tabs = _.transform(tasks, (result, value, key) => {
             const account = _.find(upstreams, {id: key});
             result.push.apply(result, value.map(x => Object.assign({
@@ -141,24 +147,29 @@ export default class PlatformManager extends React.Component {
         }, []);
         const tabId = selectedTask || (tabs[0] ? tabs[0].id : null);
         return (
-            <div className={style.container}>
-                {upstreams.map(({id, platform, nickname}) => (
-                    <div className={style.upstream} key={id}>
-                        <div className={style['upstream-header']}>
-                            <div className={style['upstream-logo']}>
-                                <img src={platformsById[platform].logo} />
-                            </div>
-                            <div className={style['upstream-name']}>
-                                {nickname}
-                            </div>
-                        </div>
-                        <div className={style['upstream-content']}>
-                            {tasks[id] && tasks[id].length ? tasks[id].map(x => (
-                                <Tag onClick={() => this.onSelectTask(x.id)} key={x.id}>{x.tips}</Tag>
-                            )) : <div style={{lineHeight: '22px'}}>暂无任务</div>}
-                        </div>
+            <div>
+                <div className={style.container + (closed ? ` ${style['upstreams-closed']}` : '')}>
+                    <div className={style['upstreams-title']} onClick={this.toggle}>
+                        我的账号
                     </div>
-                ))}
+                    {upstreams.map(({id, platform, nickname}) => (
+                        <div className={style.upstream} key={id}>
+                            <div className={style['upstream-header']}>
+                                <div className={style['upstream-logo']}>
+                                    <img src={platformsById[platform].logo} />
+                                </div>
+                                <div className={style['upstream-name']}>
+                                    {nickname}
+                                </div>
+                            </div>
+                            <div className={style['upstream-content']}>
+                                {tasks[id] && tasks[id].length ? tasks[id].map(x => (
+                                    <Tag onClick={() => this.onSelectTask(x.id)} key={x.id}>{x.tips}</Tag>
+                                )) : <div style={{lineHeight: '22px'}}>暂无任务</div>}
+                            </div>
+                        </div>
+                    ))}
+                </div>
                 {!!upstreams.length || (<div className={style.upstream}>暂无账号</div>)}
                 <Modal
                     title='选择账号'
