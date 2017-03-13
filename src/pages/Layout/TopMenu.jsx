@@ -14,6 +14,9 @@ const mapStateToProps = state => {
 export default class TopMenu extends Component {
     render () {
         const menu = [{
+            name: 'Github',
+            router: '/github'
+        }, {
             name: '编辑',
             router: '/editor'
         }, {
