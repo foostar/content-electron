@@ -75,7 +75,7 @@ export default class BaijiaPlatform extends Platform {
         const helper = new WebviewHelper(webview);
         return new Promise(async (resolve, reject) => {
             const {publishUrl} = this;
-            webview.loadURL(publishUrl);
+            await helper.load(publishUrl);
 
             const didDomReady = async () => {
                 const url = webview.getURL();

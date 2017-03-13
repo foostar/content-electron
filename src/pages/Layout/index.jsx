@@ -30,8 +30,8 @@ export default class Layout extends Component {
         }
     }
     render () {
-        const {location, upstreams, myBindUpstreams} = this.props;
-        const myUpstreams = upstreams.filter(upstream => myBindUpstreams.includes(upstream.id));
+        const {location, upstreams, myBindUpstreams, myLevel} = this.props;
+        let myUpstreams = myLevel === 0 ? upstreams : upstreams.filter(upstream => myBindUpstreams.includes(upstream.id));
         return (
             <div className={style.container}>
                 <Topbar location={location} />

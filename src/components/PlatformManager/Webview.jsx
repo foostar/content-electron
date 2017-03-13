@@ -9,7 +9,7 @@ export default class Webview extends React.Component {
     render () {
         const {className, visible} = this.props;
         return (
-            <div ref='container' className={className} style={{display: visible ? 'flex' : 'none'}} />
+            <div ref='container' className={className} style={{height: visible ? '100%' : '0'}} />
         );
     }
 };

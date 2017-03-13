@@ -24,11 +24,11 @@ const mapDispatchToProps = dispatch => {
 };
 
 const stringMapping = {
-    'start:login': '登陆中',
-    'start:publish': '发布中',
-    'start:check-login': '检查登陆状态',
-    'start:stat-by-content': '统计中',
-    'start:stat-by-upstream': '统计中'
+    'login': '登陆中',
+    'publish': '发布中',
+    'check-login': '检查登陆状态',
+    'stat-by-content': '统计中',
+    'stat-by-upstream': '统计中'
 };
 
 @connect(mapStateToProps, mapDispatchToProps, (ownProps, stateProps, dispatchProps) => Object.assign({}, ownProps, stateProps, dispatchProps), {withRef: true})
@@ -65,7 +65,7 @@ export default class PlatformManager extends React.Component {
                 tasks: Object.assign({}, this.state.tasks, {
                     [platform.id]: tasks.map(x => {
                         return Object.assign({
-                            tips: stringMapping[`${status}:${task.name}`]
+                            tips: stringMapping[x.name]
                         }, x);
                     })
                 })
