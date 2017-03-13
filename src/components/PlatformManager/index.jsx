@@ -24,7 +24,7 @@ const mapDispatchToProps = dispatch => {
 };
 
 const stringMapping = {
-    'login': '登陆中',
+    'login': '登录中',
     'publish': '发布中',
     'check-login': '检查登陆状态',
     'stat-by-content': '统计中',
@@ -146,29 +146,42 @@ export default class PlatformManager extends React.Component {
             }, x)));
         }, []);
         const tabId = selectedTask || (tabs[0] ? tabs[0].id : null);
+        upstreams.sort((a, b) => {
+            a = tasks[a.id];
+            b = tasks[b.id];
+            if (a && a.length && b && b.length) {
+                return a.length - b.length;
+            }
+            if (a && a.length) {
+                return -1;
+            }
+            return 1;
+        });
         return (
             <div>
                 <div className={style.container + (closed ? ` ${style['upstreams-closed']}` : '')}>
                     <div className={style['upstreams-title']} onClick={this.toggle}>
                         我的账号
                     </div>
-                    {upstreams.map(({id, platform, nickname}) => (
-                        <div className={style.upstream} key={id}>
-                            <div className={style['upstream-header']}>
-                                <div className={style['upstream-logo']}>
-                                    <img src={platformsById[platform].logo} />
+                    <div className={style['upstreams-list']}>
+                        {upstreams.map(({id, platform, nickname}) => (
+                            <div className={style.upstream} key={id}>
+                                <div className={style['upstream-header']}>
+                                    <div className={style['upstream-logo']}>
+                                        <img src={platformsById[platform].logo} />
+                                    </div>
+                                    <div className={style['upstream-name']}>
+                                        {nickname}
+                                    </div>
                                 </div>
-                                <div className={style['upstream-name']}>
-                                    {nickname}
+                                <div className={style['upstream-content']}>
+                                    {tasks[id] && tasks[id].length ? tasks[id].map(x => (
+                                        <Tag onClick={() => this.onSelectTask(x.id)} key={x.id}>{x.tips}</Tag>
+                                    )) : <div style={{lineHeight: '22px'}}>暂无任务</div>}
                                 </div>
                             </div>
-                            <div className={style['upstream-content']}>
-                                {tasks[id] && tasks[id].length ? tasks[id].map(x => (
-                                    <Tag onClick={() => this.onSelectTask(x.id)} key={x.id}>{x.tips}</Tag>
-                                )) : <div style={{lineHeight: '22px'}}>暂无任务</div>}
-                            </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
                 {!!upstreams.length || (<div className={style.upstream}>暂无账号</div>)}
                 <Modal
@@ -213,7 +226,7 @@ export default class PlatformManager extends React.Component {
                                     key={id}
                                     onClick={() => this.onSelectTask(id)}
                                     className={style['browser-tabbar'] + (tabId === id ? ` ${style['browser-tabbar-active']}` : '')}>
-                                    {tips} [{account.nickname} - {platform.name}]
+                                    {account.nickname} [{platform.name} - {tips}]
                                 </div>))}
                         </div>
                         <Button shape='circle' icon='close' className={style['browser-close']} onClick={this.closeBrowser} />
