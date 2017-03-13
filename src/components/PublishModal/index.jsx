@@ -102,11 +102,7 @@ class PublishModal extends Component {
             visibleUpstreams = visibleUpstreams.filter(u => myBindUpstreams.includes(u));
         }
 
-        const steps = [
-            '选择账号',
-            '发布文章',
-            '确认完成'
-        ];
+        const steps = ['选择账号', '发布文章', '确认完成'];
 
         let title = steps[current];
         try {

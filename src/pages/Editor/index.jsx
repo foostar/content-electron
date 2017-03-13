@@ -293,7 +293,6 @@ export default class Editor extends Component {
                                         initialValue: category || []
                                     })(<CategorySelect />)}
                                 </FormItem>
-                                <FormItem />
                                 <FormItem hasFeedback>
                                     <FroalaEditor
                                         tag='textarea'

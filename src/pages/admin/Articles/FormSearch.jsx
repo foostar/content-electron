@@ -64,8 +64,8 @@ export default class FormSearch extends Component {
                 <div className={style['form-item-label']}>分类</div>
                 <FormItem>
                     {getFieldDecorator('category', {
-                        initialValue: form.category || []
-                    })(<CategorySelect />)}
+                        initialValue: form.category || ['']
+                    })(<CategorySelect all />)}
                 </FormItem>
             </div>,
             <div key='4'>
