@@ -5,6 +5,7 @@ import {bindActionCreators} from 'redux';
 import {hashHistory} from 'react-router';
 import {Form, Button, Input, notification, Upload, Icon, message, Layout, Tag} from 'antd';
 import * as actions from 'reducers/editor';
+import * as managerActions from 'reducers/manager';
 
 import Page from 'components/Page';
 import CategorySelect from 'components/CategorySelect';
@@ -15,7 +16,6 @@ import 'froala-editor/js/froala_editor.pkgd.min.js';
 import 'froala-editor/css/froala_editor.pkgd.min.css';
 import 'font-awesome/css/font-awesome.css';
 import FroalaEditor from 'react-froala-wysiwyg';
-import PublishModal from 'components/PublishModal';
 const FormItem = Form.Item;
 
 const mapStateToProps = state => {
@@ -25,7 +25,9 @@ const mapStateToProps = state => {
     };
 };
 const mapDispatchToProps = dispatch => {
-    return bindActionCreators(actions, dispatch);
+    return Object.assign(bindActionCreators(actions, dispatch), {
+        managerActions: bindActionCreators(managerActions, dispatch)
+    });
 };
 @Form.create()
 @connect(mapStateToProps, mapDispatchToProps)
@@ -312,15 +314,11 @@ export default class Editor extends Component {
                         </Layout.Content>
                         <Layout.Footer className={style.footer}>
                             <Button type='primary' htmlType='submit'>提交</Button>
-                            {this.props.passport.data.level !== 1 &&
-                                <PublishModal
-                                    beforeShowModal={this.fetchData}
-                                    content={this.props.editor}
-                                    afterClose={this.addSuccess}
-                                >
-                                    <Button type='primary'>发布</Button>
-                                </PublishModal>
-                            }
+                            {this.props.passport.data.level !== 1 && <Button type='primary' onClick={async () => {
+                                await this.fetchData();
+                                // TODO: 获取title
+                                this.props.managerActions.publish(this.props.editor);
+                            }}>发布</Button>}
                         </Layout.Footer>
                         <Button className='editbutton' style={{display: 'none'}}>
                             <Icon type='edit' /> 编辑

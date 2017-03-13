@@ -2,6 +2,34 @@ export default class WebviewHelper {
     constructor (webview) {
         this.webview = webview;
     }
+    appendTo (container) {
+        const {webview} = this;
+        webview.__appending = true;
+        return new Promise(resolve => {
+            const didDomReady = () => {
+                webview.removeEventListener('dom-ready', didDomReady);
+                webview.__appending = false;
+                resolve(webview);
+            };
+            webview.addEventListener('dom-ready', didDomReady);
+            container.appendChild(webview);
+        });
+    }
+    load (url, options) {
+        const {webview} = this;
+        return new Promise(resolve => {
+            if (!webview.__appending) {
+                webview.loadURL(url, options);
+                return resolve();
+            }
+            const didDomReady = () => {
+                webview.removeEventListener('dom-ready', didDomReady);
+                webview.loadURL(url, options);
+                resolve();
+            };
+            webview.addEventListener('dom-ready', didDomReady);
+        });
+    }
     executeJavaScript (script) {
         return new Promise(resolve => {
             this.webview.executeJavaScript(script, resolve);
@@ -51,7 +79,7 @@ export default class WebviewHelper {
                 }
             };
             webview.addEventListener('dom-ready', didDomReady);
-            webview.loadURL(url);
+            this.load(url);
         });
     }
     getRresponse (url, optFn) {

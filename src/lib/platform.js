@@ -13,17 +13,6 @@ document.body.appendChild(container);
 const dataCaches = {};
 const webviews = [];
 
-const addWebviewToContainer = (webview, container) => {
-    return new Promise(resolve => {
-        const didDomReady = () => {
-            webview.removeEventListener('dom-ready', didDomReady);
-            resolve(webview);
-        };
-        webview.addEventListener('dom-ready', didDomReady);
-        container.appendChild(webview);
-    });
-};
-
 const autoLoginWithCookies = async (webview, cookies) => {
     const helper = new WebviewHelper(webview);
     if (cookies && cookies.length) {
@@ -46,19 +35,30 @@ export default class Platform extends Events {
         this.dataCache = dataCaches[id] = dataCaches[id] || new DataCache({
             store: new DiskStore()
         });
+        this.tasks = [];
         this.options = Object.assign({}, {
             container
         }, options);
+        this.addListener('task-start', task => {
+            this.emit(task.name, task.webview);
+            this.emit('tasks-update', task, 'start', this.tasks);
+        });
+        this.addListener('task-complete', task => {
+            this.emit(task.name, task.webview);
+            this.emit('tasks-update', task, 'complete', this.tasks);
+        });
     }
     async createWebview () {
         const webview = document.createElement('webview');
-        webview.style.height = '100%';
+        const helper = new WebviewHelper(webview);
+        webview.style.height = webview.style.width = '100%';
         // document.body.innerHTML = '';
+        webview.setAttribute('partition', _.uniqueId('persist:'));
         webview.setAttribute('src', 'about:blank');
         const container = typeof this.options.container === 'function'
             ? this.options.container()
             : this.options.container;
-        await addWebviewToContainer(webview, container);
+        await helper.appendTo(container);
         return webview;
         // document.body.appendChild(webview);
         // this._readyPromise.then(() => {
@@ -109,29 +109,49 @@ export default class Platform extends Events {
             if (instance.parentElement === container) {
                 return complete();
             }
-            addWebviewToContainer(instance, container).then(() => {
+            const helper = new WebviewHelper(instance);
+            helper.appendTo(container).then(() => {
                 instance.addEventListener('dom-ready', didDomReady);
                 instance.loadURL('about:blank');
             }, reject);
         });
     }
+    addTask (name, webview) {
+        const {tasks} = this;
+        const task = {
+            id: _.uniqueId('task_'),
+            name,
+            webview
+        };
+        tasks.push(task);
+        this.emit('task-start', task);
+        return () => {
+            _.remove(tasks, task);
+            this.emit('task-complete', task);
+        };
+    }
     async login (container) {
         const webview = await this.getWebview();
+        const helper = new WebviewHelper(webview);
         if (container) {
-            await addWebviewToContainer(webview, container);
+            await helper.appendTo(container);
         }
+        const onComplete = this.addTask('login', webview);
         const result = await this._login(webview);
+        onComplete();
         await this.releaseWebview(webview);
         return result;
     }
-    async isLogin (container) {
+    async isLogin () {
         if (Date.now() - this._lastCheck < 1000 * 60 * 5) {
             return true;
         }
         const webview = await this.getWebview();
         await autoLoginWithCookies(webview, this.cookies);
+        const onComplete = this.addTask('check-login', webview);
         const result = await this._isLogin(webview);
         await this.releaseWebview(webview);
+        onComplete();
         if (result) {
             this._lastCheck = Date.now();
         }
@@ -139,6 +159,7 @@ export default class Platform extends Events {
     }
     async publish (title, data, container) {
         const webview = await this.getWebview();
+        const helper = new WebviewHelper(webview);
         await autoLoginWithCookies(webview, this.cookies);
         const isLogin = await this.isLogin();
         if (!isLogin) {
@@ -146,9 +167,11 @@ export default class Platform extends Events {
             this.updateCookies(session);
         }
         if (container) {
-            await addWebviewToContainer(webview, container);
+            await helper.appendTo(container);
         }
+        const onComplete = this.addTask('publish', webview);
         const result = await this._publish(webview, title, data);
+        onComplete();
         await this.releaseWebview(webview);
         return result;
     }
@@ -160,7 +183,9 @@ export default class Platform extends Events {
             const {session} = await this.login();
             this.updateCookies(session);
         }
+        const onComplete = this.addTask('stat-by-content', webview);
         const result = await this._statByConent(webview);
+        onComplete();
         await this.releaseWebview(webview);
         return result;
     }
@@ -187,7 +212,9 @@ export default class Platform extends Events {
             const {session} = await this.login();
             this.updateCookies(session);
         }
+        const onComplete = this.addTask('stat-by-upstream', webview);
         const result = await this._statByUpstream(webview, startTime, endTime);
+        onComplete();
         await this.releaseWebview(webview);
         return result;
     }

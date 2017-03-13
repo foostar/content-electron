@@ -5,14 +5,13 @@ import {bindActionCreators} from 'redux';
 // import {uniqBy} from 'lodash';
 // import {Link} from 'react-router';
 import mapLimit from 'async/mapLimit';
+import app from 'lib/app';
 
 import moment from 'moment';
 import LineGraph from 'components/LineGraph';
 import * as upstreamsActions from 'reducers/upstreams';
 import * as reproductionActions from 'reducers/reproduction';
 
-import OMQQPlatform from 'lib/omqq-platform';
-import BaiJiaPlatform from 'lib/baijia-platform';
 import {platformsById} from 'lib/platforms';
 
 import {Table, DatePicker, Button, TreeSelect, Spin} from 'antd';
@@ -105,17 +104,8 @@ class StatByPlatform extends Component {
 
     fetchSingleUpstreamStat = async (ups) => {
         const {id: upstreamId, platform, nickname} = ups;
-        let wP;
-        switch (platform) {
-            case 'omqq':
-                wP = new OMQQPlatform(ups);
-                break;
-            case 'baijia':
-                wP = new BaiJiaPlatform(ups);
-                break;
-            default:
-                throw Error('didididi~~~');
-        }
+        const manager = app.getManager();
+        const wP = manager.getPlatform(upstreamId);
         const {startTime, endTime} = this.state;
         const data = await wP.statByUpstream(startTime, endTime);
         const name = `[${platformsById[platform].name}] ${nickname}`;
