@@ -1,7 +1,7 @@
 import {createCallApi} from 'middlewares/api';
 import {createAction, createReducer} from 'redux-act';
 import update from 'react/lib/update';
-import {format} from 'utils/util';
+import moment from 'moment';
 
 const HUSSIF = {};
 const INITAL = {
@@ -29,7 +29,7 @@ export const getArticles = createCallApi(HUSSIF, {
         const {data} = payload.result;
         data.contents.forEach((v) => {
             v.key = v.id;
-            v.createdAt = format(v.createdAt);
+            v.createdAt = moment(v.createdAt).format('YYYY-MM-DD');
         });
         return Object.assign({}, state, data, {
             isFetching: false

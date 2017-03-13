@@ -129,6 +129,7 @@ class SigninPlatform extends Component {
         switch (this.props.data.platform) {
             case platformsById.omqq.id: return <div className={style['webview-wrap']} ref='wrap' />;
             case platformsById.baijia.id: return <div className={style['webview-wrap']} ref='wrap' />;
+            case platformsById.uc.id: return <div className={style['webview-wrap']} ref='wrap' />;
             default: return (
                 <Alert
                     type='warning'

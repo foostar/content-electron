@@ -6,19 +6,50 @@ import style from './style.styl';
 const FormItem = Form.Item;
 const Option = Select.Option;
 export default class FormSearch extends Component {
+    state = {
+        data: []
+    }
+    timeout = null
+    handleChange = (value) => {
+        if (this.timeout) {
+            clearTimeout(this.timeout);
+            this.timeout = null;
+        }
+        this.timeout = setTimeout(async () => {
+            const result = await this.props.searchUser({query: {username: value, limit: 20}});
+            const data = result.payload.result.data.users.map((v) => {
+                return {
+                    value: v.id,
+                    text: v.username
+                };
+            });
+            this.setState({data});
+        }, 1000);
+    }
     render () {
         const {recentTag, getFieldDecorator, form} = this.props;
         const options = recentTag.map((v, index) => {
             return <Option key={index} value={v}>{v}</Option>;
         });
-
         const children = [
             <div key='1'>
-                <div className={style['form-item-label']}>作者ID</div>
+                <div className={style['form-item-label']}>作者</div>
                 <FormItem>
                     {getFieldDecorator('author', {
                         initialValue: form.author || ''
-                    })(<Input />)}
+                    })(<Select
+                        combobox
+                        notFoundContent=''
+                        defaultActiveFirstOption={false}
+                        showArrow={false}
+                        filterOption={false}
+                        optionLabelProp='value'
+                        onChange={this.handleChange}
+                    >
+                        {this.state.data.map((d, i) => {
+                            return <Option key={i} value={d.text}> {d.text} </Option>;
+                        })}
+                    </Select>)}
                 </FormItem>
             </div>,
             <div key='2'>

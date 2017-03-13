@@ -85,16 +85,9 @@ export default class OMQQPlatform extends Platform {
     injectPublishScript (webview, title, {content}) {
         const helper = new WebviewHelper(webview);
         return helper.executeJavaScript(`
-            (function() {
+            ;(function() {
                 const el = document.querySelector('#ueditor_0');
                 if (!el) return setTimeout(arguments.callee, 200);
-                $('#om-art-normal-title input').val(\`${title}\`);
-                window.frames['ueditor_0'].contentWindow.document.body.innerHTML = '';
-                $('#edui14_body').click();
-                $('.layui-layer-content textarea').val(\`${content}\`)
-                $('.layui-layer-btn0').click();
-                $('.ui-radio[data-id="auto"]').click();
-                $('.icon-toggle-up-b').click();
 
                 $('.side').remove();
                 $('.main-heading').remove();
@@ -103,8 +96,16 @@ export default class OMQQPlatform extends Platform {
                 $('.main').css({float: 'none', width: 'auto'});
                 $('.viewpage').css({minWidth: 'initial'});
                 $('#editor-mask').css({width: 'auto'});
-                $('.container').css({width: 'auto'})
+                $('.container').css({width: 'auto'});
                 $('.fixed-bottom .form-action .toggle').css({left: 100});
+
+                $('#om-art-normal-title input').val(\`${title}\`);
+                window.frames['ueditor_0'].contentWindow.document.body.innerHTML = '';
+                $('#edui14_body').click();
+                $('.layui-layer-content textarea').val(\`${content}\`);
+                $('.layui-layer-btn0').click();
+                $('.ui-radio[data-id="auto"]').click();
+                $('.icon-toggle-up-b').click();
             })();
         `);
     }

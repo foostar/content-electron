@@ -31,7 +31,7 @@ HUSSIF[ updateModel ] = (state, content) => {
 };
 
 HUSSIF[ fetching ] = (state, isFetching) => {
-    if (isFetching == false) {
+    if (!isFetching) {
         isFetching = false;
     } else {
         isFetching = true;
@@ -108,6 +108,22 @@ export const editArticle = createCallApi(HUSSIF, {
             isFetching: false
         });
     },
+    failure: (state, payload) => update(state, {
+        isFetching: {$set: false}
+    })
+});
+
+// 替换路径
+export const replaceImg = createCallApi(HUSSIF, {
+    type: 'REPLACEIMG',
+    endpoint: '/qiniu/replace-src',
+    method: 'POST',
+    request: (state, payload) => update(state, {
+        isFetching: {$set: true}
+    }),
+    success: (state, payload) => update(state, {
+        isFetching: {$set: false}
+    }),
     failure: (state, payload) => update(state, {
         isFetching: {$set: false}
     })

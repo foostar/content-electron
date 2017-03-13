@@ -105,7 +105,7 @@ export default class extends Component {
         dataIndex: 'createdAt',
         width: 120,
         key: 'createdAt',
-        render: (time) => moment(time).format('YY-M-D h:m')
+        render: (time) => moment(time).format('YYYY-MM-DD hh:mm')
     }, {
         title: '文章标签',
         key: 'tag',
@@ -130,7 +130,7 @@ export default class extends Component {
                     <Layout.Sider width='200' className={style.sider}>
                         <h3>搜索条件</h3>
                         <Form onSubmit={this.handleSubmit}>
-                            <FormSearch form={form} getFieldDecorator={getFieldDecorator} recentTag={recentTag} />
+                            <FormSearch form={form} getFieldDecorator={getFieldDecorator} recentTag={recentTag} searchUser={this.props.searchUser} />
                             <div className={style.buttons}>
                                 <Button onClick={this.handleReset}>
                                     清空

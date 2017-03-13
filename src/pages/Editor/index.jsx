@@ -52,12 +52,9 @@ export default class Editor extends Component {
                     message: '请输入文章内容'
                 });
             }
-            this.props.fetching();
-            const _content = await this.replaceImg(content);
-
             const data = Object.assign({}, values, {
                 type: 'article',
-                content: _content
+                content
             });
             if (articleId) {
                 const {type} = await this.props.editArticle({
@@ -87,6 +84,13 @@ export default class Editor extends Component {
     addSuccess = () => {
         hashHistory.replace('/articles');
     }
+    pasteAfter () {
+        this.props.fetching();
+        setTimeout(async () => {
+            const content = await this.replaceImg(this.props.editor.content);
+            this.handleEditorChange(content);
+        }, 300);
+    }
     replaceImg (content) {
         const modelDom = this.refs.model;
         modelDom.innerHTML = content;
@@ -110,7 +114,7 @@ export default class Editor extends Component {
             });
             for (let i = 0; i < aImgs.length; i++) {
                 oImg = aImgs[i];
-                if (!/ofsyr49wg/.test(oImg.getAttribute('src'))) {
+                if (!/distribution/.test(oImg.getAttribute('src'))) {
                     oImg.setAttribute('src', newUrls[i].url);
                 }
                 if (oImg.getAttribute('data-fr-image-pasted')) {
@@ -124,8 +128,7 @@ export default class Editor extends Component {
         if (/distribution/.test(item.url)) {
             return item;
         }
-        const blob = await this.getImg(item.url);
-        const url = await this.uploadImg(blob);
+        const url = await this.getImg(item.url);
         return {
             index: item.index,
             url
@@ -145,10 +148,11 @@ export default class Editor extends Component {
         .then(response => response.json())
         .then(json => `http://distribution-file.apps.xiaoyun.com/${json.key}`);
     }
-    getImg (url) {
-        return fetch(url)
-        .then(response => response.blob())
-        .then(blob => blob);
+    async getImg (path) {
+        const {type, payload} = await this.props.replaceImg({body: {path}});
+        if (type === 'REPLACEIMG_SUCCESS') {
+            return `http://distribution-file.apps.xiaoyun.com/${payload.result.data.key}`;
+        }
     }
     editorConfig = {
         placeholderText: '写点什么吧!',
@@ -176,6 +180,9 @@ export default class Editor extends Component {
                 this.props.fetching();
                 this.dropUpload(img);
                 return false;
+            },
+            'froalaEditor.paste.after': (e, editor) => {
+                this.pasteAfter();
             }
         }
     }
@@ -183,13 +190,15 @@ export default class Editor extends Component {
         $('.fr-element').on('mouseover', 'img', (e) => {
             const Img = $(e.target);
             const parent = Img.parent();
-            parent.css({position: 'relative'}).append('<i style="margin-left:3px" class="editor fa fa-pencil-square-o fa-2x" aria-hidden="true"></i>');
+            if (parent.find('.editor').length < 1) {
+                parent.css({position: 'relative'}).append('<i style="margin-left:3px" class="editor fa fa-pencil-square-o fa-2x" aria-hidden="true"></i>');
+            }
             $('.editor').unbind('click');
-            $('.editor').on('click', () => {
-                $('.editor').unbind('click');
-                $('.editor').remove();
-                this.props.handleImg(Img.attr('src'));
-            });
+        });
+        $('.fr-element').on('click', '.editor', (e) => {
+            const Img = $(e.target).prev();
+            $('.editor').remove();
+            this.props.handleImg(Img.attr('src'));
         });
         $('.fr-element').on('mouseout', 'img', (e) => {
             setTimeout(() => {

@@ -20,7 +20,7 @@ HUSSIF[ updateModel ] = (state, content) => {
     });
 };
 HUSSIF[ fetching ] = (state, isFetching) => {
-    if (isFetching == false) {
+    if (!isFetching) {
         isFetching = false;
     } else {
         isFetching = true;

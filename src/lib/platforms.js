@@ -1,5 +1,6 @@
 import OMQQPlatform from 'lib/omqq-platform';
 import BaijiaPlatform from 'lib/baijia-platform';
+import UCPlatform from 'lib/uc-platform';
 
 import qieLogo from './logos/platform-omqq.png';
 import baijiaLogo from './logos/platform-baijiahao.png';
@@ -24,6 +25,11 @@ const platforms = [{
     logo: qieLogo,
     Class: OMQQPlatform
 }, {
+    id: 'uc',
+    name: 'UC云观',
+    logo: ucLogo,
+    Class: UCPlatform
+}, {
     id: 'toutiao',
     name: '头条号',
     logo: toutiaoLogo,
@@ -37,11 +43,6 @@ const platforms = [{
     id: 'wechat',
     name: '微信公众号',
     logo: wechatLogo,
-    disabled: true
-}, {
-    id: 'uc',
-    name: 'UC云观',
-    logo: ucLogo,
     disabled: true
 }, {
     id: 'qq',
