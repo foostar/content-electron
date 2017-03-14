@@ -18,7 +18,7 @@ export default class BaijiaPlatform extends Platform {
         return new Promise((resolve, reject) => {
             const {loginUrl, account, password} = this;
             let session;
-            webview.loadURL(loginUrl);
+            helper.load(loginUrl);
             const didDomReady = async () => {
                 const url = webview.getURL();
                 // 登录界面
@@ -75,7 +75,7 @@ export default class BaijiaPlatform extends Platform {
         const helper = new WebviewHelper(webview);
         return new Promise(async (resolve, reject) => {
             const {publishUrl} = this;
-            webview.loadURL(publishUrl);
+            await helper.load(publishUrl);
 
             const didDomReady = async () => {
                 const url = webview.getURL();
@@ -101,7 +101,7 @@ export default class BaijiaPlatform extends Platform {
         const helper = new WebviewHelper(webview);
         return new Promise(async (resolve, reject) => {
             const {publishUrl} = this;
-            webview.loadURL(publishUrl);
+            helper.load(publishUrl);
             const didDomReady = async () => {
                 const url = webview.getURL();
                 if (url.startsWith(publishUrl)) {

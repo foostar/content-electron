@@ -6,8 +6,9 @@ import {Link} from 'react-router';
 import {bindActionCreators} from 'redux';
 import Page from 'components/Page';
 import FormSearch from './FormSearch';
-import PublishModal from 'components/PublishModal';
 import * as actions from 'reducers/admin/articles';
+import * as editorActions from 'reducers/admin/editor';
+import * as managerActions from 'reducers/manager';
 import moment from 'moment';
 import {findDOMNode} from 'react-dom';
 
@@ -18,7 +19,10 @@ const mapStateToProps = state => {
     };
 };
 const mapDispatchToProps = dispatch => {
-    return bindActionCreators(actions, dispatch);
+    return Object.assign(bindActionCreators(actions, dispatch), {
+        editorActions: bindActionCreators(editorActions, dispatch),
+        managerActions: bindActionCreators(managerActions, dispatch)
+    });
 };
 @Form.create()
 @connect(mapStateToProps, mapDispatchToProps)
@@ -110,7 +114,12 @@ export default class extends Component {
         title: '操作',
         key: 'action',
         width: 90,
-        render: (text, record) => <PublishModal content={record} ><a>发布</a></PublishModal>
+        render: (text, record) => <a onClick={async () => {
+            const res = await this.props.editorActions.getArticle({
+                params: record.id
+            });
+            this.props.managerActions.publish(res.payload.result.data);
+        }}>发布</a>
     }]
     render () {
         const {getFieldDecorator} = this.props.form;

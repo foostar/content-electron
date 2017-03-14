@@ -14,9 +14,9 @@ export default class OMQQPlatform extends Platform {
     }
     _login (webview) {
         const helper = new WebviewHelper(webview);
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             const {loginUrl, account, password} = this;
-            webview.loadURL(loginUrl);
+            await helper.load(loginUrl);
 
             const didDomReady = async () => {
                 const url = webview.getURL();
@@ -58,7 +58,7 @@ export default class OMQQPlatform extends Platform {
         const helper = new WebviewHelper(webview);
         return new Promise(async (resolve, reject) => {
             const {publishUrl} = this;
-            webview.loadURL(publishUrl);
+            await helper.load(publishUrl);
 
             const didDomReady = async () => {
                 const url = webview.getURL();
@@ -153,7 +153,7 @@ export default class OMQQPlatform extends Platform {
             throw Error('no startTime or endTime');
         }
         const helper = new WebviewHelper(webview);
-        const cookies = await helper.getCookies();
+        const cookies = await this.cookies;
         const userid = cookies.find(x => x.name === 'userid').value;
 
         const days = Math.ceil((endTime - startTime) / (60 * 60 * 24 * 1000));
