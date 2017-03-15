@@ -4,6 +4,9 @@ export default class WebviewHelper {
     }
     appendTo (container) {
         const {webview} = this;
+        if (webview.parentElement === container) {
+            return Promise.resolve();
+        }
         webview.__appending = true;
         return new Promise(resolve => {
             const didDomReady = () => {
@@ -39,7 +42,6 @@ export default class WebviewHelper {
         return new Promise((resolve, reject) => {
             this.webview.getWebContents().session.cookies.get(opt, (err, cookies) => {
                 if (err) return reject(err);
-                this.cookies = cookies;
                 resolve(cookies);
             });
         });
@@ -55,14 +57,13 @@ export default class WebviewHelper {
         });
     }
     async setCookies (cookies) {
+        const {session} = this.webview.getWebContents();
         const actions = cookies.map((cookie) => new Promise((resolve, reject) => {
-            this.webview.getWebContents().session.cookies.set(cookie, (err) => {
-                if (err) return reject(err);
+            session.cookies.set(cookie, () => {
                 resolve();
             });
         }));
         await Promise.all(actions);
-        this.cookies = cookies;
     }
     dev () {
         this.webview.openDevTools();
