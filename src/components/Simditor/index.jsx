@@ -1,20 +1,19 @@
 import 'simditor/styles/simditor.css';
 import 'simditor-fullscreen/styles/simditor-fullscreen.css';
 
-import React, {Component, createElement} from 'react';
+import React, {Component} from 'react';
 import style from './style.styl';
-import _ from 'lodash';
 import {connect} from 'react-redux';
-import config from 'config'
+import config from 'config';
 import classnames from 'classnames';
 
 import $ from 'jquery';
 import Simditor from 'simditor';
 import 'simditor-fullscreen';
-import Dropzone from './dropzone'
-import {Modal, message} from 'antd';
-import defaultImage from 'images/default-image.png'
-import errorImage from 'images/error-image.png'
+import Dropzone from './dropzone';
+import {Modal} from 'antd';
+import defaultImage from 'images/default-image.png';
+import errorImage from 'images/error-image.png';
 import MosaicImage from 'components/MosaicImage';
 
 Simditor.connect(Dropzone);
@@ -41,7 +40,7 @@ class SimpEditor extends Component {
         }
     }
 
-    componentDidMount() {
+    componentDidMount () {
         const textarea = this.refs.textarea;
         this.editor = new Simditor({
             textarea: $(textarea),
@@ -51,7 +50,7 @@ class SimpEditor extends Component {
                     const {data} = await this.getUptoken();
                     cb(data);
                 },
-                formatPath({ key }) {
+                formatPath ({key}) {
                     return 'http://distribution-file.apps.xiaoyun.com/' + key;
                 },
                 fileKey: 'file',
@@ -64,7 +63,7 @@ class SimpEditor extends Component {
             toolbar: ['title', 'bold', 'italic', 'underline', 'strikethrough', 'fontScale', 'color', 'ol', 'ul', 'table', 'link', 'image', 'hr', 'indent', 'outdent', 'alignment', 'fullscreen']
         });
         this.editor.on('pasting', () => {
-            this.setState({imgRelacing: true})
+            this.setState({imgRelacing: true});
             setTimeout(this.handlePaste, 500);
         });
         this.setValueByChildren(this.props.children);
@@ -81,13 +80,13 @@ class SimpEditor extends Component {
                 'Content-Type': 'application/json; charset=utf-8',
                 'Authorization': 'Bearer ' + this.props.token
             }
-        }).then(res => res.json())
+        }).then(res => res.json());
     }
     handlePaste = async () => {
         const replaceImgSrc = async (img) => {
             try {
                 if (img.src.startsWith('data:image')) {
-                    const file = await fetch(img.src).then(res => res.blob())
+                    const file = await fetch(img.src).then(res => res.blob());
                     const {data} = await this.getUptoken();
                     const body = new FormData();
                     body.append('file', file);
@@ -105,8 +104,8 @@ class SimpEditor extends Component {
                             'Authorization': 'Bearer ' + this.props.token
                         },
                         method: 'POST',
-                        body: JSON.stringify({ path: img.src })
-                    }).then(res => res.json())
+                        body: JSON.stringify({path: img.src})
+                    }).then(res => res.json());
                     if (!res.data.key) throw Error('no key in response body');
                     img.src = 'http://distribution-file.apps.xiaoyun.com/' + res.data.key;
                 }
@@ -114,13 +113,13 @@ class SimpEditor extends Component {
                 img.src = errorImage;
                 throw err;
             }
-        }
-        const tmpDiv = document.createElement('DIV')
-        tmpDiv.innerHTML = this.editor.getValue()
-        const imgs = [...tmpDiv.querySelectorAll('img')].filter(img => !img.src.match(/xiaoyun\.com/))
-        if (!imgs.length) return this.setState({ imgRelacing: false })
+        };
+        const tmpDiv = document.createElement('DIV');
+        tmpDiv.innerHTML = this.editor.getValue();
+        const imgs = [...tmpDiv.querySelectorAll('img')].filter(img => !img.src.match(/xiaoyun\.com/));
+        if (!imgs.length) return this.setState({imgRelacing: false});
         try {
-            await Promise.all(imgs.map(replaceImgSrc))
+            await Promise.all(imgs.map(replaceImgSrc));
         } catch (err) {
             console.error(err);
             Modal.error({
@@ -133,10 +132,10 @@ class SimpEditor extends Component {
                 )
             });
         }
-        this.setState({imgRelacing: false})
-        this.editor.setValue(tmpDiv.innerHTML)
+        this.setState({imgRelacing: false});
+        this.editor.setValue(tmpDiv.innerHTML);
     }
-    componentWillUnmount() {
+    componentWillUnmount () {
         this.editor.destroy();
         this.editor = null;
     }
@@ -147,16 +146,16 @@ class SimpEditor extends Component {
                 mosaicVisible: true,
                 mosaicKey: Date.now(), // 保证触发 cdm
                 mosaicImg: el
-            })
+            });
         }
     }
     afterMosaicClose = () => {
-        this.setState({mosaicVisible: false})
+        this.setState({mosaicVisible: false});
     }
-    render() {
+    render () {
         const className = classnames(this.props.className, style['wrap'], {
             [style['img-replacing']]: this.state.imgRelacing
-        })
+        });
         return (
             <div
                 className={className}

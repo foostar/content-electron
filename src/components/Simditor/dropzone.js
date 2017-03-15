@@ -1,5 +1,7 @@
 import $ from 'jquery';
 
+/* eslint-disable */
+
 class Dropzone {
     static pluginName = 'Dropzone'
     _entered = 0
@@ -9,19 +11,19 @@ class Dropzone {
             throw new Error("Can't work without 'simple-uploader' module");
             return;
         }
-        $(document.body).on("dragover", function (e) {
-            e.originalEvent.dataTransfer.dropEffect = "none";
+        $(document.body).on('dragover', function (e) {
+            e.originalEvent.dataTransfer.dropEffect = 'none';
             return e.preventDefault();
         });
         $(document.body).on('drop', function (e) {
             return e.preventDefault();
         });
-        this.imageBtn = this.editor.toolbar.findButton("image");
-        return this.editor.body.on("dragover", function (e) {
-            e.originalEvent.dataTransfer.dropEffect = "copy";
+        this.imageBtn = this.editor.toolbar.findButton('image');
+        return this.editor.body.on('dragover', function (e) {
+            e.originalEvent.dataTransfer.dropEffect = 'copy';
             e.stopPropagation();
             return e.preventDefault();
-        }).on("dragenter", (function (_this) {
+        }).on('dragenter', (function (_this) {
             return function (e) {
                 if ((_this._entered += 1) === 1) {
                     _this.show();
@@ -29,7 +31,7 @@ class Dropzone {
                 e.preventDefault();
                 return e.stopPropagation();
             };
-        })(this)).on("dragleave", (function (_this) {
+        })(this)).on('dragleave', (function (_this) {
             return function (e) {
                 if ((_this._entered -= 1) <= 0) {
                     _this.hide();
@@ -37,7 +39,7 @@ class Dropzone {
                 e.preventDefault();
                 return e.stopPropagation();
             };
-        })(this)).on("drop", (function (_this) {
+        })(this)).on('drop', (function (_this) {
             return function (e) {
                 var file, imageFiles, _i, _j, _len, _len1, _ref;
                 imageFiles = [];
@@ -45,7 +47,7 @@ class Dropzone {
                 for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                     file = _ref[_i];
                     if (!_this.validFile(file)) {
-                        alert("「" + file.name + "]」文件不是图片。");
+                        alert('「' + file.name + ']」文件不是图片。');
                         _this.hide();
                         return false;
                     }
@@ -73,7 +75,7 @@ class Dropzone {
     }
 
     validFile (file) {
-        return file.type.indexOf("image/") > -1;
+        return file.type.indexOf('image/') > -1;
     }
 
 }
