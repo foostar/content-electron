@@ -13,25 +13,14 @@ document.body.appendChild(container);
 const dataCaches = {};
 const helpers = [];
 
-const autoLoginWithCookies = async (webview, cookies) => {
-    const helper = new WebviewHelper(webview);
-    if (cookies && cookies.length) {
-        try {
-            await helper.setCookies(cookies);
-        } catch (err) {}
-    }
-};
-
 export default class Platform extends Events {
     constructor ({account, password, session: cookies, id}, options = {}) {
         super();
         if (!account || !password) throw new Error('缺少用户名或密码');
-        // this.partition = `persist:${id}`;
-        // this.partition = `persist:${Date.now()}`;
         this.id = id;
         this.account = account;
         this.password = password;
-        this.cookies = cookies;
+        this.cookies = cookies || [];
         this.dataCache = dataCaches[id] = dataCaches[id] || new DataCache({
             store: new DiskStore()
         });
@@ -58,34 +47,34 @@ export default class Platform extends Events {
     }
     async createWebviewHelper () {
         const webview = document.createElement('webview');
-        const helper = new WebviewHelper(webview);
         webview.style.height = webview.style.width = '100%';
         webview.setAttribute('partition', _.uniqueId('persist:'));
         webview.setAttribute('src', 'about:blank');
+        const helper = new WebviewHelper(webview);
         await helper.appendTo(container);
         return helper;
     }
     async getWebviewHelper () {
         const helper = helpers.pop() || await this.createWebviewHelper();
-        await autoLoginWithCookies(helper.webview, this.cookies);
+        await helper.clearCache();
+        await helper.setCookies(this.cookies);
         return helper;
     }
     async releaseWebviewHelper (helper) {
-        await helper.clearCache();
         await helper.load('about:blank');
         await helper.appendTo(container);
+        await helper.clearCache();
         helpers.push(helper);
     }
     updateCookies (cookies) {
-        this.cookies = cookies;
         return store.dispatch(updateUpstream({
             params: {id: this.id},
             body: {session: cookies}
         }));
     }
-    async addTask (name, fn, helper) {
+    async addTask (name, fn) {
         const {tasks} = this;
-        helper = helper || await this.getWebviewHelper();
+        const helper = await this.getWebviewHelper();
         const task = {
             id: _.uniqueId('task_'),
             name,
@@ -121,7 +110,6 @@ export default class Platform extends Events {
             if (container) {
                 await helper.appendTo(container);
             }
-            helper.clearCache();
             return this._login(helper.webview);
         });
     }
@@ -132,6 +120,7 @@ export default class Platform extends Events {
         const isLogin = await this.isLogin();
         if (!isLogin) {
             const {session} = await this.login();
+            this.cookies = JSON.parse(JSON.stringify(session));
             this.updateCookies(session);
         }
     }
