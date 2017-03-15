@@ -13,8 +13,7 @@ export default class ImgEidtor extends React.Component {
         this.originImg.onload = (e) => {
             this.ctx = this.refs.canvas.getContext('2d');
             const {naturalWidth, naturalHeight} = this.originImg;
-            this.RATIO = (window.devicePixelRatio || 1) /
-        (this.refs.canvas.backingStorePixelRatio || 1);
+            this.RATIO = (window.devicePixelRatio || 1) / (this.refs.canvas.backingStorePixelRatio || 1);
             this.WIDTH = naturalWidth * this.RATIO;
             this.HEIGHT = naturalHeight * this.RATIO;
             this.RATE = this.WIDTH / this.refs.canvas.offsetWidth;
@@ -49,17 +48,17 @@ export default class ImgEidtor extends React.Component {
         this._x2 = (this.x2 - this.x1) * this.RATE;
         this._y2 = (this.y2 - this.y1) * this.RATE;
         this.ctx.fillRect(
-      this._x1,
-      this._y1,
-      this._x2,
-      this._y2
-    );
+            this._x1,
+            this._y1,
+            this._x2,
+            this._y2
+        );
         this.ctx.strokeRect(
-      this._x1,
-      this._y1,
-      this._x2,
-      this._y2
-    );
+            this._x1,
+            this._y1,
+            this._x2,
+            this._y2
+        );
     }
     onMouseUp = (e) => {
         const {SIZE, TYPE} = this.state;
@@ -113,25 +112,7 @@ export default class ImgEidtor extends React.Component {
                 onOk={this.handleSave}
                 onCancel={this.props.modalCancel}
                 confirmLoading={this.props.isFetching}
-                                >
-                {this.state.uploading &&
-                <div>
-                    <div className='sk-fading-circle'>
-                        <div className='sk-circle1 sk-circle' />
-                        <div className='sk-circle2 sk-circle' />
-                        <div className='sk-circle3 sk-circle' />
-                        <div className='sk-circle4 sk-circle' />
-                        <div className='sk-circle5 sk-circle' />
-                        <div className='sk-circle6 sk-circle' />
-                        <div className='sk-circle7 sk-circle' />
-                        <div className='sk-circle8 sk-circle' />
-                        <div className='sk-circle9 sk-circle' />
-                        <div className='sk-circle10 sk-circle' />
-                        <div className='sk-circle11 sk-circle' />
-                        <div className='sk-circle12 sk-circle' />
-                    </div>
-                </div>
-        }
+            >
                 <Row>
                     <Col xs={8} className={style.inputWrap}>
                         <label>模糊程度：</label>
@@ -142,7 +123,8 @@ export default class ImgEidtor extends React.Component {
                             max='30'
                             value={this.state.SIZE}
                             onChange={(e) => this.setState({SIZE: e.target.value})}
-                            className={style.formControl} />
+                            className={style.formControl}
+                        />
                     </Col>
                     <Col xs={8}>
                         <label>模糊方式：</label>
@@ -160,7 +142,7 @@ export default class ImgEidtor extends React.Component {
                         onMouseUp={this.onMouseUp}
                         onMouseLeave={this.onMouseLeave}
                         className={style.canvas}
-                         />
+                    />
                 </div>
             </Modal>
         );

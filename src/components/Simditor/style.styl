@@ -1,0 +1,44 @@
+.img-replacing
+    img
+        filter blur(10px)
+
+.wrap
+    img
+        max-width 80%
+        height auto
+
+.error-img
+    position relative
+    display block
+    width 100px
+    &:after
+        content '上传错误'
+        position absolute
+        bottom 0
+        left 0
+        background #333
+        color #fff
+
+:global
+    .simditor
+        border-radius 3px
+        overflow hidden
+        border 1px solid #d9d9d9
+        transition box-shadow .3s, border-color .3s
+    .simditor:hover
+        border-color #fa8c8c
+
+    .simditor.focus
+        border-color #fa8c8c
+        outline 0
+        box-shadow 0 0 0 2px rgba(249, 104, 104, 0.2)
+
+    .simditor-fullscreen .simditor
+        border 0
+        box-shadow none
+
+    .simditor-toolbar > ul
+        padding 0
+
+    .simditor-fullscreen .simditor-body
+        height: calc(100vh - 101px) !important;

@@ -32,7 +32,7 @@ export default class extends Component {
         const fromData = this.props.form.getFieldsValue();
         this.props.changeForm(fromData);
         const data = this.getFormData(fromData, page);
-        this.props.getArticles({query: data});
+        this.props.getContents({query: data});
     }
     handleSubmit = (e) => {
         e.preventDefault();

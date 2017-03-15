@@ -1,8 +1,8 @@
 import {combineReducers} from 'redux';
 import passport from './passport';
-import editor from './editor';
+// import editor from './editor';
 import upstreams from './upstreams';
-import articles from './articles';
+import articles from './contents';
 import reproduction from './reproduction';
 
 import adminArticles from './admin/articles';
@@ -13,7 +13,7 @@ export default combineReducers({
     reproduction,
     passport,
     users,
-    editor,
+    // editor,
     articles,
     adminArticles,
     adminEditor,

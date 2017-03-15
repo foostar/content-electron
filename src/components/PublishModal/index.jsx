@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import * as articlesActions from 'reducers/articles';
+import * as articlesActions from 'reducers/contents';
 import * as upstreamsActions from 'reducers/upstreams';
 import * as reproductionActions from 'reducers/reproduction';
 import {merge} from 'lodash';
