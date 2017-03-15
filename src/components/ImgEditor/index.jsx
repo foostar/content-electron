@@ -1,5 +1,5 @@
 import React from 'react';
-import {Row, Col, Select, Modal} from 'antd';
+import {Row, Col, Select, Modal, Button} from 'antd';
 import style from './style.styl';
 const Option = Select.Option;
 export default class ImgEidtor extends React.Component {
@@ -11,21 +11,25 @@ export default class ImgEidtor extends React.Component {
     componentDidMount () {
         this.originImg = document.createElement('IMG');
         this.originImg.onload = (e) => {
-            this.ctx = this.refs.canvas.getContext('2d');
-            const {naturalWidth, naturalHeight} = this.originImg;
-            this.RATIO = (window.devicePixelRatio || 1) /
-        (this.refs.canvas.backingStorePixelRatio || 1);
-            this.WIDTH = naturalWidth * this.RATIO;
-            this.HEIGHT = naturalHeight * this.RATIO;
-            this.RATE = this.WIDTH / this.refs.canvas.offsetWidth;
-            this.refs.canvas.width = this.WIDTH;
-            this.refs.canvas.height = this.HEIGHT;
-            this.ctx.drawImage(this.originImg, 0, 0, this.WIDTH, this.HEIGHT);
-            this.refs.canvas.toBlob((blob) => {
-                this.originBlob = blob;
-            });
+            this.drawImage();
         };
         this.originImg.src = this.props.src;
+        this.isModify = false;
+    }
+    drawImage () {
+        this.ctx = this.refs.canvas.getContext('2d');
+        const {naturalWidth, naturalHeight} = this.originImg;
+        this.RATIO = (window.devicePixelRatio || 1) /
+    (this.refs.canvas.backingStorePixelRatio || 1);
+        this.WIDTH = naturalWidth * this.RATIO;
+        this.HEIGHT = naturalHeight * this.RATIO;
+        this.RATE = this.WIDTH / this.refs.canvas.offsetWidth;
+        this.refs.canvas.width = this.WIDTH;
+        this.refs.canvas.height = this.HEIGHT;
+        this.ctx.drawImage(this.originImg, 0, 0, this.WIDTH, this.HEIGHT);
+        this.refs.canvas.toBlob((blob) => {
+            this.originBlob = blob;
+        });
     }
     onMouseDown = (e) => {
         e.preventDefault();
@@ -89,11 +93,15 @@ export default class ImgEidtor extends React.Component {
             }
         }
         this.preData = this.ctx.getImageData(0, 0, this.WIDTH, this.HEIGHT);
+        this.isModify = true;
     }
     onMouseLeave = (e) => {
         this.onMouseUp(e);
     }
     handleSave = () => {
+        if (!this.isModify) {
+            return this.props.modalCancel();
+        }
         this.setState({uploading: true});
         this.refs.canvas.toBlob((blob) => {
             this.props.imageProcess(this.props.src, blob);
@@ -106,6 +114,11 @@ export default class ImgEidtor extends React.Component {
         //     this.setState({uploading: false});
         //     this.props.toggle();
         // });
+    }
+    cancelBlur = () => {
+        this.drawImage();
+        this.originImg.src = this.props.src;
+        this.isModify = false;
     }
     render () {
         return (
@@ -150,6 +163,9 @@ export default class ImgEidtor extends React.Component {
                             <Option value='square'>正方形</Option>
                             <Option value='cicle'>圆形</Option>
                         </Select>
+                    </Col>
+                    <Col xs={8}>
+                        <Button type='default' onClick={this.cancelBlur}>取消马赛克</Button>
                     </Col>
                 </Row>
                 <hr />
