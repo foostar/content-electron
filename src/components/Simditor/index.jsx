@@ -131,7 +131,7 @@ class SimpEditor extends Component {
                         <img width='80' src={errorImage} />
                     </p>
                 )
-            })
+            });
         }
         this.setState({imgRelacing: false})
         this.editor.setValue(tmpDiv.innerHTML)

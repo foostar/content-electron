@@ -1,22 +1,13 @@
 import {createCallApi} from 'middlewares/api';
-import {createAction, createReducer} from 'redux-act';
+import {createReducer} from 'redux-act';
 import update from 'react/lib/update';
-import moment from 'moment';
 
 const HUSSIF = {};
 const INITAL = {
-    isFetching: false,
+    fetching: false,
     count: 50,
     skip: 0,
-    contents: []
-};
-
-// 改变页数
-export const pageChange = createAction('PAGECHANGE');
-HUSSIF[ pageChange ] = (state, skip) => {
-    return Object.assign({}, state, {
-        skip
-    });
+    data: []
 };
 
 // 获取文章列表
@@ -25,20 +16,16 @@ export const getContents = createCallApi(HUSSIF, {
     endpoint: '/contents',
     method: 'GET',
     request: (state, payload) => update(state, {
-        isFetching: {$set: true}
+        fetching: {$set: true}
     }),
-    success: (state, payload) => {
-        const {data} = payload.result;
-        data.contents.forEach((v) => {
-            v.key = v.id;
-            v.createdAt = moment(v.createdAt).format('YYYY-MM-DD');
-        });
-        return Object.assign({}, state, data, {
-            isFetching: false
-        });
-    },
+    success: (state, payload) => update(state, {
+        data: {$set: payload.result.data.contents},
+        skip: {$set: payload.result.data.skip},
+        count: {$set: payload.result.data.count},
+        fetching: {$set: false}
+    }),
     failure: (state, payload) => update(state, {
-        isFetching: {$set: true}
+        fetching: {$set: false}
     })
 });
 

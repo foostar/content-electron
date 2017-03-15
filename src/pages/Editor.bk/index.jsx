@@ -42,9 +42,9 @@ export default class Editor extends Component {
     fetchData = () => new Promise(async (resolve, reject) => {
         const {articleId} = this.props.router.location.query;
         this.props.form.validateFields(async (err, values) => {
-            const {content, isFetching} = this.props.editor;
+            const {content, fetching} = this.props.editor;
             if (err) return;
-            if (isFetching) return;
+            if (fetching) return;
             if (!content) {
                 return notification.warning({
                     message: '请输入文章内容'
@@ -241,7 +241,7 @@ export default class Editor extends Component {
         this.props.handleImg();
     }
     render () {
-        const {content, title, category, isFetching, isAlter, originSrc} = this.props.editor;
+        const {content, title, category, fetching, isAlter, originSrc} = this.props.editor;
         const {getFieldDecorator, getFieldValue} = this.props.form;
         const self = this;
         const props = {
@@ -309,7 +309,7 @@ export default class Editor extends Component {
                                 {isAlter &&
                                     <ImgEditor
                                         src={originSrc}
-                                        isFetching={isFetching}
+                                        fetching={fetching}
                                         modalCancel={this.props.modalCancel}
                                         modalVisible={this.props.editor.modalVisible}
                                         imageProcess={this.imageProcess}

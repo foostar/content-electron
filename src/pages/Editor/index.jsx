@@ -7,6 +7,7 @@ import {Tag, Button, Layout, Form, Input, message} from 'antd';
 import style from './style.styl';
 import CategorySelect from 'components/CategorySelect';
 import {hashHistory} from 'react-router';
+import PublishModal from 'components/PublishModal';
 
 const mapStateToProps = state => {
     return {
@@ -32,29 +33,36 @@ const FormItem = Form.Item;
 @Form.create()
 @connect(mapStateToProps, mapDispatchToProps)
 class Editor extends Component {
-    state = {
-        data: {}
-    }
+    state = {data: {}}
     async componentDidMount () {
         const {contentId} = this.props.params;
         if (contentId === 'new') return this.setState({data: {}});
         const {payload} = await this.props.contentActions.getContent({params: contentId});
         this.setState({data: payload.result.data});
     }
-
-    onCreate = () => this.props.form.validateFields(async (err, values) => {
-        if (err) return;
-        const {title, category} = values;
-        const content = this.editor.getValue();
-        const {type} = await this.props.contentActions.addContent({
-            body: {title, category, content, type: 'article'}
-        });
-
-        if (type === 'ADD_CONTENT_SUCCESS') {
-            message.success(`${title} 创建成功`);
-            hashHistory.replace('/contents');
+    onPublish = async () => {
+        let {contentId} = this.props.params;
+        if (contentId === 'new') {
+            contentId = await this.onCreate(false);
         }
-    });
+        this.setState({publishId: contentId});
+    }
+    onCreate = (redirect) => new Promise((resolve, reject) => {
+        this.props.form.validateFields(async (err, values) => {
+            if (err) return;
+            const {title, category} = values;
+            const content = this.editor.getValue();
+            const {type, payload} = await this.props.contentActions.addContent({
+                body: {title, category, content, type: 'article'}
+            });
+
+            if (type === 'ADD_CONTENT_SUCCESS') {
+                if (!redirect) return resolve(payload.result.data.id);
+                message.success(`${title} 创建成功`);
+                hashHistory.replace('/contents');
+            }
+        });
+    })
     onUpdate = () => this.props.form.validateFields(async (err, values) => {
         if (err) return;
         const {title, category} = values;
@@ -72,6 +80,7 @@ class Editor extends Component {
     render () {
         const {getFieldDecorator, getFieldValue} = this.props.form;
         const {title, category} = this.state.data;
+        const {contentId} = this.props.params;
         return (
             <Form className={style.form} onSubmit={this.onSubmit}>
                 <Layout className={style.layout}>
@@ -105,12 +114,21 @@ class Editor extends Component {
                         </Sider> */}
                     </Layout>
                     <Footer className={style.footer}>
-                        {this.props.params.contentId === 'new'
+                        {contentId === 'new'
                             ? <Button type='primary' size='large' onClick={this.onCreate}>新增</Button>
                             : <Button type='primary' size='large' onClick={this.onUpdate}>更新</Button>
                         }
                         {this.props.level !== 1 &&
-                            <Button type='primary' size='large' onClick={this.onPublish}>发布</Button>
+                            <PublishModal
+                                afterClose={() => hashHistory.replace(`/contents`)}
+                                beforeShowModal={this.onPublish}
+                                content={{id: this.state.publishId}}
+                            >
+                                <Button key='publish' type='primary' size='large'>发布</Button>
+                            </PublishModal>
+                        }
+                        {contentId !== 'new' && this.props.level !== 1 &&
+                            <Button type='primary' size='large' onClick={this.onCreate}>另存为</Button>
                         }
                     </Footer>
                 </Layout>

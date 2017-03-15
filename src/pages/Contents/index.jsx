@@ -12,7 +12,7 @@ const {Column} = Table;
 
 const mapStateToProps = state => {
     return {
-        articles: state.articles
+        contents: state.contents
     };
 };
 const mapDispatchToProps = dispatch => {
@@ -21,24 +21,25 @@ const mapDispatchToProps = dispatch => {
 @connect(mapStateToProps, mapDispatchToProps)
 class Contents extends Component {
     componentDidMount () {
-        this.fetchData();
-    }
-    fetchData (page) {
-        page = (page - 1) || 0;
-        const {isFetching} = this.props.articles;
-        if (isFetching) return;
-        this.props.getContents({query: {
-            limit: 10,
-            skip: page * 10
-        }});
-    }
-    pageChange = (page) => {
-        this.props.pageChange(page);
+        const page = (this.props.contents.skip / 10) + 1;
         this.fetchData(page);
     }
+    fetchData = (page = 1) => {
+        const {fetching} = this.props.contents;
+        if (fetching) return;
+        this.props.getContents({query: {
+            limit: 10,
+            skip: (page - 1) * 10
+        }});
+    }
     render () {
-        const {contents, count, isFetching} = this.props.articles;
-        const pagination = {total: count, onChange: this.pageChange, pageSize: 10};
+        const {data, skip, count, fetching} = this.props.contents;
+        const pagination = {
+            total: count,
+            onChange: this.fetchData,
+            current: ~~(skip / 10) + 1,
+            pageSize: 10
+        };
         return (
             <Page className={style.container}>
                 <Layout className={style.layout}>
@@ -50,11 +51,10 @@ class Contents extends Component {
                     <Layout.Content className={style.content}>
                         <Table
                             bordered
-                            rowSelection={this.rowSelection}
-                            columns={this.columns}
-                            dataSource={contents}
+                            rowKey='id'
+                            dataSource={data}
                             pagination={pagination}
-                            loading={isFetching}
+                            loading={fetching}
                         >
                             <Column
                                 title='标题'

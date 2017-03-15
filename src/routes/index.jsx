@@ -9,7 +9,7 @@ import Contents from 'pages/Contents';
 import NotFound from 'pages/NotFound';
 import Editor from 'pages/Editor';
 import AdminUsers from 'pages/admin/Users';
-import AdminArticles from 'pages/admin/Articles';
+import AdminContents from 'pages/admin/Contents';
 import AdminUpstreams from 'pages/admin/Upstreams';
 import AdminStat from 'pages/admin/Stat';
 import AdminStatByPlatform from 'pages/admin/Stat/Platform';
@@ -51,7 +51,7 @@ export default (
 
             <Route path='admin'>
                 <Route path='users' component={AdminUsers} />
-                <Route path='articles' component={AdminArticles} />
+                <Route path='contents' component={AdminContents} />
                 <Route path='upstreams' component={AdminUpstreams} />
                 <Route path='stat' component={AdminStat}>
                     <IndexRoute component={AdminStatByPlatform} />

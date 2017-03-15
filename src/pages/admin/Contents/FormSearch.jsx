@@ -10,13 +10,13 @@ export default class FormSearch extends Component {
         data: []
     }
     timeout = null
-    handleChange = (value) => {
+    handleChange = (username) => {
         if (this.timeout) {
             clearTimeout(this.timeout);
             this.timeout = null;
         }
         this.timeout = setTimeout(async () => {
-            const result = await this.props.searchUser({query: {username: value, limit: 20}});
+            const result = await this.props.searchUser({query: {username, limit: 20}});
             const data = result.payload.result.data.users.map((v) => {
                 return {
                     value: v.id,
@@ -27,7 +27,7 @@ export default class FormSearch extends Component {
         }, 1000);
     }
     render () {
-        const {recentTag, getFieldDecorator, form} = this.props;
+        const {recentTag, getFieldDecorator, condition} = this.props;
         const options = recentTag.map((v, index) => {
             return <Option key={index} value={v}>{v}</Option>;
         });
@@ -36,8 +36,9 @@ export default class FormSearch extends Component {
                 <div className={style['form-item-label']}>作者</div>
                 <FormItem>
                     {getFieldDecorator('author', {
-                        initialValue: form.author || ''
+                        initialValue: condition.author || []
                     })(<Select
+                        placeholder='作者名字'
                         combobox
                         notFoundContent=''
                         defaultActiveFirstOption={false}
@@ -56,15 +57,15 @@ export default class FormSearch extends Component {
                 <div className={style['form-item-label']}>正文关键字</div>
                 <FormItem>
                     {getFieldDecorator('keyword', {
-                        initialValue: form.keyword || ''
-                    })(<Input />)}
+                        initialValue: condition.keyword || ''
+                    })(<Input placeholder='正文内容' />)}
                 </FormItem>
             </div>,
             <div key='3'>
                 <div className={style['form-item-label']}>分类</div>
                 <FormItem>
                     {getFieldDecorator('category', {
-                        initialValue: form.category || ['']
+                        initialValue: condition.category || ['']
                     })(<CategorySelect all />)}
                 </FormItem>
             </div>,
@@ -72,16 +73,16 @@ export default class FormSearch extends Component {
                 <div className={style['form-item-label']}>包含的标签</div>
                 <FormItem>
                     {getFieldDecorator('includeTags', {
-                        initialValue: form.includeTags || []
-                    })(<Select tags>{options}</Select>)}
+                        initialValue: condition.includeTags || []
+                    })(<Select placeholder='选择标签' tags>{options}</Select>)}
                 </FormItem>
             </div>,
             <div key='5'>
                 <div className={style['form-item-label']}>不包含的标签</div>
                 <FormItem>
                     {getFieldDecorator('excludeTags', {
-                        initialValue: form.excludeTags || []
-                    })(<Select tags>{options}</Select>)}
+                        initialValue: condition.excludeTags || []
+                    })(<Select placeholder='选择标签' tags>{options}</Select>)}
                 </FormItem>
             </div>
         ];

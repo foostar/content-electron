@@ -111,7 +111,7 @@ export default class ImgEidtor extends React.Component {
             <Modal width={800} title='图像处理' visible={this.props.modalVisible}
                 onOk={this.handleSave}
                 onCancel={this.props.modalCancel}
-                confirmLoading={this.props.isFetching}
+                confirmLoading={this.props.fetching}
             >
                 <Row>
                     <Col xs={8} className={style.inputWrap}>

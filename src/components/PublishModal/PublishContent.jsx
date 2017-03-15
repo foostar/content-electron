@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import * as editorActions from 'reducers/admin/editor';
+import * as editorActions from 'reducers/admin/contents';
 import * as upstreamsActions from 'reducers/upstreams';
 import {platformsById} from 'lib/platforms';
 import style from './style.styl';
