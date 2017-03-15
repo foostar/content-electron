@@ -59,12 +59,6 @@ export const addTag = createCallApi(HUSSIF, {
     method: 'POST',
     request: (state, payload) => update(state, {
         fetching: {$set: true}
-    }),
-    success: (state, payload) => update(state, {
-        fetching: {$set: false}
-    }),
-    failure: (state, payload) => update(state, {
-        fetching: {$set: false}
     })
 });
 
@@ -72,16 +66,7 @@ export const addTag = createCallApi(HUSSIF, {
 export const removeTag = createCallApi(HUSSIF, {
     type: 'ADMIN_REMOVE_TAG',
     endpoint: '/contents/:id/tag/:tag',
-    method: 'DELETE',
-    request: (state, payload) => update(state, {
-        fetching: {$set: true}
-    }),
-    success: (state, payload) => update(state, {
-        fetching: {$set: false}
-    }),
-    failure: (state, payload) => update(state, {
-        fetching: {$set: true}
-    })
+    method: 'DELETE'
 });
 
 // 搜索username

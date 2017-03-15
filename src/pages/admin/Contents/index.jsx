@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Table, Form, Button, Select, Tag, Layout} from 'antd';
+import {message, Table, Form, Button, Select, Tag, Layout} from 'antd';
 import style from './style.styl';
 import {connect} from 'react-redux';
 import {Link} from 'react-router';
@@ -179,13 +179,14 @@ class TagSelector extends Component {
             }
         });
         this.setState({inputValue: []});
+        message.success('添加成功');
         this.props.fetchData();
     }
     removeTag = (tag) => {
         const {id} = this.props.content;
         const params = {id, tag};
         this.props.removeTag({params});
-        this.props.fetchData();
+        message.success('删除成功');
     }
     toggleVisible = () => {
         this.setState({
@@ -199,10 +200,10 @@ class TagSelector extends Component {
         const {content: {tags}, recentTag} = this.props;
         return (
             <div>
-                {tags.map((label, index) =>
+                {tags.map(label =>
                     <Tag
                         closable
-                        key={index}
+                        key={label}
                         className={style['table-tag']}
                         afterClose={() => this.removeTag(label)}
                     >
@@ -220,8 +221,8 @@ class TagSelector extends Component {
                         onChange={this.addTag}
                         value={this.state.inputValue}
                     >
-                        {recentTag.map((value, index) =>
-                            <Option key={index} value={value}>{value}</Option>
+                        {recentTag.filter(item => !tags.includes(item)).map(value =>
+                            <Option key={value} value={value}>{value}</Option>
                         )}
                     </Select>
                 ) : (
