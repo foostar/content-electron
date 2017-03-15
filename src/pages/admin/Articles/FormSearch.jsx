@@ -28,7 +28,7 @@ export default class FormSearch extends Component {
     }
     render () {
         const {recentTag, getFieldDecorator, form} = this.props;
-        const options = recentTag.map((v, index) => {
+        const options = recentTag.length < 1 ? [] : recentTag.map((v, index) => {
             return <Option key={index} value={v}>{v}</Option>;
         });
         const children = [
@@ -47,7 +47,7 @@ export default class FormSearch extends Component {
                         onChange={this.handleChange}
                     >
                         {this.state.data.map((d, i) => {
-                            return <Option key={i} value={d.text}> {d.text} </Option>;
+                            return <Option key={d.id} value={d.text}> {d.text} </Option>;
                         })}
                     </Select>)}
                 </FormItem>

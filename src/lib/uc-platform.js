@@ -31,6 +31,7 @@ export default class BaijiaPlatform extends Platform {
                             inputs[0].value = '${account}';
                             inputs[1].value = '${password}';
                             inputs[0].focus();
+                            inputs[1].focus();
                         })();
                     `);
                 }
@@ -78,6 +79,7 @@ export default class BaijiaPlatform extends Platform {
             await helper.load(publishUrl);
 
             const didDomReady = async () => {
+                // webview.openDevTools();
                 const url = webview.getURL();
                 if (url.startsWith(publishUrl)) {
                     this.injectPublishScript(webview, title, data);
@@ -143,17 +145,25 @@ export default class BaijiaPlatform extends Platform {
     async injectPublishScript (webview, title, {content}) {
         const helper = new WebviewHelper(webview);
         await helper.executeJavaScript(`
-            (function() {
-                const el = document.querySelector('#ueditor_0');
-                if (!el) return setTimeout(arguments.callee, 200);
-                document.querySelector('.article-write_box-title').value = \`${title}\`;
-                window.frames['ueditor_0'].contentWindow.document.body.innerHTML = \`${content}\`;
-                document.querySelector('.article-write_box-title').focus();
-            })();
+            new Promise(resolve => {
+                (function() {
+                    const el = document.querySelector('#ueditor_0');
+                    if (!el) return setTimeout(arguments.callee, 200);
+                    const ue = document.querySelector('#ue_editor')
+                    if (!ue) return setTimeout(arguments.callee, 200);
+                    const title = document.querySelector('.article-write_box-title')
+                    title.value = \`${title}\`;
+                    const editor = UE.getEditor('ue_editor')
+                    editor.ready(function() {
+                        setTimeout(() => {
+                            editor.setContent(\`${content}\`);
+                            title.focus();
+                            resolve();
+                        }, 0)
+                    });
+                })();
+            })
         `);
-        webview.selectAll();
-        webview.cut();
-        webview.paste();
     }
     _statByContent (webview) {
         // const helper = new WebviewHelper(webview);

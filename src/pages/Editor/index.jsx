@@ -120,6 +120,7 @@ export default class Editor extends Component {
                 if (oImg.getAttribute('data-fr-image-pasted')) {
                     oImg.removeAttribute('data-fr-image-pasted');
                 }
+                oImg.style['max-width'] = '80%';
             }
             return modelDom.innerHTML;
         });
@@ -183,6 +184,9 @@ export default class Editor extends Component {
             },
             'froalaEditor.paste.after': (e, editor) => {
                 this.pasteAfter();
+            },
+            'froalaEditor.commands.after': () => {
+                console.log(arguments);
             }
         }
     }
@@ -210,9 +214,12 @@ export default class Editor extends Component {
         this.$editor.popups.hideAll();
         this.$editor.html.cleanEmptyTags();
         document.querySelector('.fr-drag-helper').remove();
-        const blob = imgs[0];
-        const url = await this.uploadImg(blob);
-        this.$editor.html.insert(`<img src='${url}'/>`, true);
+        let url;
+        for (let i = 0; i < imgs.length; i++) {
+            url = await this.uploadImg(imgs[i]);
+            this.$editor.html.insert(`<img src='${url}'/>`, true);
+        }
+        this.handleEditorChange($('.fr-element').html());
     }
     getToken () {
         const url = `http://baijia.rss.apps.xiaoyun.com/api/qiniu/uptoken`;
@@ -239,8 +246,8 @@ export default class Editor extends Component {
         this.props.modalCancel();
         this.props.fetching(false);
     }
-    handleImg = () => {
-        this.props.handleImg();
+    handleImg = (src) => {
+        this.props.handleImg(src);
     }
     render () {
         const {content, title, category, isFetching, isAlter, originSrc} = this.props.editor;

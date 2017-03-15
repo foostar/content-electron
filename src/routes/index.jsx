@@ -12,7 +12,6 @@ import GitHub from 'pages/GitHub';
 import Console from 'pages/Console';
 import AdminUsers from 'pages/admin/Users';
 import AdminArticles from 'pages/admin/Articles';
-import AdminEditor from 'pages/admin/Editor';
 import AdminUpstreams from 'pages/admin/Upstreams';
 import AdminStat from 'pages/admin/Stat';
 import AdminStatByPlatform from 'pages/admin/Stat/Platform';
@@ -58,7 +57,7 @@ export default (
                 <Route path='users' component={AdminUsers} />
                 <Route path='articles'>
                     <IndexRoute component={AdminArticles} />
-                    <Route path='editor' component={AdminEditor} />
+                    <Route path='editor' component={Editor} />
                 </Route>
                 <Route path='upstreams' component={AdminUpstreams} />
                 <Route path='stat' component={AdminStat}>
