@@ -11,7 +11,7 @@ container.style.overflow = 'hidden';
 document.body.appendChild(container);
 
 const dataCaches = {};
-const webviews = [];
+const helpers = [];
 
 const autoLoginWithCookies = async (webview, cookies) => {
     const helper = new WebviewHelper(webview);
@@ -40,154 +40,108 @@ export default class Platform extends Events {
             container
         }, options);
         this.addListener('task-start', task => {
-            this.emit(task.name, task.webview);
+            this.emit(`${task.name}:start`, task.webview);
             this.emit('tasks-update', task, 'start', this.tasks);
         });
+        this.addListener('task-success', task => {
+            this.emit(`${task.name}-success`, task.webview);
+            this.emit('tasks-update', task, 'success', this.tasks);
+        });
+        this.addListener('task-error', (task, err) => {
+            this.emit(`${task.name}-error`, task.webview);
+            this.emit('tasks-update', task, 'error', err, this.tasks);
+        });
         this.addListener('task-complete', task => {
-            this.emit(task.name, task.webview);
+            this.emit(`${task.name}-complete`, task.webview);
             this.emit('tasks-update', task, 'complete', this.tasks);
         });
     }
-    async createWebview () {
+    async createWebviewHelper () {
         const webview = document.createElement('webview');
         const helper = new WebviewHelper(webview);
         webview.style.height = webview.style.width = '100%';
-        // document.body.innerHTML = '';
         webview.setAttribute('partition', _.uniqueId('persist:'));
         webview.setAttribute('src', 'about:blank');
-        const container = typeof this.options.container === 'function'
-            ? this.options.container()
-            : this.options.container;
         await helper.appendTo(container);
-        return webview;
-        // document.body.appendChild(webview);
-        // this._readyPromise.then(() => {
-        //     webview.openDevTools();
-        // });
+        return helper;
     }
-    async getWebview () {
-        // 0 未使用
-        // 1 使用中
-        const idle = _.remove(webviews, x => x.state === 0);
-        const webview = idle.pop();
-        idle.forEach(x => {
-            webviews.push(x);
-        });
-        const instance = webview ? webview.instance : await this.createWebview();
-        webviews.push({
-            state: 1,
-            instance
-        });
-        // 如果webview池，partition无法重新设置
-        // instance.setAttribute('partition', this.partition);
-        const helper = new WebviewHelper(instance);
+    async getWebviewHelper () {
+        const helper = helpers.pop() || await this.createWebviewHelper();
+        await autoLoginWithCookies(helper.webview, this.cookies);
+        return helper;
+    }
+    async releaseWebviewHelper (helper) {
         await helper.clearCache();
-        return instance;
+        await helper.load('about:blank');
+        await helper.appendTo(container);
+        helpers.push(helper);
     }
-
     updateCookies (cookies) {
         this.cookies = cookies;
-        store.dispatch(updateUpstream({
+        return store.dispatch(updateUpstream({
             params: {id: this.id},
             body: {session: cookies}
         }));
     }
-
-    releaseWebview (instance) {
-        return new Promise((resolve, reject) => {
-            const wvs = webviews.filter(x => x.instance === instance);
-            if (wvs.length !== 1) return reject(new Error('webviews 管理错误!'));
-            const webview = wvs[0];
-            const complete = () => {
-                webview.state = 0;
-                resolve();
-            };
-            const didDomReady = () => {
-                instance.removeEventListener('dom-ready', didDomReady);
-                complete();
-            };
-            if (instance.parentElement === container) {
-                return complete();
-            }
-            const helper = new WebviewHelper(instance);
-            helper.appendTo(container).then(() => {
-                instance.addEventListener('dom-ready', didDomReady);
-                instance.loadURL('about:blank');
-            }, reject);
-        });
-    }
-    addTask (name, webview) {
+    async addTask (name, fn, helper) {
         const {tasks} = this;
+        helper = helper || await this.getWebviewHelper();
         const task = {
             id: _.uniqueId('task_'),
             name,
-            webview
+            helper,
+            webview: helper.webview,
+            complete: async () => {
+                if (task._complete) return;
+                task._complete = true;
+                await this.releaseWebviewHelper(helper);
+                _.remove(tasks, task);
+                this.emit('task-complete', task);
+            }
         };
         tasks.push(task);
         this.emit('task-start', task);
-        return () => {
-            _.remove(tasks, task);
-            this.emit('task-complete', task);
-        };
+        let result;
+        let error;
+        try {
+            result = await fn(helper);
+        } catch (err) {
+            error = err;
+        }
+        await task.complete();
+        if (error) {
+            this.emit('task-error', task, error);
+            return Promise.reject(error);
+        }
+        this.emit('task-success', task);
+        return result;
     }
     async login (container) {
-        const webview = await this.getWebview();
-        const helper = new WebviewHelper(webview);
-        if (container) {
-            await helper.appendTo(container);
-        }
-        const onComplete = this.addTask('login', webview);
-        const result = await this._login(webview);
-        onComplete();
-        await this.releaseWebview(webview);
-        return result;
+        return this.addTask('login', async helper => {
+            if (container) {
+                await helper.appendTo(container);
+            }
+            helper.clearCache();
+            return this._login(helper.webview);
+        });
     }
     async isLogin () {
-        if (Date.now() - this._lastCheck < 1000 * 60 * 5) {
-            return true;
-        }
-        const webview = await this.getWebview();
-        await autoLoginWithCookies(webview, this.cookies);
-        const onComplete = this.addTask('check-login', webview);
-        const result = await this._isLogin(webview);
-        await this.releaseWebview(webview);
-        onComplete();
-        if (result) {
-            this._lastCheck = Date.now();
-        }
-        return result;
+        return await this.addTask('check-login', helper => this._isLogin(helper.webview));
     }
-    async publish (title, data, container) {
-        const webview = await this.getWebview();
-        const helper = new WebviewHelper(webview);
-        await autoLoginWithCookies(webview, this.cookies);
+    async autoLogin () {
         const isLogin = await this.isLogin();
         if (!isLogin) {
             const {session} = await this.login();
             this.updateCookies(session);
         }
-        if (container) {
-            await helper.appendTo(container);
-        }
-        const onComplete = this.addTask('publish', webview);
-        const result = await this._publish(webview, title, data);
-        onComplete();
-        await this.releaseWebview(webview);
-        return result;
+    }
+    async publish (title, data) {
+        await this.autoLogin();
+        return this.addTask('publish', helper => this._publish(helper.webview, title, data));
     }
     async statByContent () {
-        const webview = await this.getWebview();
-        await autoLoginWithCookies(webview, this.cookies);
-        const isLogin = await this.isLogin();
-        if (!isLogin) {
-            const {session} = await this.login();
-            this.updateCookies(session);
-        }
-        const onComplete = this.addTask('stat-by-content', webview);
-        const result = await this._statByConent(webview);
-        onComplete();
-        await this.releaseWebview(webview);
-        return result;
+        await this.autoLogin();
+        return this.addTask('stat-by-content', helper => this._statByConent(helper.webview));
     }
     statByUpstream (startTime, endTime) {
         const key = JSON.stringify({
@@ -205,18 +159,8 @@ export default class Platform extends Events {
         });
     }
     async __statByUpstream (startTime, endTime) {
-        const webview = await this.getWebview();
-        await autoLoginWithCookies(webview, this.cookies);
-        const isLogin = await this.isLogin();
-        if (!isLogin) {
-            const {session} = await this.login();
-            this.updateCookies(session);
-        }
-        const onComplete = this.addTask('stat-by-upstream', webview);
-        const result = await this._statByUpstream(webview, startTime, endTime);
-        onComplete();
-        await this.releaseWebview(webview);
-        return result;
+        await this.autoLogin();
+        return this.addTask('stat-by-upstream', helper => this._statByUpstream(helper.webview, startTime, endTime));
     }
     _login () {
         throw new Error('请重写_login方法！');

@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import style from './style.styl';
 import {platformsById} from 'lib/platforms';
-import {Modal, Checkbox, Tag, Button} from 'antd';
+import {Modal, Checkbox, Tag, Button, notification} from 'antd';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import * as managerActions from 'reducers/manager';
@@ -70,6 +70,12 @@ export default class PlatformManager extends React.Component {
                         }, x);
                     })
                 })
+            });
+        });
+        platform.addListener('publish-success', () => {
+            notification.success({
+                message: '发布完成',
+                description: '文章已发布完成！'
             });
         });
         return platform;
@@ -218,15 +224,16 @@ export default class PlatformManager extends React.Component {
                         ))
                     }
                 </Modal>
-                <div className={style.browser} style={{width: browserVisible ? '100%' : '0'}}>
+                <div className={style.browser} style={{width: (browserVisible && tabs.length) ? '100%' : '0'}}>
                     <div className={style['browser-header']}>
                         <div className={style['browser-tabbars']}>
-                            {tabs.map(({id, tips, account, platform}) => (
+                            {tabs.map(({id, tips, account, platform, complete}) => (
                                 <div
                                     key={id}
                                     onClick={() => this.onSelectTask(id)}
                                     className={style['browser-tabbar'] + (tabId === id ? ` ${style['browser-tabbar-active']}` : '')}>
                                     {account.nickname} [{platform.name} - {tips}]
+                                    <Button shape='circle' icon='close' className={style['browser-tab-close']} onClick={complete} />
                                 </div>))}
                         </div>
                         <Button shape='circle' icon='close' className={style['browser-close']} onClick={this.closeBrowser} />

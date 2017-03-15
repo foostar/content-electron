@@ -9,8 +9,21 @@ export default class OMQQPlatform extends Platform {
     statsUrl = 'https://om.qq.com/statistic/ArticleReal?media=5394191&channel=0&page=2&num=8&btime=1&relogin=1'
     async _isLogin (webview) {
         const helper = new WebviewHelper(webview);
-        const data = await helper.fetchJSON('https://om.qq.com/article/list?index=1&commentflag=0&source=0&relogin=1');
-        return data.response.code !== -10403;
+        return new Promise(async (resolve, reject) => {
+            const {publishUrl} = this;
+            await helper.load(publishUrl);
+            const didGetResponseDetails = async (event) => {
+                if (event.originalURL.startsWith(publishUrl)) {
+                    webview.removeEventListener('did-get-response-details', didGetResponseDetails);
+                    webview.stop();
+                    if (event.newURL.startsWith(publishUrl)) {
+                        return resolve(true);
+                    }
+                    return resolve(false);
+                }
+            };
+            webview.addEventListener('did-get-response-details', didGetResponseDetails);
+        });
     }
     _login (webview) {
         const helper = new WebviewHelper(webview);

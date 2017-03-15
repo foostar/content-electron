@@ -4,6 +4,9 @@ export default class WebviewHelper {
     }
     appendTo (container) {
         const {webview} = this;
+        if (webview.parentElement === container) {
+            return Promise.resolve();
+        }
         webview.__appending = true;
         return new Promise(resolve => {
             const didDomReady = () => {
