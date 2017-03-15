@@ -78,7 +78,7 @@ class StatByPlatform extends Component {
 
         const upps = this.props.upstreams.filter(x => this.state.selectUps.includes(x.id));
 
-        mapLimit(upps, 2, (item, done) => {
+        mapLimit(upps, 5, (item, done) => {
             this.fetchSingleUpstreamStat(item).then((result) => done(null, result)).catch(done);
         }, (err, dataArr) => {
             if (err) {

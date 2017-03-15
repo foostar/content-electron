@@ -40,6 +40,7 @@ class MasicImage extends Component {
     }
     onMouseDown = e => {
         e.preventDefault();
+        if (this.start) return this.onMouseUp();
         const {clientX, clientY} = e;
         this.start = true;
         this.startX = clientX;
@@ -112,7 +113,7 @@ class MasicImage extends Component {
         this.refs.aside.style.height = 0;
     }
     onMouseLeave = e => {
-        this.onMouseUp(e);
+        // this.onMouseUp(e);
     }
     onOk = () => {
         this.canvas2.toBlob(async blob => {
