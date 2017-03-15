@@ -184,9 +184,6 @@ export default class Editor extends Component {
             },
             'froalaEditor.paste.after': (e, editor) => {
                 this.pasteAfter();
-            },
-            'froalaEditor.commands.after': () => {
-                console.log(arguments);
             }
         }
     }

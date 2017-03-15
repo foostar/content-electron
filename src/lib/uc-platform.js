@@ -31,7 +31,6 @@ export default class BaijiaPlatform extends Platform {
                             inputs[0].value = '${account}';
                             inputs[1].value = '${password}';
                             inputs[0].focus();
-                            inputs[1].focus();
                         })();
                     `);
                 }
