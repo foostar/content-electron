@@ -1,5 +1,4 @@
 import Platform from './platform';
-import moment from 'moment';
 import WebviewHelper from 'utils/webview-helper';
 
 export default class BaijiaPlatform extends Platform {
@@ -9,16 +8,28 @@ export default class BaijiaPlatform extends Platform {
     submitUrl = 'http://mp.uc.cn/dashboard/contents/submit'
     async _isLogin (webview) {
         const helper = new WebviewHelper(webview);
-        const data = await helper.fetchJSON(`http://mp.uc.cn/api/ws/stat/wemedia/summary?date=${moment(new Date()).format('YYYYMMDD')}&_=${Date.now()}`);
-        if (!data.data) return false;
-        return true;
+        return new Promise(async (resolve, reject) => {
+            const {publishUrl} = this;
+            await helper.load(publishUrl);
+            const didGetResponseDetails = async (event) => {
+                if (event.originalURL.startsWith(publishUrl)) {
+                    webview.removeEventListener('did-get-response-details', didGetResponseDetails);
+                    webview.stop();
+                    if (event.newURL.startsWith(publishUrl)) {
+                        return resolve(true);
+                    }
+                    return resolve(false);
+                }
+            };
+            webview.addEventListener('did-get-response-details', didGetResponseDetails);
+        });
     }
     _login (webview) {
         const helper = new WebviewHelper(webview);
         return new Promise((resolve, reject) => {
             const {loginUrl, account, password} = this;
             let session;
-            webview.loadURL(loginUrl);
+            helper.load(loginUrl);
             const didDomReady = async () => {
                 const url = webview.getURL();
                 // 登录界面
@@ -75,9 +86,10 @@ export default class BaijiaPlatform extends Platform {
         const helper = new WebviewHelper(webview);
         return new Promise(async (resolve, reject) => {
             const {publishUrl} = this;
-            webview.loadURL(publishUrl);
+            await helper.load(publishUrl);
 
             const didDomReady = async () => {
+                // webview.openDevTools();
                 const url = webview.getURL();
                 if (url.startsWith(publishUrl)) {
                     this.injectPublishScript(webview, title, data);
@@ -101,7 +113,7 @@ export default class BaijiaPlatform extends Platform {
         const helper = new WebviewHelper(webview);
         return new Promise(async (resolve, reject) => {
             const {publishUrl} = this;
-            webview.loadURL(publishUrl);
+            helper.load(publishUrl);
             const didDomReady = async () => {
                 const url = webview.getURL();
                 if (url.startsWith(publishUrl)) {
@@ -143,17 +155,25 @@ export default class BaijiaPlatform extends Platform {
     async injectPublishScript (webview, title, {content}) {
         const helper = new WebviewHelper(webview);
         await helper.executeJavaScript(`
-            (function() {
-                const el = document.querySelector('#ueditor_0');
-                if (!el) return setTimeout(arguments.callee, 200);
-                document.querySelector('.article-write_box-title').value = \`${title}\`;
-                window.frames['ueditor_0'].contentWindow.document.body.innerHTML = \`${content}\`;
-                document.querySelector('.article-write_box-title').focus();
-            })();
+            new Promise(resolve => {
+                (function() {
+                    const el = document.querySelector('#ueditor_0');
+                    if (!el) return setTimeout(arguments.callee, 200);
+                    const ue = document.querySelector('#ue_editor')
+                    if (!ue) return setTimeout(arguments.callee, 200);
+                    const title = document.querySelector('.article-write_box-title')
+                    title.value = \`${title}\`;
+                    const editor = UE.getEditor('ue_editor')
+                    editor.ready(function() {
+                        setTimeout(() => {
+                            editor.setContent(\`${content}\`);
+                            title.focus();
+                            resolve();
+                        }, 0)
+                    });
+                })();
+            })
         `);
-        webview.selectAll();
-        webview.cut();
-        webview.paste();
     }
     _statByContent (webview) {
         // const helper = new WebviewHelper(webview);

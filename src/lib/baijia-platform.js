@@ -1,6 +1,5 @@
 import Platform from './platform';
 import moment from 'moment';
-import {clipboard} from 'electron';
 import WebviewHelper from 'utils/webview-helper';
 
 export default class BaijiaPlatform extends Platform {
@@ -9,14 +8,27 @@ export default class BaijiaPlatform extends Platform {
     publishUrl = 'http://baijiahao.baidu.com/builder/article/edit'
     async _isLogin (webview) {
         const helper = new WebviewHelper(webview);
-        const data = await helper.fetchJSON('https://baijiahao.baidu.com/builderinner/api/content/marketing/income');
-        return data.error_code === 0;
+        return new Promise(async (resolve, reject) => {
+            const {publishUrl} = this;
+            await helper.load(publishUrl);
+            const didGetResponseDetails = async (event) => {
+                if (event.originalURL.startsWith(publishUrl)) {
+                    webview.removeEventListener('did-get-response-details', didGetResponseDetails);
+                    webview.stop();
+                    if (event.newURL.startsWith(publishUrl)) {
+                        return resolve(true);
+                    }
+                    return resolve(false);
+                }
+            };
+            webview.addEventListener('did-get-response-details', didGetResponseDetails);
+        });
     }
     _login (webview) {
         const helper = new WebviewHelper(webview);
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             const {loginUrl, account, password} = this;
-            webview.loadURL(loginUrl);
+            await helper.load(loginUrl);
             // 登录会有输入验证码的情况, 不能做超时
             // const timer = setTimeout(() => {
             //     reject(new Error('timeout'));
@@ -73,7 +85,7 @@ export default class BaijiaPlatform extends Platform {
         }
         return new Promise(async (resolve, reject) => {
             const {publishUrl} = this;
-            webview.loadURL(publishUrl);
+            await helper.load(publishUrl);
             const didDomReady = async () => {
                 const url = webview.getURL();
                 if (url.startsWith(publishUrl)) {
@@ -112,14 +124,18 @@ export default class BaijiaPlatform extends Platform {
                     document.querySelector('.main').style.padding = 0;
                     document.querySelector('.main').style.margin = 0;
                     document.querySelector('#article-title').value = \`${title}\`;
-                    setTimeout(() => {
-                        editor.getEditor().focus();
-                        resolve();
-                    }, 1000)
-                })();
+                    // window.frames['ueditor_0'].contentWindow.document.body.innerHTML = \`${content}\`;
+                    editor = editor.getEditor()
+                    editor.ready(function() {
+                        editor.setContent(\`${content}\`);
+                        editor.focus()
+                        resolve()
+                    });
+                })()
             });
         `);
-        clipboard.writeHTML(content);
+        webview.selectAll();
+        webview.cut();
         webview.paste();
     }
 
@@ -135,7 +151,7 @@ export default class BaijiaPlatform extends Platform {
         endTime = moment(endTime).format('YYYYMMDD');
 
         const helper = new WebviewHelper(webview);
-        webview.loadURL('http://baijiahao.baidu.com/');
+        await helper.load('http://baijiahao.baidu.com/');
         const appId = await helper.executeJavaScript(`
             new Promise(resolve => {
                 (function () {

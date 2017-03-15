@@ -1,12 +1,116 @@
 .container
-    width 200px
-    max-height 100px
-    min-height 40px
+    width 240px
+    height 380px
     background #FFF
     box-shadow 0 0 3px #CCC
-    border-radius 3px
+    border-radius 4px
     position absolute
-    bottom 20px
+    bottom -10px
+    padding-bottom 10px
+    padding-top 30px
     right 20px
     z-index 99
-
+    display flex
+.upstreams-closed
+    bottom -350px
+.upstreams-title
+    position absolute
+    height 30px
+    line-height 30px
+    top 0
+    width 100%
+    padding 0 5px
+    font-weight bold
+    background #F6F7F8
+    cursor pointer
+.upstreams-list
+    flex 1
+    overflow auto
+.upstream
+    padding 5px
+    height 60px
+    border-bottom 1px solid #F6F7F8
+.upstream-header
+    height 20px
+    line-height 20px
+    width 100%
+    margin-bottom 8px
+.upstream-logo
+    width 20px
+    height 100%
+    float left
+    box-shadow 0 0 1px #CCC
+    border-radius 2px
+    overflow hidden
+    img
+        width 100%
+        height 100%
+        display block
+.upstream-name
+    float left
+    margin-left 5px
+    width 180px
+    height 100%
+.checkbox-group
+    margin-bottom 15px
+    padding 5px 0
+    .checkbox-group-all
+        padding 5px 0
+        span
+            font-size 14px
+            font-weight bold
+    .checkbox-group-list
+        padding-left 25px
+.browser
+    position fixed
+    top 0
+    bottom 0
+    left 0
+    right 0
+    overflow hidden
+    z-index 100
+    background #F6F7F8
+    display flex
+    flex-direction column
+    .browser-header
+        height 30px
+        line-height 30px
+        display flex
+        .browser-tabbars
+            height 100%
+            flex 1
+            display flex
+            .browser-tabbar
+                flex 1
+                max-width 160px
+                overflow hidden
+                padding 0 5px
+                box-shadow 0 0 1px #CCC
+                border-bottom 0
+                cursor pointer
+                position relative
+                padding-right 28px
+                .browser-tab-close
+                    position absolute
+                    right 0
+                    top 0
+                    border 0
+                    width 28px
+                    height 28px
+                    background none
+            .browser-tabbar-active
+                background #FFF
+        .browser-close
+            border 0
+            width 30px
+            height 30px
+            background #F6F7F8
+    .browser-content
+        position relative
+        background #FFF
+        flex 1
+        display flex
+    .browser-webview
+        position absolute
+        width 100%
+        height 100%
