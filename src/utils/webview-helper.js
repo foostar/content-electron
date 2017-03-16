@@ -49,11 +49,11 @@ export default class WebviewHelper {
     clearCache () {
         return new Promise((resolve, reject) => {
             const session = this.webview.getWebContents().session;
-            session.clearCache(() => {
-                session.clearStorageData([], function () {
-                    resolve();
-                });
+            // session.clearCache(() => {
+            session.clearStorageData([], function () {
+                resolve();
             });
+            // });
         });
     }
     async setCookies (cookies) {

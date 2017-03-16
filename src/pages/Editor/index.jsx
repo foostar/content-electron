@@ -44,11 +44,12 @@ class Editor extends Component {
     onPublish = async () => {
         let {contentId} = this.props.params;
         if (contentId === 'new') {
-            contentId = await this.onCreate(false);
+            contentId = await this.onCreate();
         }
-        this.props.managerActions.publish(this.state.data);
+        const res = await this.props.contentActions.getContent({params: contentId});
+        this.props.managerActions.publish(res.payload.result.data);
     }
-    onCreate = (redirect) => new Promise((resolve, reject) => {
+    onCreate = () => new Promise((resolve, reject) => {
         this.props.form.validateFields(async (err, values) => {
             if (err) return;
             const {title, category} = values;
