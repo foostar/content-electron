@@ -65,7 +65,7 @@ export const apiMiddleware = (opt = {}) => store => next => async action => {
 
     if (method !== 'GET' && body) body = JSON.stringify(body);
 
-    next(request());
+    next(request(payload));
 
     try {
         const res = await fetch(url, {headers, method, body});

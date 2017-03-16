@@ -38,7 +38,7 @@ export const addContent = createCallApi(HUSSIF, {
 
 // 获取文章详情
 export const getContent = createCallApi(HUSSIF, {
-    type: 'GET_CONTENT',
+    type: 'ADMIN_GET_CONTENT',
     endpoint: '/contents'
 });
 

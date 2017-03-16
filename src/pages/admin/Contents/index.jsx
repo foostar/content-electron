@@ -6,8 +6,9 @@ import {Link} from 'react-router';
 import {bindActionCreators} from 'redux';
 import Page from 'components/Page';
 import FormSearch from './FormSearch';
-import PublishModal from 'components/PublishModal';
-import * as actions from 'reducers/admin/contents';
+// import PublishModal from 'components/PublishModal';
+import * as contentActions from 'reducers/admin/contents';
+import * as managerActions from 'reducers/manager';
 import moment from 'moment';
 import {findDOMNode} from 'react-dom';
 import {omitBy} from 'lodash';
@@ -16,18 +17,22 @@ const {Column} = Table;
 const {Option} = Select;
 const mapStateToProps = state => {
     return {
+        level: state.passport.data.level,
         contents: state.adminContents
     };
 };
 const mapDispatchToProps = dispatch => {
-    return bindActionCreators(actions, dispatch);
+    return {
+        contentActions: bindActionCreators(contentActions, dispatch),
+        managerActions: bindActionCreators(managerActions, dispatch)
+    };
 };
 @Form.create()
 @connect(mapStateToProps, mapDispatchToProps)
 export default class extends Component {
     componentDidMount () {
         this.fetchData();
-        this.props.getRecentTag();
+        this.props.contentActions.getRecentTag();
     }
     fetchData = (page) => {
         let {skip} = this.props.contents;
@@ -49,7 +54,7 @@ export default class extends Component {
             }
             return false;
         });
-        this.props.getContents({query});
+        this.props.contentActions.getContents({query});
     }
     handleSubmit = (e) => {
         e.preventDefault();
@@ -71,7 +76,18 @@ export default class extends Component {
     }
     handleReset = () => {
         this.props.form.resetFields();
-        this.props.changeForm({});
+    }
+    renderDelBtn = content => {
+        return (
+            <Button size='small' shape='circle' icon='delete' />
+        );
+    }
+    publish = async id => {
+        console.log(111);
+        const res = await this.props.contentActions.getContent({
+            params: id
+        });
+        this.props.managerActions.publish(res.payload.result.data);
     }
     render () {
         const {getFieldDecorator} = this.props.form;
@@ -91,7 +107,7 @@ export default class extends Component {
                             <FormSearch
                                 condition={condition}
                                 recentTag={recentTag}
-                                searchUser={this.props.searchUser}
+                                searchUser={this.props.contentActions.searchUser}
                                 getFieldDecorator={getFieldDecorator}
                             />
                             <div className={style.buttons}>
@@ -151,10 +167,11 @@ export default class extends Component {
                                 title='操作'
                                 key='action'
                                 width={90}
-                                render={(text, record) =>
-                                    <PublishModal content={record}>
-                                        <a>发布</a>
-                                    </PublishModal>
+                                render={(text, content) =>
+                                    <div>
+                                        <a onClick={() => this.publish(content.id)}>发布</a>
+                                        {/* {this.props.level === 0 && this.renderDelBtn(content)} */}
+                                    </div>
                                 }
                             />
                         </Table>

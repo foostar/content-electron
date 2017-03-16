@@ -2,12 +2,12 @@ import React, {Component} from 'react';
 import Simditor from 'components/Simditor';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import * as actions from 'reducers/contents';
+import * as contentActions from 'reducers/contents';
+import * as managerActions from 'reducers/manager';
 import {Tag, Button, Layout, Form, Input, message} from 'antd';
 import style from './style.styl';
 import CategorySelect from 'components/CategorySelect';
 import {hashHistory} from 'react-router';
-import PublishModal from 'components/PublishModal';
 
 const mapStateToProps = state => {
     return {
@@ -16,7 +16,8 @@ const mapStateToProps = state => {
 };
 const mapDispatchToProps = dispatch => {
     return {
-        contentActions: bindActionCreators(actions, dispatch)
+        contentActions: bindActionCreators(contentActions, dispatch),
+        managerActions: bindActionCreators(managerActions, dispatch)
     };
 };
 const {Content, Footer} = Layout;
@@ -45,7 +46,7 @@ class Editor extends Component {
         if (contentId === 'new') {
             contentId = await this.onCreate(false);
         }
-        this.setState({publishId: contentId});
+        this.props.managerActions.publish(this.state.data);
     }
     onCreate = (redirect) => new Promise((resolve, reject) => {
         this.props.form.validateFields(async (err, values) => {
@@ -57,9 +58,12 @@ class Editor extends Component {
             });
 
             if (type === 'ADD_CONTENT_SUCCESS') {
-                if (!redirect) return resolve(payload.result.data.id);
                 message.success(`${title} 创建成功`);
-                hashHistory.replace('/contents');
+                if (this.props.params.contentId === 'new') {
+                    hashHistory.replace('/contents');
+                }
+                hashHistory.goBack();
+                resolve(payload.result.data.id);
             }
         });
     })
@@ -74,7 +78,8 @@ class Editor extends Component {
 
         if (type === 'UPDATE_CONTENT_SUCCESS') {
             message.success(`${title} 更新成功`);
-            hashHistory.replace('/contents');
+            // hashHistory.replace('/contents');
+            hashHistory.goBack();
         }
     });
     render () {
@@ -119,13 +124,7 @@ class Editor extends Component {
                             : <Button type='primary' size='large' onClick={this.onUpdate}>更新</Button>
                         }
                         {this.props.level !== 1 &&
-                            <PublishModal
-                                afterClose={() => hashHistory.replace(`/contents`)}
-                                beforeShowModal={this.onPublish}
-                                content={{id: this.state.publishId}}
-                            >
-                                <Button key='publish' type='primary' size='large'>发布</Button>
-                            </PublishModal>
+                            <Button type='primary' size='large' onClick={this.onPublish}>发布</Button>
                         }
                         {contentId !== 'new' && this.props.level !== 1 &&
                             <Button type='primary' size='large' onClick={this.onCreate}>另存为</Button>
