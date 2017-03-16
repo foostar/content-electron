@@ -99,7 +99,7 @@ export default class OMQQPlatform extends Platform {
         return new Promise(async (resolve, reject) => {
             setTimeout(resolve, 10000);
             await helper.getRresponse(({url}) => url.startsWith('https://om.qq.com/editorCache'));
-            resolve();
+            setTimeout(resolve, 500);
         });
     }
 

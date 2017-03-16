@@ -6,7 +6,8 @@ import {connect} from 'react-redux';
 import {Link} from 'react-router';
 import {bindActionCreators} from 'redux';
 import Page from 'components/Page';
-import * as actions from 'reducers/contents';
+import * as contentActions from 'reducers/contents';
+import * as managerActions from 'reducers/manager';
 
 const {Column} = Table;
 
@@ -16,7 +17,10 @@ const mapStateToProps = state => {
     };
 };
 const mapDispatchToProps = dispatch => {
-    return bindActionCreators(actions, dispatch);
+    return {
+        contentActions: bindActionCreators(contentActions, dispatch),
+        managerActions: bindActionCreators(managerActions, dispatch)
+    };
 };
 @connect(mapStateToProps, mapDispatchToProps)
 class Contents extends Component {
@@ -27,10 +31,16 @@ class Contents extends Component {
     fetchData = (page = 1) => {
         const {fetching} = this.props.contents;
         if (fetching) return;
-        this.props.getContents({query: {
+        this.props.contentActions.getContents({query: {
             limit: 10,
             skip: (page - 1) * 10
         }});
+    }
+    publish = async id => {
+        const res = await this.props.contentActions.getContent({
+            params: id
+        });
+        this.props.managerActions.publish(res.payload.result.data);
     }
     render () {
         const {data, skip, count, fetching} = this.props.contents;
@@ -77,6 +87,14 @@ class Contents extends Component {
                                 key='createdAt'
                                 render={(time) => moment(time).format('YYYY-MM-DD hh:mm')}
                             />
+                            {this.props.level !== 1 &&
+                                <Column
+                                    title='操作'
+                                    dataIndex='actions'
+                                    key='actions'
+                                    render={(_, content) => <a onClick={() => this.publish(content.id)}>发布</a>}
+                                />
+                            }
                         </Table>
                     </Layout.Content>
                 </Layout>

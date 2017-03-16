@@ -83,7 +83,6 @@ export default class extends Component {
         );
     }
     publish = async id => {
-        console.log(111);
         const res = await this.props.contentActions.getContent({
             params: id
         });
