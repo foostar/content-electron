@@ -1,6 +1,7 @@
-import OMQQPlatform from 'lib/omqq-platform';
-import BaijiaPlatform from 'lib/baijia-platform';
-import UCPlatform from 'lib/uc-platform';
+import OMQQPlatform from 'lib/platforms/omqq-platform';
+import BaijiaPlatform from 'lib/platforms/baijia-platform';
+import UCPlatform from 'lib/platforms/uc-platform';
+import neteasePlatform from 'lib/platforms/netease-platform';
 
 import qieLogo from './logos/platform-omqq.png';
 import baijiaLogo from './logos/platform-baijiahao.png';
@@ -13,6 +14,7 @@ import sohuLogo from './logos/platform-sohu.png';
 import weiboLogo from './logos/platform-weibo.png';
 import zhihuLogo from './logos/platform-zhihu.png';
 import jianshuLogo from './logos/platform-jianshu.png';
+import neteaseLogo from './logos/platform-wangyi.png';
 
 const platforms = [{
     id: 'baijia',
@@ -29,6 +31,11 @@ const platforms = [{
     name: 'UC云观',
     logo: ucLogo,
     Class: UCPlatform
+}, {
+    id: 'netease',
+    name: '网易',
+    logo: neteaseLogo,
+    Class: neteasePlatform
 }, {
     id: 'toutiao',
     name: '头条号',

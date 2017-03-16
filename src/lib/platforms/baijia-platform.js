@@ -1,4 +1,4 @@
-import Platform from './platform';
+import Platform from 'lib/platform';
 import moment from 'moment';
 import WebviewHelper from 'utils/webview-helper';
 
