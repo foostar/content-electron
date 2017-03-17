@@ -76,22 +76,30 @@ export default class OMQQPlatform extends Platform {
             const didDomReady = async () => {
                 const url = webview.getURL();
                 if (url.startsWith(publishUrl)) {
+                    // 等待 企鹅默认的缓存插入
+                    await this.inputCache(helper);
+
                     this.injectPublishScript(webview, title, data);
-                }
-                try {
-                    // 企鹅号
-                    const res = await helper.getRresponse('https://om.qq.com/article/publish?relogin=1');
-                    // const res = await helper.getRresponse('https://om.qq.com/article/getWhiteListOfWordsInTitle?relogin=1');
-                    const result = JSON.parse(res.body);
-                    const link = result.data.article.Furl.replace(/https?:\/\//, '');
-                    resolve(link);
-                } catch (err) {
-                    reject(err);
-                } finally {
-                    webview.removeEventListener('dom-ready', didDomReady);
+                    try { // 企鹅号
+                        const res = await helper.getRresponse('https://om.qq.com/article/publish?relogin=1'); // await helper.getRresponse('https://om.qq.com/article/getWhiteListOfWordsInTitle?relogin=1');
+                        const result = JSON.parse(res.body);
+                        const link = result.data.article.Furl.replace(/https?:\/\//, '');
+                        resolve(link);
+                    } catch (err) {
+                        reject(err);
+                    } finally {
+                        webview.removeEventListener('dom-ready', didDomReady);
+                    }
                 }
             };
             webview.addEventListener('dom-ready', didDomReady);
+        });
+    }
+    inputCache (helper) {
+        return new Promise(async (resolve, reject) => {
+            setTimeout(resolve, 10000);
+            await helper.getRresponse(({url}) => url.startsWith('https://om.qq.com/editorCache'));
+            setTimeout(resolve, 500);
         });
     }
 

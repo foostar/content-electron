@@ -18,7 +18,7 @@ export default class TopMenu extends Component {
             router: '/editor'
         }, {
             name: '我的文章',
-            router: '/articles'
+            router: '/contents'
         }, {
             name: '平台账号',
             level: l => l === 0,
@@ -30,7 +30,7 @@ export default class TopMenu extends Component {
         }, {
             name: '内容库',
             level: l => l === 0 || l > 1,
-            router: '/admin/articles'
+            router: '/admin/contents'
         }, {
             name: '统计',
             level: l => l === 0 || l > 1,

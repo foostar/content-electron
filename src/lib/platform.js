@@ -38,7 +38,7 @@ export default class Platform extends Events {
         });
         this.addListener('task-error', (task, err) => {
             this.emit(`${task.name}-error`, task.webview);
-            this.emit('tasks-update', task, 'error', err, this.tasks);
+            this.emit('tasks-update', task, 'error', this.tasks, err);
         });
         this.addListener('task-complete', task => {
             this.emit(`${task.name}-complete`, task.webview);
@@ -48,7 +48,7 @@ export default class Platform extends Events {
     async createWebviewHelper () {
         const webview = document.createElement('webview');
         webview.style.height = webview.style.width = '100%';
-        webview.setAttribute('partition', _.uniqueId('persist:'));
+        // webview.setAttribute('partition', _.uniqueId('persist:'));
         webview.setAttribute('src', 'about:blank');
         const helper = new WebviewHelper(webview);
         await helper.appendTo(container);

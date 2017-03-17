@@ -119,6 +119,7 @@ export default class PlatformManager extends React.Component {
         this.platforms
             .filter(x => _.flatten(tree.map(x => x.checkedList)).includes(x.id))
             .forEach(async x => {
+                console.log(manager.content.title, manager.content);
                 const link = await x.publish(manager.content.title, manager.content);
                 await reproduction.upsert({
                     body: {

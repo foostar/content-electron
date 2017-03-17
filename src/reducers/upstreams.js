@@ -1,5 +1,4 @@
 import {createCallApi} from 'middlewares/api';
-import {createCallIpc} from 'middlewares/ipc';
 import {createReducer} from 'redux-act';
 import update from 'react/lib/update';
 
@@ -10,14 +9,6 @@ const INITAL = {
     count: 0,
     data: []
 };
-
-export const getCookiesByPartition = createCallIpc(HUSSIF, {
-    channel: 'GET_COOKIES_BY_PARTITION'
-});
-
-export const setPartitionCookies = createCallIpc(HUSSIF, {
-    channel: 'SET_PARTITION_COOKIES'
-});
 
 export const fetchUpstreams = createCallApi(HUSSIF, {
     type: 'FETCH_UPSTREAMS',
