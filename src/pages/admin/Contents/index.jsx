@@ -62,15 +62,16 @@ export default class extends Component {
     }
     renderTag = (_, content) => {
         const {recentTag} = this.props.contents;
-        const {addTag, removeTag} = this.props;
+        const {addTag, removeTag, getRecentTag} = this.props.contentActions;
         return (
             <TagSelector
-                fetchData={this.fetchData}
                 key={content.id}
+                fetchData={this.fetchData}
                 recentTag={recentTag}
                 content={content}
                 removeTag={removeTag}
                 addTag={addTag}
+                getRecentTag={getRecentTag}
             />
         );
     }
@@ -197,6 +198,7 @@ class TagSelector extends Component {
         this.setState({inputValue: []});
         message.success('添加成功');
         this.props.fetchData();
+        this.props.getRecentTag();
     }
     removeTag = (tag) => {
         const {id} = this.props.content;
