@@ -61,11 +61,7 @@ class AdminUsers extends Component {
                     .filter(item => ids.includes(item.id))
                     .map(item =>
                         <div key={item.id} className={style['bind-upstream-tag']}>
-                            <Tag
-                                key={item.id}
-                            >
-                                [{platformsById[item.platform].name}] {item.nickname}
-                            </Tag>
+                            <Tag key={item.id}> [{platformsById[item.platform].name}] {item.nickname}</Tag>
                         </div>
                     )
                 }

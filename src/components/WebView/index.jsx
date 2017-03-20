@@ -59,8 +59,7 @@ export default class extends React.Component {
                     <Icon
                         type='setting'
                         className={style['dev-tool']}
-                        onClick={this.openDevTools}
-                    />
+                        onClick={this.openDevTools} />
                 }
                 <Spin spinning={this.state.loading}>
                     <webview ref='webview' style={{width: '100%', height: '100%'}} />

@@ -92,8 +92,7 @@ class Contents extends Component {
                                     title='操作'
                                     dataIndex='actions'
                                     key='actions'
-                                    render={(_, content) => <a onClick={() => this.publish(content.id)}>发布</a>}
-                                />
+                                    render={(_, content) => <a onClick={() => this.publish(content.id)}>发布</a>} />
                             }
                         </Table>
                     </Layout.Content>
