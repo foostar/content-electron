@@ -2,7 +2,7 @@ import Platform from 'lib/platform';
 import moment from 'moment';
 import WebviewHelper from 'utils/webview-helper';
 
-export default class BaijiaPlatform extends Platform {
+export default class NetEasePlatform extends Platform {
     platformId = 'netease'
     loginUrl = 'http://dy.163.com/wemedia/login.html'
     publishUrl = 'http://dy.163.com/'
@@ -19,10 +19,9 @@ export default class BaijiaPlatform extends Platform {
     }
     _login (webview) {
         const helper = new WebviewHelper(webview);
-        const self = this;
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             const {loginUrl, account, password} = this;
-            helper.load(loginUrl);
+            await helper.load(loginUrl);
             const didDomReady = async () => {
                 const url = webview.getURL();
                 // 登录界面
@@ -60,9 +59,8 @@ export default class BaijiaPlatform extends Platform {
                             })
                             
                         `);
-                        self.publishUrl += publishUrl;
-                        self.wemediaId = publishUrl.substr(publishUrl.lastIndexOf('/') + 1);
-                        console.log(session, nickname);
+                        this.publishUrl += publishUrl;
+                        this.wemediaId = publishUrl.substr(publishUrl.lastIndexOf('/') + 1);
                         resolve({session, nickname});
                     } catch (err) {
                         reject(err);
@@ -79,13 +77,12 @@ export default class BaijiaPlatform extends Platform {
             await helper.load(publishUrl);
 
             const didDomReady = async () => {
-                // webview.openDevTools();
                 const url = webview.getURL();
                 if (url.startsWith(publishUrl)) {
                     this.injectPublishScript(webview, title, data);
                 }
                 try {
-                    // uc云观
+                    // 网易号
                     const res = await helper.getRresponse('http://dy.163.com/wemedia/article/status/api/publish.do');
                     const result = JSON.parse(res.body);
                     const link = result.data.substr(result.data.lastIndexOf(',') + 1);

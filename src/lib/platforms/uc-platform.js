@@ -2,7 +2,7 @@ import Platform from 'lib/platform';
 import moment from 'moment';
 import WebviewHelper from 'utils/webview-helper';
 
-export default class BaijiaPlatform extends Platform {
+export default class UCPlatform extends Platform {
     platformId = 'uc'
     loginUrl = 'http://mp.uc.cn/index.html'
     publishUrl = 'http://mp.uc.cn/dashboard/article/write'
@@ -27,10 +27,10 @@ export default class BaijiaPlatform extends Platform {
     }
     _login (webview) {
         const helper = new WebviewHelper(webview);
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             const {loginUrl, account, password} = this;
             let session;
-            helper.load(loginUrl);
+            await helper.load(loginUrl);
             const didDomReady = async () => {
                 const url = webview.getURL();
                 // 登录界面

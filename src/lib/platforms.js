@@ -1,7 +1,7 @@
 import OMQQPlatform from 'lib/platforms/omqq-platform';
 import BaijiaPlatform from 'lib/platforms/baijia-platform';
 import UCPlatform from 'lib/platforms/uc-platform';
-import neteasePlatform from 'lib/platforms/netease-platform';
+import NetEasePlatform from 'lib/platforms/netease-platform';
 
 import qieLogo from './logos/platform-omqq.png';
 import baijiaLogo from './logos/platform-baijiahao.png';
@@ -35,7 +35,7 @@ const platforms = [{
     id: 'netease',
     name: '网易',
     logo: neteaseLogo,
-    Class: neteasePlatform
+    Class: NetEasePlatform
 }, {
     id: 'toutiao',
     name: '头条号',
