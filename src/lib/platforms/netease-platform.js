@@ -129,7 +129,7 @@ export default class BaijiaPlatform extends Platform {
 
         const fetchListScript = `
             function fetchList (page = 1, result = []) {
-                return fetch(\`http://dy.163.com/wemedia/docPvs.json?orderBy=pv&order=desc&start=${startTime}&end=${endTime}&wemediaId=${this.wemediaId}&pageSize=10&pageNo=page\`)
+                return fetch(\`http://dy.163.com/wemedia/docPvs.json?orderBy=pv&order=desc&start=${startTime}&end=${endTime}&wemediaId=${this.wemediaId}&pageSize=10&pageNo=1\`)
                     .then(res => res.json())
                     .then(json => {
                         const { data } = json;
@@ -146,7 +146,7 @@ export default class BaijiaPlatform extends Platform {
         return list.map(item => {
             return {
                 view: Number(item.pv),
-                day: moment(item.date).format('YYYY-MM-DD')
+                day: moment(item.ptime).format('YYYY-MM-DD')
             };
         });
     }

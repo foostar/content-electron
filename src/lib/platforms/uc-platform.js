@@ -148,11 +148,10 @@ export default class BaijiaPlatform extends Platform {
                 (function() {
                     const el = document.querySelector('#ueditor_0');
                     if (!el) return setTimeout(arguments.callee, 200);
-                    const ue = document.querySelector('#ue_editor')
-                    if (!ue) return setTimeout(arguments.callee, 200);
+                    const editor = UE.getEditor('ue_editor')
+                    if (!editor) return setTimeout(arguments.callee, 200);
                     const title = document.querySelector('.article-write_box-title')
                     title.value = \`${title}\`;
-                    const editor = UE.getEditor('ue_editor')
                     editor.ready(function() {
                         setTimeout(() => {
                             editor.setContent(\`${content}\`);
