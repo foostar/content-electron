@@ -21,16 +21,27 @@ class DiskStore {
             }
             fs.readFile(this.filePath, 'utf-8', (err, data) => {
                 if (err) return reject(err);
-                return resolve(JSON.parse(data));
+                try {
+                    const res = JSON.parse(data);
+                    resolve(res);
+                } catch (err) {
+                    console.error(err);
+                    resolve({});
+                }
             });
         });
     }
     _setStore (store) {
         return new Promise((resolve, reject) => {
-            fs.writeFile(this.filePath, JSON.stringify(store), (err) => {
-                if (err) return reject(err);
-                return resolve();
-            });
+            try {
+                const json = JSON.stringify(store);
+                fs.writeFile(this.filePath, json, (err) => {
+                    if (err) return reject(err);
+                    return resolve();
+                });
+            } catch (err) {
+                reject(err);
+            }
         });
     }
     async get (id) {

@@ -69,7 +69,7 @@ class CategorySelect extends Component {
                             </OptGroup>
                         );
                     } else {
-                        return <Option value={item.value}>{item.label}</Option>;
+                        return <Option key='all' value={item.value}>{item.label}</Option>;
                     }
                 })
                 }

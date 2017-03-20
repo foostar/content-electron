@@ -8,8 +8,21 @@ export default class BaijiaPlatform extends Platform {
     publishUrl = 'http://baijiahao.baidu.com/builder/article/edit'
     async _isLogin (webview) {
         const helper = new WebviewHelper(webview);
-        const data = await helper.fetchJSON('https://baijiahao.baidu.com/builderinner/api/content/marketing/income');
-        return data.error_code === 0;
+        return new Promise(async (resolve, reject) => {
+            const {publishUrl} = this;
+            await helper.load(publishUrl);
+            const didGetResponseDetails = async (event) => {
+                if (event.originalURL.startsWith(publishUrl)) {
+                    webview.removeEventListener('did-get-response-details', didGetResponseDetails);
+                    webview.stop();
+                    if (event.newURL.startsWith(publishUrl)) {
+                        return resolve(true);
+                    }
+                    return resolve(false);
+                }
+            };
+            webview.addEventListener('did-get-response-details', didGetResponseDetails);
+        });
     }
     _login (webview) {
         const helper = new WebviewHelper(webview);

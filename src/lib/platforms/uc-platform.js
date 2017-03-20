@@ -9,9 +9,21 @@ export default class BaijiaPlatform extends Platform {
     submitUrl = 'http://mp.uc.cn/dashboard/contents/submit'
     async _isLogin (webview) {
         const helper = new WebviewHelper(webview);
-        const data = await helper.fetchJSON(`http://mp.uc.cn/api/ws/stat/wemedia/summary?date=${moment(new Date()).format('YYYYMMDD')}&_=${Date.now()}`);
-        if (!data.data) return false;
-        return true;
+        return new Promise(async (resolve, reject) => {
+            const {publishUrl} = this;
+            await helper.load(publishUrl);
+            const didGetResponseDetails = async (event) => {
+                if (event.originalURL.startsWith(publishUrl)) {
+                    webview.removeEventListener('did-get-response-details', didGetResponseDetails);
+                    webview.stop();
+                    if (event.newURL.startsWith(publishUrl)) {
+                        return resolve(true);
+                    }
+                    return resolve(false);
+                }
+            };
+            webview.addEventListener('did-get-response-details', didGetResponseDetails);
+        });
     }
     _login (webview) {
         const helper = new WebviewHelper(webview);

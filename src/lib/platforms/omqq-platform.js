@@ -9,8 +9,21 @@ export default class OMQQPlatform extends Platform {
     statsUrl = 'https://om.qq.com/statistic/ArticleReal?media=5394191&channel=0&page=2&num=8&btime=1&relogin=1'
     async _isLogin (webview) {
         const helper = new WebviewHelper(webview);
-        const data = await helper.fetchJSON('https://om.qq.com/article/list?index=1&commentflag=0&source=0&relogin=1');
-        return data.response.code !== -10403;
+        return new Promise(async (resolve, reject) => {
+            const {publishUrl} = this;
+            await helper.load(publishUrl);
+            const didGetResponseDetails = async (event) => {
+                if (event.originalURL.startsWith(publishUrl)) {
+                    webview.removeEventListener('did-get-response-details', didGetResponseDetails);
+                    webview.stop();
+                    if (event.newURL.startsWith(publishUrl)) {
+                        return resolve(true);
+                    }
+                    return resolve(false);
+                }
+            };
+            webview.addEventListener('did-get-response-details', didGetResponseDetails);
+        });
     }
     _login (webview) {
         const helper = new WebviewHelper(webview);
@@ -63,22 +76,30 @@ export default class OMQQPlatform extends Platform {
             const didDomReady = async () => {
                 const url = webview.getURL();
                 if (url.startsWith(publishUrl)) {
+                    // 等待 企鹅默认的缓存插入
+                    await this.inputCache(helper);
+
                     this.injectPublishScript(webview, title, data);
-                }
-                try {
-                    // 企鹅号
-                    const res = await helper.getRresponse('https://om.qq.com/article/publish?relogin=1');
-                    // const res = await helper.getRresponse('https://om.qq.com/article/getWhiteListOfWordsInTitle?relogin=1');
-                    const result = JSON.parse(res.body);
-                    const link = result.data.article.Furl.replace(/https?:\/\//, '');
-                    resolve(link);
-                } catch (err) {
-                    reject(err);
-                } finally {
-                    webview.removeEventListener('dom-ready', didDomReady);
+                    try { // 企鹅号
+                        const res = await helper.getRresponse('https://om.qq.com/article/publish?relogin=1'); // await helper.getRresponse('https://om.qq.com/article/getWhiteListOfWordsInTitle?relogin=1');
+                        const result = JSON.parse(res.body);
+                        const link = result.data.article.Furl.replace(/https?:\/\//, '');
+                        resolve(link);
+                    } catch (err) {
+                        reject(err);
+                    } finally {
+                        webview.removeEventListener('dom-ready', didDomReady);
+                    }
                 }
             };
             webview.addEventListener('dom-ready', didDomReady);
+        });
+    }
+    inputCache (helper) {
+        return new Promise(async (resolve, reject) => {
+            setTimeout(resolve, 10000);
+            await helper.getRresponse(({url}) => url.startsWith('https://om.qq.com/editorCache'));
+            setTimeout(resolve, 500);
         });
     }
 

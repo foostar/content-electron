@@ -39,7 +39,7 @@ class InputAccount extends Component {
                         <Layout.Content className={style.content}>
                             <FormItem>
                                 {getFieldDecorator('account', {
-                                    initialValue: '17600806970',
+                                    // initialValue: '17600806970',
                                     // initialValue: 'mameiling@goyoo.com',
                                     rules: [{required: true, message: '请输入账号!'}]
                                 })(
@@ -48,7 +48,7 @@ class InputAccount extends Component {
                             </FormItem>
                             <FormItem>
                                 {getFieldDecorator('password', {
-                                    initialValue: 'zxc123456',
+                                    // initialValue: 'zxc123456',
                                     rules: [{required: true, message: '请输入密码!'}]
                                 })(
                                     <Input placeholder='密码' />
