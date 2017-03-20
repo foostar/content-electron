@@ -48,14 +48,16 @@ export default class Platform extends Events {
     async createWebviewHelper () {
         const webview = document.createElement('webview');
         webview.style.height = webview.style.width = '100%';
-        // webview.setAttribute('partition', _.uniqueId('persist:'));
+        webview.setAttribute('partition', `persist:${this.id}`);
         webview.setAttribute('src', 'about:blank');
         const helper = new WebviewHelper(webview);
+        helper.id = this.id;
         await helper.appendTo(container);
         return helper;
     }
     async getWebviewHelper () {
-        const helper = helpers.pop() || await this.createWebviewHelper();
+        const index = _.findIndex(helpers, {id: this.id});
+        const helper = index !== -1 ? _.remove(helpers, (x, i) => i === index)[0] : await this.createWebviewHelper();
         await helper.clearCache();
         await helper.setCookies(this.cookies);
         return helper;
