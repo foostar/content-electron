@@ -17,10 +17,19 @@ export default class NetEasePlatform extends Platform {
         }
         return false;
     }
+    async _getMes (webview) {
+        const helper = new WebviewHelper(webview);
+        const data = await helper.fetchJSON(`http://dy.163.com/wemedia/navinfo?t=${Date.now()}&wemediaId=`);
+        if (data.code === 1) {
+            this.publishUrl += `/wemedia/article/postpage/${data.data.wemediaId}`;
+            this.wemediaId = data.data.wemediaId;
+        }
+    }
     _login (webview) {
         const helper = new WebviewHelper(webview);
         return new Promise(async (resolve, reject) => {
             const {loginUrl, account, password} = this;
+            await this._getMes(webview);
             await helper.load(loginUrl);
             const didDomReady = async () => {
                 const url = webview.getURL();
@@ -74,8 +83,8 @@ export default class NetEasePlatform extends Platform {
         const helper = new WebviewHelper(webview);
         return new Promise(async (resolve, reject) => {
             const {publishUrl} = this;
+            await this._getMes(webview);
             await helper.load(publishUrl);
-
             const didDomReady = async () => {
                 const url = webview.getURL();
                 if (url.startsWith(publishUrl)) {
@@ -139,6 +148,7 @@ export default class NetEasePlatform extends Platform {
             }
             fetchList();
         `;
+        await this._getMes(webview);
         const list = await helper.executeJavaScript(fetchListScript);
         return list.map(item => {
             return {
