@@ -1,6 +1,6 @@
 node_modules/
 dist/
-config/dev.js
+src/config/dev.js
 
 *.log
 
