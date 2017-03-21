@@ -123,8 +123,8 @@ class MasicImage extends Component {
                 body.append('file', blob);
                 body.append('key', data.key);
                 body.append('token', data.token);
-                const res = await fetch('http://upload.qiniu.com', {method: 'POST', body}).then(res => res.json());
-                this.img.src = 'http://distribution-file.apps.xiaoyun.com/' + res.key;
+                const res = await fetch(config.QINIU_UPLOAD_PREFIX, {method: 'POST', body}).then(res => res.json());
+                this.img.src = `${config.FILESERVER_PREFIX}/${res.key}`;
                 this.props.done(this.img.src);
                 this.setState({visible: false});
             } catch (error) {
