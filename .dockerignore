@@ -1,0 +1,16 @@
+node_modules/
+src/
+dist/
+.vscode/
+.babelrc
+.eslintignore
+.eslintrc
+.gitignore
+.gitlab-ci.yml
+build.sh
+jsconfig.json
+main.dev.js
+main.js
+message.js
+package.json
+webpack.config.js

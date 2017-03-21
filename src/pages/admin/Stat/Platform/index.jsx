@@ -208,7 +208,7 @@ class StatByPlatform extends Component {
                     */}
                 </div>
                 <br />
-                <LineGraph width={900} data={this.state.statData} />
+                <LineGraph width={900} height={300} data={this.state.statData} />
                 <br />
                 <Table
                     bordered

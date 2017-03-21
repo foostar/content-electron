@@ -181,11 +181,12 @@ function createWindow () {
         }
     });
 
-    mainWindow.loadURL(url.format({
-        pathname: path.join(__dirname, 'dist', 'index.html'),
-        protocol: 'file:',
-        slashes: true
-    }));
+    // mainWindow.loadURL(url.format({
+    //     pathname: path.join(__dirname, 'public', 'index.html'),
+    //     protocol: 'file:',
+    //     slashes: true
+    // }));
+    mainWindow.loadURL('https://fengchao-client.apps.xiaoyun.com/');
 
     mainWindow.on('closed', function () {
         mainWindow = null;

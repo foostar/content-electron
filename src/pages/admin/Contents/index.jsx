@@ -129,7 +129,7 @@ export default class extends Component {
                             loading={fetching}
                         >
                             <Column
-                                title='文章标题'
+                                title='标题'
                                 dataIndex='title'
                                 width={300}
                                 key='title'
@@ -147,7 +147,7 @@ export default class extends Component {
                                 render={author => author ? author.username : '作者已被删除'}
                             />
                             <Column
-                                title='文章分类'
+                                title='分类'
                                 dataIndex='category'
                                 key='category'
                                 width={80}
@@ -160,9 +160,10 @@ export default class extends Component {
                                 render={(time) => moment(time).format('YYYY-MM-DD hh:mm')}
                             />
                             <Column
-                                title='文章标签'
+                                title='标签'
                                 dataIndex='tags'
                                 key='tags'
+                                width={50}
                                 render={this.renderTag}
                             />
                             <Column
