@@ -163,7 +163,6 @@ export default class extends Component {
                                 title='标签'
                                 dataIndex='tags'
                                 key='tags'
-                                width={50}
                                 render={this.renderTag}
                             />
                             <Column

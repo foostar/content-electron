@@ -139,13 +139,6 @@ class AdminUsers extends Component {
                                 width='30%'
                                 dataIndex='bindUpstreams'
                                 filters={upstreamTypes}
-                                sorter={(a, b) => a.bindUpstreams.length - b.bindUpstreams.length}
-                                onFilter={(value, record) => {
-                                    if (value === 'null' && record.bindUpstreams.length === 0) {
-                                        return true;
-                                    }
-                                    return record.bindUpstreams.includes(value);
-                                }}
                                 render={this.renderUpstreamsByIds}
                             />
                             <Column
