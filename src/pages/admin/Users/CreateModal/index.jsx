@@ -121,11 +121,11 @@ class CreateModal extends Component {
                             style={{width: '100%'}}
                             placeholder='请选择平台账号'
                         >
-                            {this.props.upstreams.map(item =>
+                            {this.props.upstreams.map(item => (
                                 <Option key={item.id}>
-                                    [{platformsById[item.platform].name}] {item.nickname}
+                                    <span>[{platformsById[item.platform].name}] {item.nickname}</span>
                                 </Option>
-                            )}
+                            ))}
 
                         </Select>
                         )}

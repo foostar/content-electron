@@ -61,11 +61,7 @@ class AdminUsers extends Component {
                     .filter(item => ids.includes(item.id))
                     .map(item =>
                         <div key={item.id} className={style['bind-upstream-tag']}>
-                            <Tag
-                                key={item.id}
-                            >
-                                [{platformsById[item.platform].name}] {item.nickname}
-                            </Tag>
+                            <Tag key={item.id}> [{platformsById[item.platform].name}] {item.nickname}</Tag>
                         </div>
                     )
                 }
@@ -143,13 +139,6 @@ class AdminUsers extends Component {
                                 width='30%'
                                 dataIndex='bindUpstreams'
                                 filters={upstreamTypes}
-                                sorter={(a, b) => a.bindUpstreams.length - b.bindUpstreams.length}
-                                onFilter={(value, record) => {
-                                    if (value === 'null' && record.bindUpstreams.length === 0) {
-                                        return true;
-                                    }
-                                    return record.bindUpstreams.includes(value);
-                                }}
                                 render={this.renderUpstreamsByIds}
                             />
                             <Column

@@ -166,8 +166,7 @@ class SimpEditor extends Component {
                     <MosaicImage
                         key={this.state.key}
                         img={this.state.mosaicImg}
-                        afterClose={this.afterMosaicClose}
-                    />
+                        afterClose={this.afterMosaicClose} />
                 }
                 <style scope>{`
                     .simditor-body {

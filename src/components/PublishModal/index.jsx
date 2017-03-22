@@ -121,8 +121,7 @@ class PublishModal extends Component {
                     visible={visible}
                     title={title}
                     onCancel={this.onCancel}
-                    afterClose={this.clearData}
-                >
+                    afterClose={this.clearData}>
                     <Steps className={style.steps} current={current}>
                         {steps.map(title => <Step key={title} title={title} />)}
                     </Steps>
@@ -131,23 +130,20 @@ class PublishModal extends Component {
                             <ChooseUpstream
                                 visibleUpstreams={visibleUpstreams}
                                 upstreams={upstreams}
-                                nextStep={this.nextStep}
-                            />
+                                nextStep={this.nextStep} />
                         }
                         {current === 1 &&
                             <PublishContent
                                 data={data}
                                 content={content}
-                                nextStep={this.nextStep}
-                            />
+                                nextStep={this.nextStep} />
                         }
                         {current === 2 &&
                             <div style={{width: 500, margin: 'auto'}}>
                                 <Alert
                                     message={`${content.title} 发布成功`}
                                     description='请记得增加标签'
-                                    type='success'
-                                />
+                                    type='success' />
                                 <Button style={{width: '100%'}} onClick={this.onCancel}>
                                     点击关闭
                                 </Button>

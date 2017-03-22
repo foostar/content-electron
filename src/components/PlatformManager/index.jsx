@@ -8,7 +8,7 @@ import {bindActionCreators} from 'redux';
 import * as managerActions from 'reducers/manager';
 import * as reproductionActions from 'reducers/reproduction';
 import Webview from './Webview';
-
+import classnames from 'classnames';
 const CheckboxGroup = Checkbox.Group;
 
 const mapStateToProps = (state, props) => {
@@ -80,8 +80,6 @@ export default class PlatformManager extends React.Component {
         });
         return platform;
     }
-    componentDidMount () {
-    }
     closeBrowser = () => {
         this.setState({
             browserVisible: false
@@ -119,7 +117,6 @@ export default class PlatformManager extends React.Component {
         this.platforms
             .filter(x => _.flatten(tree.map(x => x.checkedList)).includes(x.id))
             .forEach(async x => {
-                console.log(manager.content.title, manager.content);
                 const link = await x.publish(manager.content.title, manager.content);
                 await reproduction.upsert({
                     body: {
@@ -190,59 +187,59 @@ export default class PlatformManager extends React.Component {
                         ))}
                     </div>
                 </div>
-                {!!upstreams.length || (<div className={style.upstream}>暂无账号</div>)}
+                {!!upstreams.length || <div className={style.upstream}>暂无账号</div>}
                 <Modal
                     title='选择账号'
                     visible={manager.isAccountSelecting}
                     onCancel={this.onSelectAccountCancel}
-                    onOk={this.onSelectAccount}
-                    >
-                    {
-                        tree.map(({platform, accounts, checkAll, checkedList, indeterminate}) => (
-                            <div key={platform} className={style['checkbox-group']}>
-                                <div className={style['checkbox-group-all']}>
-                                    <Checkbox
-                                        indeterminate={indeterminate}
-                                        onChange={e => {
-                                            this.onSelectAccountCheckAllChange(platform, e);
-                                        }}
-                                        checked={checkAll}
-                                    >
-                                        {platformsById[platform].name}
-                                    </Checkbox>
-                                </div>
-                                <CheckboxGroup
-                                    className={style['checkbox-group-list']}
-                                    options={accounts.map(x => ({
-                                        label: x.nickname,
-                                        value: x.id
-                                    }))}
-                                    value={checkedList}
-                                    onChange={list => {
-                                        this.onSelectAccountChange(platform, list);
-                                    }} />
+                    onOk={this.onSelectAccount}>
+                    {tree.map(({platform, accounts, checkAll, checkedList, indeterminate}) =>
+                        <div key={platform} className={style['checkbox-group']}>
+                            <div className={style['checkbox-group-all']}>
+                                <Checkbox
+                                    indeterminate={indeterminate}
+                                    onChange={e => {
+                                        this.onSelectAccountCheckAllChange(platform, e);
+                                    }}
+                                    checked={checkAll}>
+                                    {platformsById[platform].name}
+                                </Checkbox>
                             </div>
-                        ))
-                    }
+                            <CheckboxGroup
+                                className={style['checkbox-group-list']}
+                                options={accounts.map(x => ({
+                                    label: x.nickname,
+                                    value: x.id
+                                }))}
+                                value={checkedList}
+                                onChange={list => {
+                                    this.onSelectAccountChange(platform, list);
+                                }}
+                            />
+                        </div>
+                    )}
                 </Modal>
                 <div className={style.browser} style={{width: (browserVisible && tabs.length) ? '100%' : '0'}}>
                     <div className={style['browser-header']}>
                         <div className={style['browser-tabbars']}>
-                            {tabs.map(({id, tips, account, platform, complete}) => (
+                            {tabs.map(({id, tips, account, platform, complete}) =>
                                 <div
                                     key={id}
                                     onClick={() => this.onSelectTask(id)}
-                                    className={style['browser-tabbar'] + (tabId === id ? ` ${style['browser-tabbar-active']}` : '')}>
-                                    {account.nickname} [{platform.name} - {tips}]
+                                    className={classnames(style['browser-tabbar'], {
+                                        [style['browser-tabbar-active']]: tabId === id
+                                    })}>
+                                    <span>{account.nickname}&nbsp;[{platform.name} - {tips}]</span>
                                     <Button shape='circle' icon='close' className={style['browser-tab-close']} onClick={complete} />
-                                </div>))}
+                                </div>
+                            )}
                         </div>
                         <Button shape='circle' icon='close' className={style['browser-close']} onClick={this.closeBrowser} />
                     </div>
                     <div className={style['browser-content']}>
-                        {tabs.map(({id, webview}) => (
+                        {tabs.map(({id, webview}) =>
                             <Webview key={id} webview={webview} visible={id === tabId} className={style['browser-webview']} />
-                        ))}
+                        )}
                     </div>
                 </div>
             </div>

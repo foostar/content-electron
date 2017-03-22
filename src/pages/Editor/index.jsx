@@ -98,7 +98,7 @@ class Editor extends Component {
                                     initialValue: title || ''
                                 })(<Input placeholder='输入文章标题' autoFocus />)}
                                 <Tag className={style['text-num']} color='blue'>
-                                    已输入 {(getFieldValue('title') || {}).length || '0'} 个字
+                                    <span>已输入 {(getFieldValue('title') || {}).length || '0'} 个字</span>
                                 </Tag>
                             </FormItem>
                             <FormItem>

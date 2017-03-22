@@ -31,9 +31,7 @@ export default class Topbar extends Component {
         );
         return (
             <div className={style.topbar}>
-                <div className={style.brand}>
-                    <span>蜂巢</span>内容平台
-                </div>
+                <div className={style.brand}><span>蜂巢</span>内容平台</div>
                 <TopMenu />
                 <div className={style['user-board']}>
                     <Dropdown overlay={menu} trigger={['click']}>

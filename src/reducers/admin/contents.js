@@ -81,13 +81,18 @@ export const removeTag = createCallApi(HUSSIF, {
 // 搜索username
 export const searchUser = createCallApi(HUSSIF, {
     type: 'ADMIN_SEARCH_USER',
-    endpoint: '/users',
-    method: 'GET'
+    endpoint: '/users'
 });
 
 export const getContent = createCallApi(HUSSIF, {
     type: 'GET_CONTENT',
     endpoint: '/contents'
+});
+
+export const deleteContent = createCallApi(HUSSIF, {
+    type: 'ADMIN_DELETE_CONTENT',
+    endpoint: '/contents',
+    method: 'DELETE'
 });
 
 export default createReducer(HUSSIF, INITAL);

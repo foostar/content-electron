@@ -117,9 +117,7 @@ class ModifyModal extends Component {
                             placeholder='请选择平台账号'
                         >
                             {this.props.upstreams.map(item =>
-                                <Option key={item.id}>
-                                    [{platformsById[item.platform].name}] {item.nickname}
-                                </Option>
+                                <Option key={item.id}>[{platformsById[item.platform].name}] {item.nickname}</Option>
                             )}
                         </Select>
                         )}
