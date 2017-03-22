@@ -1,6 +1,7 @@
 import Platform from 'lib/platform';
 import moment from 'moment';
 import WebviewHelper from 'utils/webview-helper';
+import _ from 'lodash';
 
 export default class BaijiaPlatform extends Platform {
     platformId = 'baijia'
@@ -106,13 +107,14 @@ export default class BaijiaPlatform extends Platform {
         });
     }
 
-    async injectPublishScript (webview, title, {content}) {
+    injectPublishScript (webview, title, {content}) {
         const helper = new WebviewHelper(webview);
-        await helper.executeJavaScript(`
-            new Promise(resolve => {
-                (function () {
-                    const el = document.querySelector('#ueditor_0');
-                    if (!el) return setTimeout(arguments.callee, 200);
+        helper.executeJavaScript(`
+            (function () {
+                const el = document.querySelector('#ueditor_0');
+                if (!el) return setTimeout(arguments.callee, 200);
+                editor = editor.getEditor()
+                editor.ready(function() {
                     document.querySelector('#header-wrapper').remove();
                     document.querySelector('.aside').remove();
                     document.querySelector('.post-article-tips-wrap').remove();
@@ -125,18 +127,10 @@ export default class BaijiaPlatform extends Platform {
                     document.querySelector('.main').style.margin = 0;
                     document.querySelector('#article-title').value = \`${title}\`;
                     // window.frames['ueditor_0'].contentWindow.document.body.innerHTML = \`${content}\`;
-                    editor = editor.getEditor()
-                    editor.ready(function() {
-                        editor.setContent(\`${content}\`);
-                        editor.focus()
-                        resolve()
-                    });
-                })()
-            });
-        `);
-        webview.selectAll();
-        webview.cut();
-        webview.paste();
+                    editor.setContent(\`${content}\`);
+                });
+            })()
+    `);
     }
 
     _statByContent (webview) {
@@ -179,13 +173,23 @@ export default class BaijiaPlatform extends Platform {
                 return fetchList();
             })();
         `;
-        const list = await helper.executeJavaScript(fetchListScript);
-        return list.map(item => {
+
+        let viewList = await helper.executeJavaScript(fetchListScript);
+        viewList = viewList.map(item => {
             return {
                 view: Number(item.view_reader_num),
                 day: moment(item.day, 'YYYYMMDD').format('YYYY-MM-DD')
             };
         });
+        let {results: incomeList} = await helper.fetchJSON(`http://cep.baidu.com/api/js/reports?begin=${start}&end=${end}&timeGranularity=day&metrics=income`);
+        incomeList = incomeList.map(item => {
+            return {
+                income: item.income,
+                day: moment(item.time, 'YYYYMMDD').format('YYYY-MM-DD')
+            };
+        });
+
+        return _.zipWith(viewList, incomeList, _.merge);
     }
 }
 

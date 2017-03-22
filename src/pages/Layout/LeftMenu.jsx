@@ -40,7 +40,7 @@ export default class LeftMenu extends Component {
             >
                 <MenuItemGroup title={
                     <div onClick={this.changeTheme}>
-                        <Icon type='cloud' />&emsp;小云
+                        <span><Icon type='cloud' />&emsp;小云</span>
                     </div>
                 }>
                     <Item key='/'>

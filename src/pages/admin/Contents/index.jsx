@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {message, Table, Form, Button, Select, Tag, Layout} from 'antd';
+import {message, Table, Form, Button, Select, Tag, Layout, Popconfirm} from 'antd';
 import style from './style.styl';
 import {connect} from 'react-redux';
 import {Link} from 'react-router';
@@ -36,16 +36,12 @@ export default class extends Component {
     }
     fetchData = (page) => {
         let {skip} = this.props.contents;
-
         if (page) {
             skip = (page - 1) * 10;
         }
-
         let query = this.props.form.getFieldsValue();
-
         query.skip = skip;
         query.limit = 10;
-
         query = omitBy(query, item => {
             if (!item) return true;
             if (Array.isArray(item)) {
@@ -88,6 +84,12 @@ export default class extends Component {
             params: id
         });
         this.props.managerActions.publish(res.payload.result.data);
+    }
+    delete = async id => {
+        const {type} = await this.props.contentActions.deleteContent({
+            params: id
+        });
+        if (type === 'ADMIN_DELETE_CONTENT_SUCCESS') this.fetchData();
     }
     render () {
         const {getFieldDecorator} = this.props.form;
@@ -161,7 +163,6 @@ export default class extends Component {
                                 title='标签'
                                 dataIndex='tags'
                                 key='tags'
-                                width={50}
                                 render={this.renderTag}
                             />
                             <Column
@@ -170,6 +171,11 @@ export default class extends Component {
                                 width={90}
                                 render={(text, content) =>
                                     <div>
+                                        {this.props.level === 0 &&
+                                            <Popconfirm placement='topRight' title='确认删除此文章?' onConfirm={() => this.delete(content.id)} >
+                                                <a style={{marginRight: '1rem'}}>删除</a>
+                                            </Popconfirm>
+                                        }
                                         <a onClick={() => this.publish(content.id)}>发布</a>
                                         {/* {this.props.level === 0 && this.renderDelBtn(content)} */}
                                     </div>

@@ -23,10 +23,12 @@ export default class ModalDetail extends React.Component {
             if (v.isImg) {
                 data = <img src={data} alt={data} />;
             }
-            return (<Row key={v.key}>
-                <Col span={8} className='text-right modal-item'>{ v.title }</Col>
-                <Col span={16} className={v.isFlex ? 'modal-content' : ''}>{ data } </Col>
-            </Row>);
+            return (
+                <Row key={v.key}>
+                    <Col span={8} className='text-right modal-item'>{ v.title }</Col>
+                    <Col span={16} className={v.isFlex ? 'modal-content' : ''}>{ data } </Col>
+                </Row>
+            );
         });
         return (
             <Modal
@@ -34,8 +36,7 @@ export default class ModalDetail extends React.Component {
                 style={{top: 20, width: 1200}}
                 visible={modalShow}
                 onOk={() => setModalVisible(false)}
-                onCancel={() => setModalVisible(false)}
-          >
+                onCancel={() => setModalVisible(false)}>
                 <div className='modalDetail'>
                     { modalContent }
                 </div>
