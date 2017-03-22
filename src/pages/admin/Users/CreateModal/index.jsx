@@ -123,7 +123,7 @@ class CreateModal extends Component {
                         >
                             {this.props.upstreams.map(item => (
                                 <Option key={item.id}>
-                                    [{platformsById[item.platform].name}                                    ] {item.nickname}
+                                    <span>[{platformsById[item.platform].name}] {item.nickname}</span>
                                 </Option>
                             ))}
 
