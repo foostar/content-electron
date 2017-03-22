@@ -1,7 +1,7 @@
 const {
     API_PREFIX = 'https://content-distribution.apps.xiaoyun.com/api',
-    FILESERVER_PREFIX = 'https://distribution-file.apps.xiaoyun.com',
-    QINIU_UPLOAD_PREFIX = 'https://upload.qiniu.com'
+    FILESERVER_PREFIX = 'http://distribution-file.apps.xiaoyun.com',
+    QINIU_UPLOAD_PREFIX = 'http://upload.qiniu.com'
 } = process.env;
 
 export default {
