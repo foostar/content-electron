@@ -1,6 +1,7 @@
 import Platform from 'lib/platform';
 import moment from 'moment';
 import WebviewHelper from 'utils/webview-helper';
+import _ from 'lodash';
 
 export default class BaijiaPlatform extends Platform {
     platformId = 'baijia'
@@ -179,13 +180,23 @@ export default class BaijiaPlatform extends Platform {
                 return fetchList();
             })();
         `;
-        const list = await helper.executeJavaScript(fetchListScript);
-        return list.map(item => {
+
+        let viewList = await helper.executeJavaScript(fetchListScript);
+        viewList = viewList.map(item => {
             return {
                 view: Number(item.view_reader_num),
                 day: moment(item.day, 'YYYYMMDD').format('YYYY-MM-DD')
             };
         });
+        let {results: incomeList} = await helper.fetchJSON(`http://cep.baidu.com/api/js/reports?begin=${start}&end=${end}&timeGranularity=day&metrics=income`);
+        incomeList = incomeList.map(item => {
+            return {
+                income: item.income,
+                day: moment(item.time, 'YYYYMMDD').format('YYYY-MM-DD')
+            };
+        });
+
+        return _.zipWith(viewList, incomeList, _.merge);
     }
 }
 

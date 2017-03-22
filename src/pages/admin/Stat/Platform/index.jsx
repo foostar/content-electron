@@ -82,16 +82,17 @@ class StatByPlatform extends Component {
             this.fetchSingleUpstreamStat(item).then((result) => done(null, result)).catch(done);
         }, (err, dataArr) => {
             if (err) {
-                this.setState({
-                    loading: false
-                });
+                console.log(err);
+                return this.setState({loading: false});
             }
             const statData = [];
             const upsData = dataArr.map(stat => {
                 statData.push(...stat.data);
+                console.log(stat);
                 return {
                     name: stat.name,
-                    total: stat.data.reduce((view, b) => view + Number(b.view), 0)
+                    totalIncome: stat.data.reduce((income, b) => income + Number(b.income || 0), 0),
+                    totalView: stat.data.reduce((view, b) => view + Number(b.view || 0), 0)
                 };
             });
             this.setState({
@@ -220,14 +221,19 @@ class StatByPlatform extends Component {
                     <Column
                         title='[平台] 账号昵称'
                         dataIndex='name'
-                        width={'50%'}
+                        width={'33%'}
                         // render={(name, recod) => <Link to={`/admin/stat/${recod.upstreamId}`}>{name}</Link>}
                     />
                     <Column
-                        width={'50%'}
-                        title='该时段该 PV 总数'
-                        key='total'
-                        dataIndex='total'
+                        width={'33%'}
+                        title='该时段 PV 总数'
+                        key='totalView'
+                        dataIndex='totalView'
+                    /><Column
+                        width={'34%'}
+                        title='该时段 收入 总数'
+                        key='totalIncome'
+                        dataIndex='totalIncome'
                     />
                 </Table>
 
