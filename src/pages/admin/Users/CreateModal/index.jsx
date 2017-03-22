@@ -107,28 +107,26 @@ class CreateModal extends Component {
                     {getFieldDecorator('password', {
                         initialValue: '123456',
                         rules: [{required: true, message: '请输入密码!'}]
-                    })(
-                        <Input placeholder='密码' />
-                        )}
+                    })(<Input placeholder='密码' />)}
                 </FormItem>
 
                 <FormItem label='绑定平台账号' labelCol={{span: 5}} wrapperCol={{span: 17}}>
-                    {getFieldDecorator('bindUpstreams', {
-                        initialValue: []
-                    })(
+                    {getFieldDecorator('bindUpstreams', {initialValue: []})(
                         <Select
                             multiple
                             style={{width: '100%'}}
                             placeholder='请选择平台账号'
-                        >
-                            {this.props.upstreams.map(item => (
-                                <Option key={item.id}>
+                            filterOption={(input, option) => option.props.label.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
+                            {this.props.upstreams.map(item =>
+                                <Option
+                                    key={item.id}
+                                    value={item.id}
+                                    label={platformsById[item.platform].name + item.nickname}>
                                     <span>[{platformsById[item.platform].name}] {item.nickname}</span>
                                 </Option>
-                            ))}
-
+                            )}
                         </Select>
-                        )}
+                    )}
                 </FormItem>
             </Form>
         );

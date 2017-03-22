@@ -108,19 +108,22 @@ class ModifyModal extends Component {
                 </FormItem>
 
                 <FormItem label='绑定平台账号' labelCol={{span: 5}} wrapperCol={{span: 17}}>
-                    {getFieldDecorator('bindUpstreams', {
-                        initialValue: bindUpstreams
-                    })(
+                    {getFieldDecorator('bindUpstreams', {initialValue: bindUpstreams})(
                         <Select
                             multiple
                             style={{width: '100%'}}
                             placeholder='请选择平台账号'
-                        >
+                            filterOption={(input, option) => option.props.label.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
                             {this.props.upstreams.map(item =>
-                                <Option key={item.id}>[{platformsById[item.platform].name}] {item.nickname}</Option>
+                                <Option
+                                    key={item.id}
+                                    value={item.id}
+                                    label={platformsById[item.platform].name + item.nickname}>
+                                    <span>[{platformsById[item.platform].name}] {item.nickname}</span>
+                                </Option>
                             )}
                         </Select>
-                        )}
+                    )}
                 </FormItem>
             </Form>
         );
