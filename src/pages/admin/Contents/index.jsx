@@ -177,7 +177,6 @@ export default class extends Component {
                                             </Popconfirm>
                                         }
                                         <a onClick={() => this.publish(content.id)}>发布</a>
-                                        {/* {this.props.level === 0 && this.renderDelBtn(content)} */}
                                     </div>
                                 }
                             />
