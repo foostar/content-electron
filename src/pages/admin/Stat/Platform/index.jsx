@@ -221,20 +221,23 @@ class StatByPlatform extends Component {
                     <Column
                         title='[平台] 账号昵称'
                         dataIndex='name'
-                        width={'33%'}
+                        width='33%'
                         // render={(name, recod) => <Link to={`/admin/stat/${recod.upstreamId}`}>{name}</Link>}
                     />
                     <Column
-                        width={'33%'}
+                        width='33%'
                         title='该时段 PV 总数'
                         key='totalView'
                         dataIndex='totalView'
-                    /><Column
-                        width={'34%'}
-                        title='该时段 收入 总数'
-                        key='totalIncome'
-                        dataIndex='totalIncome'
                     />
+                    {this.props.passport.level === 0 &&
+                        <Column
+                            width='34%'
+                            title='该时段 收入 总数'
+                            key='totalIncome'
+                            dataIndex='totalIncome'
+                        />
+                    }
                 </Table>
 
             </Spin>
