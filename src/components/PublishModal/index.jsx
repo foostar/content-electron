@@ -108,7 +108,6 @@ class PublishModal extends Component {
         try {
             title = `[${platformsById[data.upstream.platform].name}] ${data.upstream.nickname || ''}`;
         } catch (err) {}
-
         return (
             <span>
                 <span onClick={this.showModal}>

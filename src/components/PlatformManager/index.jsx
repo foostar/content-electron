@@ -139,6 +139,11 @@ export default class PlatformManager extends React.Component {
             closed: !this.state.closed
         });
     }
+    async updateUpstream (platform) {
+        const classPlatform = this.platforms.filter(x => x.platformId === platform)[0];
+        const publishState = await classPlatform.getPushlistState();
+        console.log(publishState);
+    }
     render () {
         const {upstreams, manager} = this.props;
         const {tree, tasks, selectedTask, browserVisible, closed} = this.state;
@@ -204,6 +209,7 @@ export default class PlatformManager extends React.Component {
                                     checked={checkAll}>
                                     {platformsById[platform].name}
                                 </Checkbox>
+                                {/* <a onClick={() => this.updateUpstream(platform)}>更新</a> */}
                             </div>
                             <CheckboxGroup
                                 className={style['checkbox-group-list']}

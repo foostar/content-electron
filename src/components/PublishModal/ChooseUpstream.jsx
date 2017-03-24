@@ -11,7 +11,6 @@ class ChooseUpstream extends Component {
         const list = visibleUpstreams === 'all'
             ? upstreams
             : upstreams.filter(u => visibleUpstreams.includes(u.id));
-
         return (
             <div>
                 {list.map((upstream, idx) => (

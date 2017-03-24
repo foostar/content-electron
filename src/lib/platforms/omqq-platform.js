@@ -67,6 +67,23 @@ export default class OMQQPlatform extends Platform {
             webview.addEventListener('dom-ready', didDomReady);
         });
     }
+    _getPushlistState (webview) {
+        const helper = new WebviewHelper(webview);
+        const {publishUrl} = this;
+        return new Promise(async (resolve, reject) => {
+            await helper.load(publishUrl);
+            const state = await helper.executeJavaScript(`
+                new Promise(resolve => {
+                    (function () {
+                        const el = document.querySelector("#publish-tips").querySelector(".text-light")
+                        if (!el) return setTimeout(arguments.callee, 200);
+                        resolve(el.innerText);
+                    })()
+                })
+            `);
+            resolve(state);
+        });
+    }
     _publish (webview, title, data) {
         const helper = new WebviewHelper(webview);
         return new Promise(async (resolve, reject) => {
@@ -120,7 +137,6 @@ export default class OMQQPlatform extends Platform {
             })();
         `);
     }
-
     async _statByConent (webview) {
         const helper = new WebviewHelper(webview);
 

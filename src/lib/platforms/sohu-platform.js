@@ -2,34 +2,33 @@ import Platform from 'lib/platform';
 import moment from 'moment';
 import WebviewHelper from 'utils/webview-helper';
 
-export default class NetEasePlatform extends Platform {
-    platformId = 'netease'
-    loginUrl = 'http://dy.163.com/wemedia/login.html'
-    publishUrl = 'http://dy.163.com/'
-    wemediaId = ''
+export default class SohuPlatform extends Platform {
+    platformId = 'sohu'
+    loginUrl = 'http://mp.sohu.com/'
+    listUrl = 'http://mp.sohu.com/v2/main/news/list.action'
+    publishUrl = 'http://mp.sohu.com/v2/main/news/add.action'
     async _isLogin (webview) {
         const helper = new WebviewHelper(webview);
-        const data = await helper.fetchJSON(`http://dy.163.com/wemedia/navinfo?t=${Date.now()}&wemediaId=`);
-        if (data.code === 1) {
-            this.publishUrl += `/wemedia/article/postpage/${data.data.wemediaId}`;
-            this.wemediaId = data.data.wemediaId;
-            return true;
-        }
-        return false;
-    }
-    async _getMes (webview) {
-        const helper = new WebviewHelper(webview);
-        const data = await helper.fetchJSON(`http://dy.163.com/wemedia/navinfo?t=${Date.now()}&wemediaId=`);
-        if (data.code === 1) {
-            this.publishUrl += `/wemedia/article/postpage/${data.data.wemediaId}`;
-            this.wemediaId = data.data.wemediaId;
-        }
+        return new Promise(async (resolve, reject) => {
+            const {listUrl} = this;
+            await helper.load(listUrl);
+            const didGetResponseDetails = async (event) => {
+                if (event.originalURL.startsWith(listUrl)) {
+                    webview.removeEventListener('did-get-response-details', didGetResponseDetails);
+                    webview.stop();
+                    if (event.newURL.startsWith(listUrl)) {
+                        return resolve(true);
+                    }
+                    return resolve(false);
+                }
+            };
+            webview.addEventListener('did-get-response-details', didGetResponseDetails);
+        });
     }
     _login (webview) {
         const helper = new WebviewHelper(webview);
         return new Promise(async (resolve, reject) => {
             const {loginUrl, account, password} = this;
-            await this._getMes(webview);
             await helper.load(loginUrl);
             const didDomReady = async () => {
                 const url = webview.getURL();
@@ -37,39 +36,32 @@ export default class NetEasePlatform extends Platform {
                 if (url.startsWith(loginUrl)) {
                     await helper.executeJavaScript(`
                         (function() {
-                            const el = document.querySelector('#loginEmail');
+                            const el = document.querySelector('#userid');
                             if (!el) return setTimeout(arguments.callee, 200);
                             el.value = '${account}';
-                            document.querySelector('#loginPassword').value = '${password}';
+                            document.querySelector('#pwd').value = '${password}';
                         })();
                     `);
                 }
 
                 // 登录成功, 获取 cookies
-                if (url.match(/http:\/\/dy\.163\.com\/wemedia\/notice\/list/)) {
+                if (url === 'http://mp.sohu.com/main/home/index.action') {
                     try {
                         const cookies = await helper.getCookies();
                         const session = cookies.map(item => {
-                            item.url = 'http://dy.163.com';
+                            item.url = 'http://mp.sohu.com';
                             return item;
                         });
-                        const {nickname, publishUrl} = await helper.executeJavaScript(`
+                        const nickname = await helper.executeJavaScript(`
                             new Promise(resolve => {
                                 (function() {
-                                    const el = document.querySelector('#loginUser');
+                                    const el = document.querySelector('.user-name');
                                     if (!el) return setTimeout(arguments.callee, 200);
-                                    const nickname = el.innerHTML;
-                                    const publishUrl = document.querySelector("#loginUser").getAttribute("href");
-                                    resolve({
-                                        nickname,
-                                        publishUrl
-                                    })
+                                    resolve(el.innerText)
                                 })();
                             })
                             
                         `);
-                        this.publishUrl += publishUrl;
-                        this.wemediaId = publishUrl.substr(publishUrl.lastIndexOf('/') + 1);
                         resolve({session, nickname});
                     } catch (err) {
                         reject(err);
@@ -87,7 +79,7 @@ export default class NetEasePlatform extends Platform {
             const state = await helper.executeJavaScript(`
                 new Promise(resolve => {
                     (function () {
-                        const el = document.querySelector(".m-article-count").querySelector(".z-red-font")
+                        const el = document.querySelector(".publish-tip").querySelector(".font-alert")
                         if (!el) return setTimeout(arguments.callee, 200);
                         resolve(el.innerText);
                     })()
@@ -97,42 +89,49 @@ export default class NetEasePlatform extends Platform {
         });
     }
     _publish (webview, title, data) {
-        const helper = new WebviewHelper(webview);
-        return new Promise(async (resolve, reject) => {
-            const {publishUrl} = this;
-            await this._getMes(webview);
-            await helper.load(publishUrl);
-            const didDomReady = async () => {
-                const url = webview.getURL();
-                if (url.startsWith(publishUrl)) {
-                    this.injectPublishScript(webview, title, data);
-                }
-                try {
-                    // 网易号
-                    const res = await helper.getRresponse('http://dy.163.com/wemedia/article/status/api/publish.do');
-                    const result = JSON.parse(res.body);
-                    const link = result.data.substr(result.data.lastIndexOf(',') + 1);
-                    resolve(link);
-                } catch (err) {
-                    reject(err);
-                } finally {
-                    webview.removeEventListener('dom-ready', didDomReady);
-                }
-            };
-            webview.addEventListener('dom-ready', didDomReady);
-        });
+        throw Error('TODO');
+        // const helper = new WebviewHelper(webview);
+        // return new Promise(async (resolve, reject) => {
+        //     const {publishUrl} = this;
+        //     await helper.load(publishUrl);
+        //     const didDomReady = async () => {
+        //         const url = webview.getURL();
+        //         if (url.startsWith(publishUrl)) {
+        //             this.injectPublishScript(webview, title, data);
+        //         }
+        //         try {
+        //             // 搜狐
+        //             const res = await helper.getRresponse('http://dy.163.com/wemedia/article/status/api/publish.do');
+        //             const result = JSON.parse(res.body);
+        //             const link = result.data.substr(result.data.lastIndexOf(',') + 1);
+        //             resolve(link);
+        //         } catch (err) {
+        //             reject(err);
+        //         } finally {
+        //             webview.removeEventListener('dom-ready', didDomReady);
+        //         }
+        //     };
+        //     webview.addEventListener('dom-ready', didDomReady);
+        // });
     }
     async injectPublishScript (webview, title, {content}) {
         const helper = new WebviewHelper(webview);
         await helper.executeJavaScript(`
             new Promise(resolve => {
                 (function() {
-                    const el = document.querySelector('#container');
+                    const el = document.querySelector('#edui1');
                     if (!el) return setTimeout(arguments.callee, 200);
-                    const title = document.querySelector('#title')
+                    const editor = UE.getEditor('editor-container')
+                    if (!editor) return setTimeout(arguments.callee, 200);
+                    const title = document.getElementsByName('title')[0];
                     title.value = \`${title}\`;
-                    el.innerHTML = \`${content}\`;
-                    title.focus();
+                    editor.ready(function() {
+                        setTimeout(() => {
+                            editor.setContent(\`${content}\`);
+                            title.focus();
+                            resolve();
+                        }, 0)
+                    });
                 })();
             })
         `);
@@ -165,7 +164,6 @@ export default class NetEasePlatform extends Platform {
             }
             fetchList();
         `;
-        await this._getMes(webview);
         const list = await helper.executeJavaScript(fetchListScript);
         return list.map(item => {
             return {

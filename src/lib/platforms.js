@@ -2,6 +2,7 @@ import OMQQPlatform from 'lib/platforms/omqq-platform';
 import BaijiaPlatform from 'lib/platforms/baijia-platform';
 import UCPlatform from 'lib/platforms/uc-platform';
 import NetEasePlatform from 'lib/platforms/netease-platform';
+import SohuPlanform from 'lib/platforms/sohu-platform';
 
 import qieLogo from './logos/platform-omqq.png';
 import baijiaLogo from './logos/platform-baijiahao.png';
@@ -37,6 +38,11 @@ const platforms = [{
     logo: neteaseLogo,
     Class: NetEasePlatform
 }, {
+    id: 'sohu',
+    name: '搜狐公众平台',
+    logo: sohuLogo,
+    Class: SohuPlanform
+}, {
     id: 'toutiao',
     name: '头条号',
     logo: toutiaoLogo,
@@ -55,11 +61,6 @@ const platforms = [{
     id: 'qq',
     name: 'QQ公众平台',
     logo: qqLogo,
-    disabled: true
-}, {
-    id: 'sohu',
-    name: '搜狐公众平台',
-    logo: sohuLogo,
     disabled: true
 }, {
     id: 'sina',

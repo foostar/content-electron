@@ -131,6 +131,7 @@ class SigninPlatform extends Component {
             case platformsById.baijia.id: return <div className={style['webview-wrap']} ref='wrap' />;
             case platformsById.uc.id: return <div className={style['webview-wrap']} ref='wrap' />;
             case platformsById.netease.id: return <div className={style['webview-wrap']} ref='wrap' />;
+            case platformsById.sohu.id: return <div className={style['webview-wrap']} ref='wrap' />;
             default: return (
                 <Alert
                     type='warning'

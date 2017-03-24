@@ -83,6 +83,9 @@ export default class UCPlatform extends Platform {
             webview.addEventListener('dom-ready', didDomReady);
         });
     }
+    _getPushlistState (webview) {
+        return -1;
+    }
     _publish (webview, title, data) {
         const helper = new WebviewHelper(webview);
         return new Promise(async (resolve, reject) => {

@@ -134,6 +134,10 @@ export default class Platform extends Events {
         await this.autoLogin();
         return this.addTask('stat-by-content', helper => this._statByConent(helper.webview));
     }
+    async getPushlistState () {
+        await this.autoLogin();
+        return this.addTask('get-publish-state', helper => this._getPushlistState(helper.webview));
+    }
     statByUpstream (startTime, endTime) {
         const key = JSON.stringify({
             startTime,

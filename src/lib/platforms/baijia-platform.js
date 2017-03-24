@@ -71,6 +71,23 @@ export default class BaijiaPlatform extends Platform {
             webview.addEventListener('dom-ready', didDomReady);
         });
     }
+    _getPushlistState (webview) {
+        const helper = new WebviewHelper(webview);
+        const {publishUrl} = this;
+        return new Promise(async (resolve, reject) => {
+            await helper.load(publishUrl);
+            const state = await helper.executeJavaScript(`
+                new Promise(resolve => {
+                    (function () {
+                        const el = document.querySelector(".mod-limit").querySelector(".num")
+                        if (!el) return setTimeout(arguments.callee, 200);
+                        resolve(el.innerText);
+                    })()
+                })
+            `);
+            resolve(state);
+        });
+    }
     _publish (webview, title, data) {
         const helper = new WebviewHelper(webview);
         function bodyCheck (res) {
