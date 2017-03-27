@@ -45,13 +45,13 @@ class SimpEditor extends Component {
         this.editor = new Simditor({
             textarea: $(textarea),
             upload: {
-                url: 'http://upload.qiniu.com',
+                url: config.QINIU_UPLOAD_PREFIX,
                 getParams: async (cb) => {
                     const {data} = await this.getUptoken();
                     cb(data);
                 },
                 formatPath ({key}) {
-                    return 'http://distribution-file.apps.xiaoyun.com/' + key;
+                    return `${config.FILESERVER_PREFIX}/${key}`;
                 },
                 fileKey: 'file',
                 connectionCount: 3,
@@ -92,11 +92,11 @@ class SimpEditor extends Component {
                     body.append('file', file);
                     body.append('key', data.key);
                     body.append('token', data.token);
-                    const {key} = await fetch('http://upload.qiniu.com', {
+                    const {key} = await fetch(config.QINIU_UPLOAD_PREFIX, {
                         method: 'POST',
                         body
                     }).then(res => res.json());
-                    img.src = 'http://distribution-file.apps.xiaoyun.com/' + key;
+                    img.src = `${config.FILESERVER_PREFIX}/${key}`;
                 } else {
                     const res = await fetch(`${config.API_PREFIX}/qiniu/replace-src`, {
                         headers: {
@@ -107,7 +107,7 @@ class SimpEditor extends Component {
                         body: JSON.stringify({path: img.src})
                     }).then(res => res.json());
                     if (!res.data.key) throw Error('no key in response body');
-                    img.src = 'http://distribution-file.apps.xiaoyun.com/' + res.data.key;
+                    img.src = `${config.FILESERVER_PREFIX}/${res.data.key}`;
                 }
             } catch (err) {
                 img.src = errorImage;

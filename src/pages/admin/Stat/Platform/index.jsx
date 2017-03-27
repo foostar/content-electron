@@ -4,11 +4,11 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 // import {uniqBy} from 'lodash';
 // import {Link} from 'react-router';
-import mapLimit from 'async/mapLimit';
+import eachLimit from 'async/eachLimit';
 import app from 'lib/app';
 
 import moment from 'moment';
-import LineGraph from 'components/LineGraph';
+// import LineGraph from 'components/LineGraph';
 import * as upstreamsActions from 'reducers/upstreams';
 import * as reproductionActions from 'reducers/reproduction';
 
@@ -35,6 +35,13 @@ const mapDispatchToProps = dispatch => {
     };
 };
 
+const timeout = (ms, promise, err = new Error('timeout')) => new Promise((resolve, reject) => {
+    setTimeout(() => {
+        reject(err);
+    }, ms);
+    promise.then(resolve, reject);
+});
+
 const DAY = 1000 * 60 * 60 * 24;
 
 @connect(mapStateToProps, mapDispatchToProps)
@@ -43,7 +50,7 @@ class StatByPlatform extends Component {
         loading: false,
         selectUps: [],
         statData: [],
-        upsData: [],
+        // upsData: [],
         startTime: Math.floor((Date.now() - 30 * DAY) / DAY) * DAY,
         endTime: Math.floor((Date.now() - DAY) / DAY) * DAY
     }
@@ -70,50 +77,61 @@ class StatByPlatform extends Component {
     }
 
     fetchUpstreamsStat = async () => {
-        this.setState({
-            loading: true,
-            statData: [],
-            upsData: []
-        });
-
         const upps = this.props.upstreams.filter(x => this.state.selectUps.includes(x.id));
 
-        mapLimit(upps, 5, (item, done) => {
-            this.fetchSingleUpstreamStat(item).then((result) => done(null, result)).catch(done);
-        }, (err, dataArr) => {
-            if (err) {
-                console.log(err);
-                return this.setState({loading: false});
-            }
-            const statData = [];
-            const upsData = dataArr.map(stat => {
-                statData.push(...stat.data);
-                console.log(stat);
+        this.setState({
+            // loading: true,
+            // statData: [],
+            statData: upps.map(x => {
                 return {
-                    name: stat.name,
-                    totalIncome: stat.data.reduce((income, b) => income + Number(b.income || 0), 0),
-                    totalView: stat.data.reduce((view, b) => view + Number(b.view || 0), 0)
+                    id: x.id,
+                    name: x.nickname,
+                    totalIncome: '-',
+                    totalView: '-',
+                    status: 'initial',
+                    data: []
                 };
-            });
-            this.setState({
-                statData,
-                upsData,
-                loading: false
-            });
+            })
+        }, () => {
+            eachLimit(upps, 5, (item, done) => {
+                this.fetchSingleUpstreamStat(item)
+                    .then(() => done())
+                    .catch(() => done());
+            }, console.error);
         });
     }
-
-    fetchSingleUpstreamStat = async (ups) => {
-        const {id: upstreamId, platform, nickname} = ups;
-        const manager = app.getManager();
-        const wP = manager.getPlatform(upstreamId);
-        const {startTime, endTime} = this.state;
-        const data = await wP.statByUpstream(startTime, endTime);
-        const name = `[${platformsById[platform].name}] ${nickname}`;
-        data.forEach(item => {
-            item['平台账号'] = name;
+    fetchSingleUpstreamStat = ups => {
+        const oldStat = this.state.statData.find((stat) => {
+            return stat.id === ups.id;
         });
-        return {upstreamId, name, data};
+        oldStat.status = 'fetching';
+        const fetch = async () => {
+            const {id: upstreamId, platform, nickname} = ups;
+            const manager = app.getManager();
+            const wP = manager.getPlatform(upstreamId);
+            const {startTime, endTime} = this.state;
+            const data = await wP.statByUpstream(startTime, endTime);
+            const name = `[${platformsById[platform].name}] ${nickname}`;
+            data.forEach(item => {
+                item['平台账号'] = name;
+            });
+            return {upstreamId, name, data};
+        };
+        return timeout(20000, fetch())
+            .then((result) => {
+                oldStat.totalIncome = result.data.reduce((income, b) => income + Number(b.income || 0), 0);
+                oldStat.totalView = result.data.reduce((view, b) => view + Number(b.view || 0), 0);
+                oldStat.data = result.data;
+                oldStat.status = 'success';
+                this.setState(this.state);
+            })
+            .catch((err) => {
+                oldStat.totalIncome = '-';
+                oldStat.totalView = '-';
+                oldStat.status = 'error';
+                this.setState(this.state);
+                return Promise.reject(err);
+            });
     }
 
     render () {
@@ -209,35 +227,54 @@ class StatByPlatform extends Component {
                     */}
                 </div>
                 <br />
-                <LineGraph width={900} height={300} data={this.state.statData} />
+                {/* <LineGraph width={900} height={300} data={[].concat.apply([], this.state.statData.map(x => x.data))} /> */}
                 <br />
                 <Table
                     bordered
                     style={{margin: '0 50px', userSelect: 'initial'}}
                     rowKey='name'
                     pagination={false}
-                    dataSource={this.state.upsData}
+                    rowClassName={(item) => {
+                        return style[item.status];
+                    }}
+                    dataSource={this.state.statData}
                 >
                     <Column
                         title='[平台] 账号昵称'
                         dataIndex='name'
-                        width='33%'
                         // render={(name, recod) => <Link to={`/admin/stat/${recod.upstreamId}`}>{name}</Link>}
                     />
                     <Column
-                        width='33%'
+                        width='25%'
                         title='该时段 PV 总数'
                         key='totalView'
                         dataIndex='totalView'
                     />
                     {this.props.passport.level === 0 &&
                         <Column
-                            width='34%'
+                            width='25%'
                             title='该时段 收入 总数'
                             key='totalIncome'
                             dataIndex='totalIncome'
                         />
                     }
+                    <Column
+                        width='25%'
+                        title='操作'
+                        key='action'
+                        render={(_, item) => {
+                            return (
+                                <Button
+                                    disabled={item.status !== 'error'}
+                                    icon='reload'
+                                    shape='circle'
+                                    onClick={() => {
+                                        this.fetchSingleUpstreamStat(item);
+                                    }}
+                                    loading={item.status === 'fetching'} />
+                            );
+                        }}
+                    />
                 </Table>
 
             </Spin>

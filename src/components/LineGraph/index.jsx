@@ -4,6 +4,13 @@ import createG2 from 'g2-react';
 
 class LineGraph extends Component {
     shouldComponentUpdate (nextProps, nextState) {
+        clearTimeout(this.timer);
+        this.timer = setTimeout(() => {
+            delete this.timer;
+        }, 5000);
+        if (this.timer) {
+            return false;
+        }
         return this.props.data !== nextProps.data;
     }
 
