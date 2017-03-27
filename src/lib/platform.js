@@ -2,7 +2,7 @@ import Events from 'events';
 import _ from 'lodash';
 import WebviewHelper from 'utils/webview-helper';
 import store from 'store';
-import {updateUpstream} from 'reducers/upstreams';
+import {fetchUpstream} from 'reducers/upstreams';
 import DataCache, {DiskStore} from './datacache';
 
 const container = document.createElement('div');
@@ -11,7 +11,6 @@ container.style.overflow = 'hidden';
 document.body.appendChild(container);
 
 const dataCaches = {};
-const helpers = [];
 
 export default class Platform extends Events {
     constructor ({account, password, session: cookies, id}, options = {}) {
@@ -56,23 +55,19 @@ export default class Platform extends Events {
         return helper;
     }
     async getWebviewHelper () {
-        const index = _.findIndex(helpers, {id: this.id});
-        const helper = index !== -1 ? _.remove(helpers, (x, i) => i === index)[0] : await this.createWebviewHelper();
-        await helper.clearCache();
+        const helper = await this.createWebviewHelper();
+        const upstream = await store.dispatch(fetchUpstream({
+            params: this.id
+        }));
+        const {session} = upstream.payload.result.data;
+        this.cookies = session;
         await helper.setCookies(this.cookies);
         return helper;
     }
     async releaseWebviewHelper (helper) {
-        await helper.load('about:blank');
-        await helper.appendTo(container);
-        await helper.clearCache();
-        helpers.push(helper);
-    }
-    updateCookies (cookies) {
-        return store.dispatch(updateUpstream({
-            params: {id: this.id},
-            body: {session: cookies}
-        }));
+        helper.webview.parentElement.removeChild(helper.webview);
+        helper.webview = null;
+        helper = null;
     }
     async addTask (name, fn) {
         const {tasks} = this;
@@ -112,26 +107,14 @@ export default class Platform extends Events {
             if (container) {
                 await helper.appendTo(container);
             }
+            await helper.clearCache();
             return this._login(helper.webview);
         });
     }
-    async isLogin () {
-        return await this.addTask('check-login', helper => this._isLogin(helper.webview));
-    }
-    async autoLogin () {
-        const isLogin = await this.isLogin();
-        if (!isLogin) {
-            const {session} = await this.login();
-            this.cookies = JSON.parse(JSON.stringify(session));
-            this.updateCookies(session);
-        }
-    }
     async publish (title, data) {
-        await this.autoLogin();
         return this.addTask('publish', helper => this._publish(helper.webview, title, data));
     }
     async statByContent () {
-        await this.autoLogin();
         return this.addTask('stat-by-content', helper => this._statByConent(helper.webview));
     }
     statByUpstream (startTime, endTime) {
@@ -150,7 +133,6 @@ export default class Platform extends Events {
         });
     }
     async __statByUpstream (startTime, endTime) {
-        await this.autoLogin();
         return this.addTask('stat-by-upstream', helper => this._statByUpstream(helper.webview, startTime, endTime));
     }
     _login () {

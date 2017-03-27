@@ -93,11 +93,11 @@ class StatByPlatform extends Component {
                 };
             })
         }, () => {
-            eachLimit(upps, 5, (item, done) => {
+            eachLimit(upps, 1, (item, done) => {
                 this.fetchSingleUpstreamStat(item)
                     .then(() => done())
                     .catch(() => done());
-            }, console.error);
+            });
         });
     }
     fetchSingleUpstreamStat = ups => {
@@ -269,6 +269,7 @@ class StatByPlatform extends Component {
                                     icon='reload'
                                     shape='circle'
                                     onClick={() => {
+                                        console.log(item);
                                         this.fetchSingleUpstreamStat(item);
                                     }}
                                     loading={item.status === 'fetching'} />
