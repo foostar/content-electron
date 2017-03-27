@@ -210,6 +210,7 @@ class TagSelector extends Component {
         const {id} = this.props.content;
         const params = {id, tag};
         this.props.removeTag({params});
+        this.props.fetchData();
         message.success('删除成功');
     }
     toggleVisible = () => {
