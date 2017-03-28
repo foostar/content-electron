@@ -10,6 +10,26 @@ const INITAL = {
     data: []
 };
 
+export const fetchUpstream = createCallApi(HUSSIF, {
+    type: 'FETCH_UPSTREAM',
+    endpoint: '/upstreams',
+    method: 'GET',
+    request: (state) => update(state, {
+        fetching: {$set: true}
+    }),
+    success: (state, payload) => update(state, {
+        fetching: {$set: false},
+        data: {$apply: arr => {
+            const idx = arr.findIndex(x => x.id === payload.result.data.id);
+            arr[idx] = payload.result.data;
+            return arr;
+        }}
+    }),
+    failure: (state) => update(state, {
+        fetching: {$set: true}
+    })
+});
+
 export const fetchUpstreams = createCallApi(HUSSIF, {
     type: 'FETCH_UPSTREAMS',
     endpoint: '/upstreams',
