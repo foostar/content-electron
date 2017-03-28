@@ -6,7 +6,7 @@ export default class UCPlatform extends Platform {
     platformId = 'uc'
     loginUrl = 'http://mp.uc.cn/index.html'
     publishUrl = 'http://mp.uc.cn/dashboard/article/write'
-    submitUrl = 'http://mp.uc.cn/dashboard/contents/submit'
+    // submitUrl = 'http://mp.uc.cn/dashboard/contents/submit'
     async _isLogin (webview) {
         const helper = new WebviewHelper(webview);
         return new Promise(async (resolve, reject) => {
@@ -84,7 +84,22 @@ export default class UCPlatform extends Platform {
         });
     }
     _getPushlistState (webview) {
-        return -1;
+        const helper = new WebviewHelper(webview);
+        const {publishUrl} = this;
+        return new Promise(async (resolve, reject) => {
+            await helper.load(publishUrl);
+            const state = await helper.executeJavaScript(`
+                new Promise(resolve => {
+                    (function () {
+                        const el = document.querySelector(".article-write_box-opt_msgNum")
+                        if (!el) return setTimeout(arguments.callee, 200);
+                        const text = el.querySelector('span')
+                        resolve(text.innerText);
+                    })()
+                })
+            `);
+            resolve(state);
+        });
     }
     _publish (webview, title, data) {
         const helper = new WebviewHelper(webview);
@@ -113,32 +128,32 @@ export default class UCPlatform extends Platform {
             webview.addEventListener('dom-ready', didDomReady);
         });
     }
-    _submit (webview) {
-        const helper = new WebviewHelper(webview);
-        return new Promise(async (resolve, reject) => {
-            const {publishUrl} = this;
-            helper.load(publishUrl);
-            const didDomReady = async () => {
-                const url = webview.getURL();
-                if (url.startsWith(publishUrl)) {
-                    this.injectSubmitScript(webview);
-                }
-                try {
-                    // uc云观
-                    const res = await helper.getRresponse('http://mp.uc.cn/dashboard/submit-article');
-                    const result = JSON.parse(res.body);
-                    if (result.data) {
-                        resolve();
-                    }
-                } catch (err) {
-                    reject(err);
-                } finally {
-                    webview.removeEventListener('dom-ready', didDomReady);
-                }
-            };
-            webview.addEventListener('dom-ready', didDomReady);
-        });
-    }
+    // _submit (webview) {
+    //     const helper = new WebviewHelper(webview);
+    //     return new Promise(async (resolve, reject) => {
+    //         const {publishUrl} = this;
+    //         helper.load(publishUrl);
+    //         const didDomReady = async () => {
+    //             const url = webview.getURL();
+    //             if (url.startsWith(publishUrl)) {
+    //                 this.injectSubmitScript(webview);
+    //             }
+    //             try {
+    //                 // uc云观
+    //                 const res = await helper.getRresponse('http://mp.uc.cn/dashboard/submit-article');
+    //                 const result = JSON.parse(res.body);
+    //                 if (result.data) {
+    //                     resolve();
+    //                 }
+    //             } catch (err) {
+    //                 reject(err);
+    //             } finally {
+    //                 webview.removeEventListener('dom-ready', didDomReady);
+    //             }
+    //         };
+    //         webview.addEventListener('dom-ready', didDomReady);
+    //     });
+    // }
     async injectSubmitScript (webview) {
         const helper = new WebviewHelper(webview);
         await helper.executeJavaScript(`
