@@ -1,5 +1,5 @@
 import Platform from 'lib/platform';
-import moment from 'moment';
+// import moment from 'moment';
 import WebviewHelper from 'utils/webview-helper';
 
 export default class SohuPlatform extends Platform {
@@ -89,30 +89,34 @@ export default class SohuPlatform extends Platform {
         });
     }
     _publish (webview, title, data) {
-        throw Error('TODO');
-        // const helper = new WebviewHelper(webview);
-        // return new Promise(async (resolve, reject) => {
-        //     const {publishUrl} = this;
-        //     await helper.load(publishUrl);
-        //     const didDomReady = async () => {
-        //         const url = webview.getURL();
-        //         if (url.startsWith(publishUrl)) {
-        //             this.injectPublishScript(webview, title, data);
-        //         }
-        //         try {
-        //             // 搜狐
-        //             const res = await helper.getRresponse('http://dy.163.com/wemedia/article/status/api/publish.do');
-        //             const result = JSON.parse(res.body);
-        //             const link = result.data.substr(result.data.lastIndexOf(',') + 1);
-        //             resolve(link);
-        //         } catch (err) {
-        //             reject(err);
-        //         } finally {
-        //             webview.removeEventListener('dom-ready', didDomReady);
-        //         }
-        //     };
-        //     webview.addEventListener('dom-ready', didDomReady);
-        // });
+        // throw Error('TODO');
+        const helper = new WebviewHelper(webview);
+        return new Promise(async (resolve, reject) => {
+            const {publishUrl} = this;
+            await helper.load(publishUrl);
+            const didDomReady = async () => {
+                const url = webview.getURL();
+                if (url.startsWith(publishUrl)) {
+                    this.injectPublishScript(webview, title, data);
+                }
+
+                if (url === 'http://mp.sohu.com/v2/main/news/list.action') {
+                    const link = await helper.executeJavaScript(`
+                        new Promise(resolve => {
+                            (function() {
+                                const el = document.querySelector('.article-content');
+                                if (!el) return setTimeout(arguments.callee, 200);
+                                const href = el.querySelector('.left-title a').getAttribute('href');
+                                resolve(href)
+                            })();
+                        })
+                    `);
+                    resolve(link);
+                    webview.removeEventListener('dom-ready', didDomReady);
+                }
+            };
+            webview.addEventListener('dom-ready', didDomReady);
+        });
     }
     async injectPublishScript (webview, title, {content}) {
         const helper = new WebviewHelper(webview);
@@ -141,36 +145,37 @@ export default class SohuPlatform extends Platform {
         throw Error('TODO');
     }
     async _statByUpstream (webview, startTime, endTime) {
-        if (!startTime || !endTime) {
-            throw Error('no startTime or endTime');
-        }
-        startTime = moment(startTime).format('YYYY-MM-DD');
-        endTime = moment(endTime).format('YYYY-MM-DD');
+        throw Error('TODO');
+        // if (!startTime || !endTime) {
+        //     throw Error('no startTime or endTime');
+        // }
+        // startTime = moment(startTime).format('YYYY-MM-DD');
+        // endTime = moment(endTime).format('YYYY-MM-DD');
 
-        const helper = new WebviewHelper(webview);
+        // const helper = new WebviewHelper(webview);
 
-        const fetchListScript = `
-            function fetchList (page = 1, result = []) {
-                return fetch(\`http://dy.163.com/wemedia/docPvs.json?orderBy=pv&order=desc&start=${startTime}&end=${endTime}&wemediaId=${this.wemediaId}&pageSize=10&pageNo=1\`)
-                    .then(res => res.json())
-                    .then(json => {
-                        const { data } = json;
-                        const { pageNo, totalPage } = data;
-                        if (pageNo < totalPage) {
-                            return fetchList(page + 1, result.concat(data.list));
-                        }
-                        return result.concat(data.list);
-                    });
-            }
-            fetchList();
-        `;
-        const list = await helper.executeJavaScript(fetchListScript);
-        return list.map(item => {
-            return {
-                view: Number(item.pv),
-                day: moment(item.ptime).format('YYYY-MM-DD')
-            };
-        });
+        // const fetchListScript = `
+        //     function fetchList (page = 1, result = []) {
+        //         return fetch(\`http://dy.163.com/wemedia/docPvs.json?orderBy=pv&order=desc&start=${startTime}&end=${endTime}&wemediaId=${this.wemediaId}&pageSize=10&pageNo=1\`)
+        //             .then(res => res.json())
+        //             .then(json => {
+        //                 const { data } = json;
+        //                 const { pageNo, totalPage } = data;
+        //                 if (pageNo < totalPage) {
+        //                     return fetchList(page + 1, result.concat(data.list));
+        //                 }
+        //                 return result.concat(data.list);
+        //             });
+        //     }
+        //     fetchList();
+        // `;
+        // const list = await helper.executeJavaScript(fetchListScript);
+        // return list.map(item => {
+        //     return {
+        //         view: Number(item.pv),
+        //         day: moment(item.ptime).format('YYYY-MM-DD')
+        //     };
+        // });
     }
 }
 
