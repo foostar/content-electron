@@ -90,18 +90,20 @@ export default class BaijiaPlatform extends Platform {
     }
     _publish (webview, title, data) {
         const helper = new WebviewHelper(webview);
-        function bodyCheck (res) {
-            try {
-                return JSON.parse(res.body).status === 'analyze';
-            } catch (err) {
-                console.info('isPublishReq', err);
-            }
-        }
-        function urlCheck (response) {
-            const {url} = response;
-            return url.match(/builderinner\/api\/content\/article\/(\d+)\/update/);
-        }
+        let link = '';
+        // function bodyCheck (res) {
+        //     try {
+        //         return JSON.parse(res.body).status === 'analyze';
+        //     } catch (err) {
+        //         console.info('isPublishReq', err);
+        //     }
+        // }
+        // function urlCheck (response) {
+        //     const {url} = response;
+        //     return url.match(/builderinner\/api\/content\/article\/(\d+)\/update/);
+        // }
         return new Promise(async (resolve, reject) => {
+            console.log(222);
             const {publishUrl} = this;
             await helper.load(publishUrl);
             const didDomReady = async () => {
@@ -109,15 +111,17 @@ export default class BaijiaPlatform extends Platform {
                 if (url.startsWith(publishUrl)) {
                     this.injectPublishScript(webview, title, data);
                     try {
-                        const res = await helper.getRresponse(urlCheck, bodyCheck);
+                        const res = await helper.getRresponse('http://baijiahao.baidu.com/builderinner/api/content/article/create');
                         const result = JSON.parse(res.body);
-                        const link = result.url.replace(/https?:\/\//, '');
-                        resolve(link);
+                        link = result.url.replace(/http?:\/\//, '');
                     } catch (err) {
                         reject(err);
-                    } finally {
-                        webview.removeEventListener('dom-ready', didDomReady);
                     }
+                }
+                if (url.startsWith('http://baijiahao.baidu.com/builder/article/list')) {
+                    console.log(111);
+                    resolve(link);
+                    webview.removeEventListener('dom-ready', didDomReady);
                 }
             };
             webview.addEventListener('dom-ready', didDomReady);

@@ -186,7 +186,7 @@ function createWindow () {
     //     protocol: 'file:',
     //     slashes: true
     // }));
-    mainWindow.loadURL('https://fengchao-client.apps.xiaoyun.com/');
+    mainWindow.loadURL('http://120.27.24.55/client/index.html');
 
     mainWindow.on('closed', function () {
         mainWindow = null;

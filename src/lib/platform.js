@@ -60,7 +60,7 @@ export default class Platform extends Events {
             params: this.id
         }));
         const {session} = upstream.payload.result.data;
-        this.cookies = session;
+        this.cookies = session || [];
         await helper.setCookies(this.cookies);
         return helper;
     }
