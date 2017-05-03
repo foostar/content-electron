@@ -181,6 +181,7 @@ export default class extends Component {
                                 }
                             />
                         </Table>
+                        { /* <PublishModal /> */ }
                     </Layout.Content>
                 </Layout>
             </Page>

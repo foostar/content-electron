@@ -8,7 +8,7 @@
     "lint": "eslint --ext js,jsx src",
     "dev": "concurrently --kill-others 'npm run dev:electron' 'npm run dev:webpack'",
     "dev:electron": "electron main.dev.js",
-    "build:client": "NODE_ENV=production API_PREFIX=https://content-distribution.apps.xiaoyun.com/api webpack",
+    "build:client": "NODE_ENV=production API_PREFIX=http://120.27.24.55/api webpack",
     "build:pack": "build --dir",
     "build:dist": "build",
     "dev:webpack": "webpack-dev-server"
