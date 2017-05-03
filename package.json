@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
-  "author": "xiaoyun",
+  "author": "huston",
   "scripts": {
     "lint": "eslint --ext js,jsx src",
     "dev": "concurrently --kill-others 'npm run dev:electron' 'npm run dev:webpack'",
@@ -14,7 +14,7 @@
     "dev:webpack": "webpack-dev-server"
   },
   "build": {
-    "appId": "fengchao.xiaoyun.com",
+    "appId": "120.27.24.55:8080",
     "files": [
       "!node_modules${/*}",
       "!src${/*}"
